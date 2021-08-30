@@ -15,6 +15,6 @@ extern void command_move(char* src, char* dst);
 
 extern void command_rename(char* src, char* name);
 
-extern void command_edit(char* src, char* content, char** flags);
+extern void command_edit(char* src, char* content, char* flag);
 
 #endif

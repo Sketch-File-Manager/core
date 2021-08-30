@@ -5,7 +5,7 @@
 #### Session creation
 Command argument |  Description
 ---------|--------------
-session start `id` | Begin new session with `id`. `id` can be skipped (File creation).
+session start | Begin new session (File creation).
 session end `id` | Delete a session with a specific `id` (File delete).
 session use `id` | Set a session with `id` as current (current-session file set `id`).
 session run `id` | Execute a session with `id` (Read session file and execute).
