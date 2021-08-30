@@ -1,0 +1,3 @@
+/mnt/sda1/repos/JexSrs/sketch-core/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/mnt/sda1/repos/JexSrs/sketch-core/cmake-build-debug/CMakeFiles/edit_cache.dir
+/mnt/sda1/repos/JexSrs/sketch-core/cmake-build-debug/CMakeFiles/sketch_core.dir

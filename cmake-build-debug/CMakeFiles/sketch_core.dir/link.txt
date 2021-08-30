@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/sketch_core.dir/main.c.o CMakeFiles/sketch_core.dir/tools/argument_parser.c.o CMakeFiles/sketch_core.dir/sessions/session.c.o CMakeFiles/sketch_core.dir/sessions/session_edit.c.o -o sketch_core 
