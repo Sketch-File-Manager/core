@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <argument_parser.h>
 
 

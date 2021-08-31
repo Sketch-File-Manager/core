@@ -66,12 +66,11 @@ static int parse_session(char **argv) {
 }
 
 static int parse_command(char **argv) {
-    if (argv[1] == NULL) return -1;
-
     return find_command(argv[1]);
 }
 
 int parse(int argc, char **argv) {
+    if (argv[1] == NULL) return -1;
 
     int command;
     int offset;
