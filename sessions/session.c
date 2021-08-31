@@ -18,7 +18,7 @@ static char *rand_string(char *str, size_t size){
     return str;
 }
 
-char* check_current() {
+static char* check_current() {
     char* current;
     int config_result = get_current(&current);
     if(config_result != -1)
@@ -28,39 +28,48 @@ char* check_current() {
 }
 
 void session_start() {
+    printf("START");
     int name_len = 10;
     char* name = (char*) calloc(name_len + 9 + 1, sizeof(char));
     strcat(name, rand_string("", 10));
     strcat(name, ".session");
 
     create_file(name);
+    free(name);
 }
 
 void session_end(char* id) {
+    printf("END");
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
 
     delete_file(name);
+    free(name);
 }
 
 void session_use(char* id) {
+    printf("USE");
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
 
     set_current(name);
+    free(name);
 }
 
 void session_run(char* id) {
+    printf("RUN");
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
     // TODO - Execute with system call.
     //        Add to the start as executed.
+    free(name);
 }
 
 void session_current() {
+    printf("CURRENT");
     char* current = check_current();
     if(current == NULL)
         printf("No current sessions.");
@@ -69,6 +78,7 @@ void session_current() {
 }
 
 void session_show(char* id) {
+    printf("SHOW");
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
@@ -83,4 +93,6 @@ void session_show(char* id) {
     for(size_t i = 0; i < sizeof(lines)/sizeof(lines[0]); i++)
         printf("%s", lines[i]);
     putchar('\n');
+
+    free(name);
 }

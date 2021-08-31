@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <string.h>
 
-char* check_current() {
+static char* check_current() {
     char* current;
     int config_result = get_current(&current);
     if(config_result != -1)
@@ -15,7 +15,7 @@ char* check_current() {
 }
 
 void command_exit(){
-    int result = set_current("-1");
+    int result = set_current("");
     if(result != -1)
         printf("Cannot change current session to null. Error code: %d", result);
 }
@@ -42,6 +42,8 @@ void command_mkdir(char* dst, char* folder){
     int result = append_to_end(current, cmd);
     if(result != -1)
         printf("Cannot add cmd to current session. Error code: %d", result);
+
+    free(cmd);
 }
 
 void command_mkfile(char* dst, char* file){
@@ -57,6 +59,8 @@ void command_mkfile(char* dst, char* file){
     int result = append_to_end(current, cmd);
     if(result != -1)
         printf("Cannot add cmd to current session. Error code: %d", result);
+
+    free(cmd);
 }
 
 void command_copy(char* src, char* dst){
@@ -72,6 +76,8 @@ void command_copy(char* src, char* dst){
     int result = append_to_end(current, cmd);
     if(result != -1)
         printf("Cannot add cmd to current session. Error code: %d", result);
+
+    free(cmd);
 }
 
 void command_move(char* src, char* dst){
@@ -87,6 +93,8 @@ void command_move(char* src, char* dst){
     int result = append_to_end(current, cmd);
     if(result != -1)
         printf("Cannot add cmd to current session. Error code: %d", result);
+
+    free(cmd);
 }
 
 void command_rename(char* src, char* name){
@@ -102,6 +110,8 @@ void command_rename(char* src, char* name){
     int result = append_to_end(current, cmd);
     if(result != -1)
         printf("Cannot add cmd to current session. Error code: %d", result);
+
+    free(cmd);
 }
 
 void command_edit(char* src, char* content, char* flag){
@@ -119,4 +129,6 @@ void command_edit(char* src, char* content, char* flag){
     int result = append_to_end(current, cmd);
     if(result != -1)
         printf("Cannot add cmd to current session. Error code: %d", result);
+
+    free(cmd);
 }

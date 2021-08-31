@@ -1,4 +1,0 @@
-/home/george/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/212.5080.54/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - Unix Makefiles" /mnt/sda1/repos/JexSrs/sketch-core
--- Configuring done
--- Generating done
--- Build files have been written to: /mnt/sda1/repos/JexSrs/sketch-core/cmake-build-debug

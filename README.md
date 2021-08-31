@@ -17,8 +17,8 @@ Command argument |  Description
 ---------|--------------
 exit | Remove current session as current.
 undo | Undo the last command.
-mkdir `dst` `folder` | Create a new `folder` to `dst`
-mkfile `dst` `file` | Create a new `file` at `dst` directory.
+mkdir `dst` `folder` | Create a new `folder` to `dst`, if name contains space it should be inside quotes.
+mkfile `dst` `file` | Create a new `file` at `dst` directory, if name contains space it should be inside quotes.
 copy `src` `dst` | Move a `src` (file or directory) to `dst` folder.
 move `src` `dst` | Move a `src` (file or directory) to `dst` folder.
 rename `src` `new_name` | Rename `src` (file or directory) to `new_name`
