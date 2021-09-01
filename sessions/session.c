@@ -5,7 +5,7 @@
 #include <config_parser.h>
 #include <stdio.h>
 #include <executor.h>
-#include <error_codes.h>
+#include <codes.h>
 
 static char *rand_string(char *str, size_t size){
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -46,7 +46,7 @@ void session_start() {
 
 void session_end(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, rand_string("", 10));
+    strcat(id, id);
     strcat(name, ".session");
 
     int result = delete_file(name);
@@ -60,26 +60,29 @@ void session_end(char* id) {
 
 void session_use(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, rand_string("", 10));
+    strcat(id, id);
     strcat(name, ".session");
 
-    int result = set_current(name);
-    if(result != SUCCESS)
-        printf("Failed to use session. Error code: %d", result);
-    else
-        printf("Using session: %s.", name);
+    if(session_exists(name) == TRUE) {
+        int result = set_current(name);
+        if (result != SUCCESS)
+            printf("Failed to use session. Error code: %d", result);
+        else
+            printf("Using session: %s.", name);
+    }
+    else printf("Session: %s does not exist.", name);
 
     free(name);
 }
 
 void session_run(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, rand_string("", 10));
+    strcat(id, id);
     strcat(name, ".session");
 
     char** lines;
     size_t n;
-    int read_result = read(name, &lines, &n);
+    int read_result = read_session(name, &lines, &n);
 
     if(read_result == SUCCESS) {
         // Check if it is executed
@@ -127,12 +130,12 @@ void session_current() {
 
 void session_show(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, rand_string("", 10));
+    strcat(id, id);
     strcat(name, ".session");
 
     char** lines;
     size_t n;
-    int result = read(name, &lines, &n);
+    int result = read_session(name, &lines, &n);
     if(result != SUCCESS)
         printf("Cannot read session. Error code: %d", result);
 

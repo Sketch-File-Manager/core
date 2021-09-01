@@ -1,7 +1,0 @@
-#ifndef SKETCH_CORE_ERROR_CODES_H
-#define SKETCH_CORE_ERROR_CODES_H
-
-#define SUCCESS 0
-
-
-#endif

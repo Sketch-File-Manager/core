@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-#include <error_codes.h>
+#include <codes.h>
 
 static char* check_current() {
     char* current;
