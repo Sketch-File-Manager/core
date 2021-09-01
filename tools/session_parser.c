@@ -183,5 +183,6 @@ int session_exists(char* name) {
 
     if (file_fd == -1) return 0;
 
+    close(file_fd);
     return 1;
 }
