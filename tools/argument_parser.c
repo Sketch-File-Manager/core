@@ -1,8 +1,9 @@
+#include <string.h>
+#include <malloc.h>
+
 #include <argument_parser.h>
 #include <session.h>
 #include <session_edit.h>
-#include <string.h>
-#include <malloc.h>
 
 #define COMMAND_NUMBER 14
 
@@ -25,7 +26,17 @@
 #define COMMAND_EDIT      "edit"
 
 
-static command commands[COMMAND_NUMBER] = {
+struct command {
+    char *c_name;
+    int   c_argc;
+    void (*c_session_arg)(char *);
+    void (*c_session_edit_arg)(char *, char *);
+    void (*c_session_edit_multi_arg)(char *, char *, char *);
+    void (*c_session_empty_arg)();
+};
+
+
+static struct command commands[COMMAND_NUMBER] = {
         // session.
         {.c_name = SESSION_START,   .c_argc = 0, .c_session_empty_arg=&session_start},
         {.c_name = SESSION_END,     .c_argc = 1, .c_session_arg=&session_end},
@@ -46,55 +57,51 @@ static command commands[COMMAND_NUMBER] = {
 
 static int find_command(char *name) {
 
-    for (int command = 0; command < COMMAND_NUMBER; command++)
-        if (strcmp(commands[command].c_name, name) == 0) return command;
+    for (int curr_command = 0; curr_command < COMMAND_NUMBER; curr_command++)
+        if (strcmp(commands[curr_command].c_name, name) == 0) return curr_command;
     return -1;
 }
 
 static int parse_session(char **argv) {
     if (argv[1] == NULL || argv[2] == NULL ) return -1;
 
-    // form the full command.
+    // form the full result_command.
     char *name = calloc(strlen(argv[1]) + strlen(argv[2]) + 2, sizeof(char));
     strcat(name, argv[1]);
     strcat(name, " ");
     strcat(name, argv[2]);
 
-    int command = find_command(name);
+    int result_command = find_command(name);
     free(name);
-    return command;
-}
-
-static int parse_command(char **argv) {
-    return find_command(argv[1]);
+    return result_command;
 }
 
 int parse(int argc, char **argv) {
     if (argv[1] == NULL) return -1;
 
-    int command;
+    int result_command;
     int offset;
 
     if (strcmp(argv[1], "session") == 0) {
-        command = parse_session(argv);
+        result_command = parse_session(argv);
         offset = 0;
         // check if the arguments is enough
-        if (commands[command].c_argc > (argc - 3)) return  -1; // TODO call the help function.
+        if (commands[result_command].c_argc > (argc - 3)) return  -1; // TODO call the help function.
     }
     else {
-        command = parse_command(argv);
+        result_command = find_command(argv[1]);
         offset = 1;
         // check if the arguments is enough
-        if (commands[command].c_argc > (argc - 2)) return -1; // TODO call the help function here.
+        if (commands[result_command].c_argc > (argc - 2)) return -1; // TODO call the help function here.
     }
 
-    // check if the command exists.
-    if (command == -1) return -1; // TODO call the help function here.
+    // check if the result_command exists.
+    if (result_command == -1) return -1; // TODO call the help function here.
 
-    if (commands[command].c_argc == 0) commands[command].c_session_empty_arg();
-    else if (commands[command].c_argc == 1) commands[command].c_session_arg(argv[3 - offset]);
-    else if (commands[command].c_argc == 2) commands[command].c_session_edit_arg(argv[3 - offset], argv[4 - offset]);
-    else if (commands[command].c_argc == 3) commands[command].c_session_edit_multi_arg(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
+    if (commands[result_command].c_argc == 0) commands[result_command].c_session_empty_arg();
+    else if (commands[result_command].c_argc == 1) commands[result_command].c_session_arg(argv[3 - offset]);
+    else if (commands[result_command].c_argc == 2) commands[result_command].c_session_edit_arg(argv[3 - offset], argv[4 - offset]);
+    else if (commands[result_command].c_argc == 3) commands[result_command].c_session_edit_multi_arg(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
 
     return 0;
 }
