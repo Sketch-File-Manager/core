@@ -46,7 +46,7 @@ void session_start() {
 
 void session_end(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, id);
+    strcat(name, id);
     strcat(name, ".session");
 
     int result = delete_file(name);
@@ -60,7 +60,7 @@ void session_end(char* id) {
 
 void session_use(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, id);
+    strcat(name, id);
     strcat(name, ".session");
 
     if(session_exists(name) == TRUE) {
@@ -77,7 +77,7 @@ void session_use(char* id) {
 
 void session_run(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, id);
+    strcat(name, id);
     strcat(name, ".session");
 
     char** lines;
@@ -130,7 +130,7 @@ void session_current() {
 
 void session_show(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
-    strcat(id, id);
+    strcat(name, id);
     strcat(name, ".session");
 
     char** lines;
