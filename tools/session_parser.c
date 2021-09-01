@@ -7,15 +7,16 @@
 #include <file_handler.h>
 #include <codes.h>
 
-#define SESSION_FOLDER "sessions/"
-
+#define SESSION_FOLDER      "sessions/"
+#define SESSION_LOCATION    "/.local/share/sketch/"
 
 static char *get_absolute_path(char *session_file_name) {
     char *username = getlogin();
-    size_t absolute_path_s = strlen(username) + strlen(SESSION_FOLDER) + strlen("/home/") + strlen(session_file_name);
-    char *absolute_path = calloc(absolute_path_s + 1, sizeof(char));
+    size_t absolute_path_s = strlen(username) + strlen(SESSION_FOLDER) + strlen("/home/") + strlen(SESSION_LOCATION) + strlen(session_file_name);
+    char *absolute_path = calloc(absolute_path_s + 2, sizeof(char));
     strcpy(absolute_path, "/home/");
     strcat(absolute_path, username);
+    strcat(absolute_path, SESSION_LOCATION);
     strcat(absolute_path, SESSION_FOLDER);
     strcat(absolute_path, session_file_name);
 
@@ -34,7 +35,7 @@ int delete_file(char *name) {
 int create_file(char *name) {
     char *absolute = get_absolute_path(name);
     // make a new file with name.
-    int new_fd = open(name, O_CREAT);
+    int new_fd = open(absolute, O_CREAT, 0700);
 
     close(new_fd);
     return 0;
@@ -124,7 +125,7 @@ static int append(char *name, char *content, int is_start) {
         strcat(new_file, content);
         strcat(new_file, "\n");
     }
-    
+
     if (write_file(relative_path, new_file, new_file_s + 1) == -1) return -1;
 
     free(relative_path);
@@ -141,9 +142,38 @@ int append_to_start(char *name, char *content) {
 }
 
 int read_session(char *name, char ***result, size_t *size) {
+    char *relative_path = calloc(strlen(SESSION_FOLDER) + strlen(name) + 1, sizeof(char));
+    char *session_file = NULL;
+
+    strcat(relative_path, SESSION_FOLDER);
+    strcat(relative_path, name);
+
+    if (read_file(relative_path, &session_file) == -1) return -1;
+
+    size_t session_file_lines_s = get_session_lines(session_file);
+    char **lines = calloc(session_file_lines_s, sizeof(char *));
+
+    char *current_line = strtok(session_file, "\n");
+    lines[0] = calloc(strlen(current_line) + 1, sizeof(char));
+    strcpy(lines[0], current_line);
+    for (size_t line = 1; line < session_file_lines_s; line++) {
+        current_line = strtok(NULL, "\n");
+        lines[line] = calloc(strlen(current_line) + 1, sizeof(char));
+        strcpy(lines[line], current_line);
+    }
+    *size = session_file_lines_s;
+    *result = lines;
+
+    free(session_file);
+    free(relative_path);
     return 0;
 }
 
 int session_exists(char* name) {
+    char *absolute_path = get_absolute_path(name);
+    int file_fd = open(absolute_path, O_RDONLY);
+
+    if (file_fd == -1) return 0;
+
     return 1;
 }
