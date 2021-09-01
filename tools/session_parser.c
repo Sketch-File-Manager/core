@@ -56,28 +56,37 @@ static size_t get_session_lines(char *session_file) {
     return size;
 }
 
-static char *double_array_to_string(char **d_array, size_t size, size_t* total_len) {
+static char *double_array_to_string(char **d_array, size_t size) {
     size_t total_size = 0;
 
-    for (int s_size = 0; s_size < size; s_size++) strlen(d_array[s_size]);
-
-    char *string = calloc(total_size + size + 2, sizeof(char));
-
-    for (int set = 0; set < size; set++) {
-        strcat(string, d_array[set]);
-        strcat(string, "\n");
+    if (size == 1) {
+        char *tmp = calloc(strlen(d_array[0]) + 1, sizeof(char));
+        strcpy(tmp, d_array[0]);
+        return tmp;
     }
 
-    *total_len = total_size;
-    return string;
+    // calculate the total size of the new string.
+    for (int element = 0; element < size; element++) total_size += strlen(d_array[element]);
+
+    // allocate the space of the new string.
+    char *string_form = calloc(total_size + size + 1, sizeof(char));
+    // save each element on the as sequence of strings.
+    for (int element = 0; element < size; element++) {
+        strcat(string_form, d_array[element]);
+        strcat(string_form, "\n");
+    }
+
+    return string_form;
 }
 
 int delete_last_line(char *name) {
-    /*char *absolute_path = get_absolute_path(name);
-
+    char *relative_path = calloc(strlen(SESSION_FOLDER) + strlen(name) + 1, sizeof(char));
     char *session_file = NULL;
 
-    if (read_file(absolute_path, &session_file) == -1) return -1;
+    strcat(relative_path, SESSION_FOLDER);
+    strcat(relative_path, name);
+
+    if (read_file(relative_path, &session_file) == -1) return -1;
 
     size_t session_lines_s = get_session_lines(session_file);
     char **session_lines = calloc(session_lines_s, sizeof(char *));
@@ -87,20 +96,19 @@ int delete_last_line(char *name) {
     char tmp[strlen(session_file) + 1];
     strcpy(tmp, session_file);
 
+    printf("%d", (int) session_lines_s);
     session_lines[0] = strtok(tmp, "\n");
     for (size_t s = 1; s < session_lines_s - 1; s++) {
         session_lines[s] = strtok(NULL, "\n");
     }
+    char *new_session_file = double_array_to_string(session_lines, session_lines_s - 1);
 
-    size_t total_new_len = 0;
-    char *new_session_file = double_array_to_string(session_lines, session_lines_s - 1, &total_new_len);
-
-    printf("%s\n", new_session_file);
-    //if (write_file(absolute_path, new_session_file, total_new_len) == -1) return -1;
+    if (write_file(relative_path, new_session_file, strlen(new_session_file)) == -1) return -1;
 
     free(session_file);
+    free(relative_path);
     free(session_lines);
-    free(new_session_file);*/
+    free(new_session_file);
     return 0;
 }
 
