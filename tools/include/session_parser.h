@@ -13,6 +13,8 @@ extern int append_to_end(char *name, char *content);
 
 extern int append_to_start(char *name, char *content);
 
-extern int read(char *name, char ***result, size_t *size);
+extern int read_session(char *name, char ***result, size_t *size);
+
+extern int session_exists(char* name);
 
 #endif

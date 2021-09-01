@@ -23,6 +23,10 @@ int append_to_start(char *name, char *content) {
     return 0;
 }
 
-int read(char *name, char ***result, size_t *size) {
+int read_session(char *name, char ***result, size_t *size) {
     return 0;
+}
+
+int session_exists(char* name) {
+    return 1;
 }
