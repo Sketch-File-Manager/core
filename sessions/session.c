@@ -7,8 +7,10 @@
 #include <executor.h>
 #include <codes.h>
 
-static char *rand_string(char *str, size_t size){
+static char *rand_string(size_t size){
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+    char *str = (char*) calloc(size + 1, sizeof(char));
     if (size) {
         --size;
         for (size_t n = 0; n < size; n++) {
@@ -32,7 +34,7 @@ static char* check_current() {
 void session_start() {
     int name_len = 10;
     char* name = (char*) calloc(name_len + 9 + 1, sizeof(char));
-    strcat(name, rand_string("", 10));
+    strcat(name, rand_string(10));
     strcat(name, ".session");
 
     int result = create_file(name);
