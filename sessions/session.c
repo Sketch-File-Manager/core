@@ -4,6 +4,8 @@
 #include <session_parser.h>
 #include <config_parser.h>
 #include <stdio.h>
+#include <executor.h>
+#include <error_codes.h>
 
 static char *rand_string(char *str, size_t size){
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -21,7 +23,7 @@ static char *rand_string(char *str, size_t size){
 static char* check_current() {
     char* current;
     int config_result = get_current(&current);
-    if(config_result != -1)
+    if(config_result != SUCCESS)
         printf("Cannot get current session. Error code: %d", config_result);
 
     return current;
@@ -33,7 +35,12 @@ void session_start() {
     strcat(name, rand_string("", 10));
     strcat(name, ".session");
 
-    create_file(name);
+    int result = create_file(name);
+    if(result != SUCCESS)
+        printf("Failed to create session. Error code: %d", result);
+    else
+        printf("Created session: %s.", name);
+
     free(name);
 }
 
@@ -42,7 +49,12 @@ void session_end(char* id) {
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
 
-    delete_file(name);
+    int result = delete_file(name);
+    if(result != SUCCESS)
+        printf("Failed to end session. Error code: %d", result);
+    else
+        printf("Ended session: %s.", name);
+
     free(name);
 }
 
@@ -51,7 +63,12 @@ void session_use(char* id) {
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
 
-    set_current(name);
+    int result = set_current(name);
+    if(result != SUCCESS)
+        printf("Failed to use session. Error code: %d", result);
+    else
+        printf("Using session: %s.", name);
+
     free(name);
 }
 
@@ -59,14 +76,50 @@ void session_run(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(id, rand_string("", 10));
     strcat(name, ".session");
-    // TODO - Execute with system call.
-    //        Add to the start as executed.
+
+    char** lines;
+    size_t n;
+    int read_result = read(name, &lines, &n);
+
+    if(read_result == SUCCESS) {
+        // Check if it is executed
+        if(strcmp(lines[0], "executed") != 0) {
+            int flag = 0;
+
+            // Add to the start as executed.
+            int append_result = append_to_start(name, "executed");
+            if(append_result != SUCCESS) {
+                printf("Cannot execute session. Error code: %d", read_result);
+                flag = 1;
+            }
+
+            // Execute with system call.
+            for (int i = 0; i < n; ++i) {
+                if(flag == 1) continue;
+
+                char* line = lines[i];
+                int exec_result = execute(line);
+
+                if(exec_result != SUCCESS) {
+                    printf("Cannot execute session line %d: %s, aborting the rest of the session. Error code: %d", i, line, read_result);
+                    flag = 1;
+                }
+            }
+        }
+        else printf("Session is already executed.");
+    }
+    else printf("Cannot read session. Error code: %d", read_result);
+
     free(name);
+    for (int i = 0; i < n; ++i)
+        free(lines[i]);
+    free(lines);
 }
 
 void session_current() {
     char* current = check_current();
-    if(current == NULL)
+    if(current == NULL) return;
+    if(strcmp(current, "") == 0)
         printf("No current sessions.");
     else
         printf("%s", current);
@@ -78,13 +131,12 @@ void session_show(char* id) {
     strcat(name, ".session");
 
     char** lines;
-    int result = read(name, &lines);
-    if(result != -1) {
+    size_t n;
+    int result = read(name, &lines, &n);
+    if(result != SUCCESS)
         printf("Cannot read session. Error code: %d", result);
-        return;
-    }
 
-    for(size_t i = 0; i < sizeof(lines)/sizeof(lines[0]); i++)
+    for(size_t i = 0; i < n; i++)
         printf("%s", lines[i]);
     putchar('\n');
 

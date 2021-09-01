@@ -4,11 +4,12 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
+#include <error_codes.h>
 
 static char* check_current() {
     char* current;
     int config_result = get_current(&current);
-    if(config_result != -1)
+    if(config_result != SUCCESS)
         printf("Cannot get current session. Error code: %d", config_result);
 
     return current;
@@ -16,7 +17,7 @@ static char* check_current() {
 
 void command_exit(){
     int result = set_current("");
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot change current session to null. Error code: %d", result);
 }
 
@@ -25,7 +26,7 @@ void command_undo(){
     if(current == NULL) return;
 
     int edit_result = delete_last_line(current);
-    if(edit_result != -1)
+    if(edit_result != SUCCESS)
         printf("Cannot undo in current session. Error code: %d", edit_result);
 }
 
@@ -40,7 +41,7 @@ void command_mkdir(char* dst, char* folder){
     strcat(cmd, folder);
 
     int result = append_to_end(current, cmd);
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot add cmd to current session. Error code: %d", result);
 
     free(cmd);
@@ -57,7 +58,7 @@ void command_mkfile(char* dst, char* file){
     strcat(cmd, file);
 
     int result = append_to_end(current, cmd);
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot add cmd to current session. Error code: %d", result);
 
     free(cmd);
@@ -74,7 +75,7 @@ void command_copy(char* src, char* dst){
     strcat(cmd, dst);
 
     int result = append_to_end(current, cmd);
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot add cmd to current session. Error code: %d", result);
 
     free(cmd);
@@ -91,7 +92,7 @@ void command_move(char* src, char* dst){
     strcat(cmd, dst);
 
     int result = append_to_end(current, cmd);
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot add cmd to current session. Error code: %d", result);
 
     free(cmd);
@@ -108,7 +109,7 @@ void command_rename(char* src, char* name){
     strcat(cmd, name);
 
     int result = append_to_end(current, cmd);
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot add cmd to current session. Error code: %d", result);
 
     free(cmd);
@@ -127,7 +128,7 @@ void command_edit(char* src, char* content, char* flag){
     strcat(cmd, content);
 
     int result = append_to_end(current, cmd);
-    if(result != -1)
+    if(result != SUCCESS)
         printf("Cannot add cmd to current session. Error code: %d", result);
 
     free(cmd);

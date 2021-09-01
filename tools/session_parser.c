@@ -1,4 +1,4 @@
-
+#include "session_parser.h"
 #define SESSION_FILE_PATH ".local/share/sketch/session/"
 
 
@@ -23,6 +23,6 @@ int append_to_start(char *name, char *content) {
     return 0;
 }
 
-int read(char *name, char ***result) {
+int read(char *name, char ***result, size_t *size) {
     return 0;
 }
