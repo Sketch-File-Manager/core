@@ -5,9 +5,9 @@
 #include <file_handler.h>
 
 
-#define CONFIG_PATH        ".local/share/sketch/config.conf"
+#define CONFIG_PATH         ".local/share/sketch/config.conf"
 
-#define CURRENT_SESSION_ID "current_session:"
+#define CURRENT_SESSION_ID  "current_session:"
 
 
 int get_current(char** current) {
@@ -15,15 +15,33 @@ int get_current(char** current) {
 
     if (read_file(CONFIG_PATH, &config) == -1) return -1;
 
-    /*strtok(location_of_interest, " ");
+    // Find the location of current session in the file.
+    char *location_of_interest = strstr(config, CURRENT_SESSION_ID);
+    strtok(location_of_interest, " ");
+    // get the current session.
     char *current_session = strtok(NULL, "\n");
 
-    printf("Current session: %s\n", current_session);
-*/
+    // Allocate enough space for the current session.
+    *current = calloc(strlen(current_session) + 1, sizeof(char));
+    // set the current session to current.
+    strcpy(*current, current_session);
+
     free(config);
     return 0;
 }
 
 int set_current(char* current) {
+    // Calculate the size of the new current session.
+    size_t new_current_session_s = strlen(current) + strlen(CURRENT_SESSION_ID);
+    // Allocate enough memory for the new current session.
+    char *new_current_session = calloc(new_current_session_s + 2, sizeof(char));
+    // Set the new current session.
+    strcpy(new_current_session, CURRENT_SESSION_ID);
+    strcat(new_current_session, " ");
+    strcat(new_current_session, current);
+
+    // Make the changes in the config file.
+    if (write_file(CONFIG_PATH, new_current_session, new_current_session_s) == -1) return -1;
+
     return 0;
 }

@@ -49,7 +49,6 @@ int read_file(char *file_path, char **config_content) {
     if (read(fd, buffer, file_len) == -1)
         return -1;
 
-    printf("%s\n", buffer);
     // Give the results.
     *config_content = calloc(file_len + 1, sizeof(char));
     strcpy(*config_content, buffer);

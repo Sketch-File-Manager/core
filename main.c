@@ -5,9 +5,6 @@
 
 
 int main(int argc, char **argv) {
-    char **test = NULL;
-    get_current(test);
-
     parse(argc, argv);
     return 0;
 }
