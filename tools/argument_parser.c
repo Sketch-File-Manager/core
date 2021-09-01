@@ -63,7 +63,7 @@ static int find_command(char *name) {
 }
 
 static int parse_session(char **argv) {
-    if (argv[1] == NULL || argv[2] == NULL ) return -1;
+    if (argv[1] == NULL || argv[2] == NULL) return -1;
 
     // form the full result_command.
     char *name = calloc(strlen(argv[1]) + strlen(argv[2]) + 2, sizeof(char));
