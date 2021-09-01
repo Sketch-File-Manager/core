@@ -22,25 +22,11 @@ static char *rand_string(size_t size){
     return str;
 }
 
-static int endsWith(const char *str, const char *suffix){
-    if (!str || !suffix)
-        return FALSE;
-    size_t lenstr = strlen(str);
-    size_t lensuffix = strlen(suffix);
-    if (lensuffix >  lenstr)
-        return FALSE;
-
-    if(strncmp(str + lenstr - lensuffix, suffix, lensuffix) != 0)
-        return FALSE;
-
-    return TRUE;
-}
-
 static char* check_current() {
     char* current;
     int config_result = get_current(&current);
     if(config_result != SUCCESS)
-        printf("%s %s %d", MSG_SESSION_CURRENT_NOT_FOUND, MSG_ERROR_CODE, config_result);
+        printf("Cannot get current session. Error code: %d", config_result);
 
     return current;
 }
@@ -49,15 +35,13 @@ void session_start() {
     int name_len = 10;
     char* name = (char*) calloc(name_len + 9 + 1, sizeof(char));
     strcat(name, rand_string(10));
-
-    if(endsWith(name, ".session") == FALSE)
-        strcat(name, ".session");
+    strcat(name, ".session");
 
     int result = create_file(name);
-    if (result == SUCCESS)
-        printf("%s %s", MSG_SESSION_CREATED_SUCCESSFULLY, name);
+    if(result != SUCCESS)
+        printf("Failed to create session. Error code: %d", result);
     else
-        printf("%s %s %d", MSG_SESSION_FAILED_TO_CREATE, MSG_ERROR_CODE, result);
+        printf("Created session: %s.", name);
 
     free(name);
 }
@@ -65,15 +49,13 @@ void session_start() {
 void session_end(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
-
-    if(endsWith(name, ".session") == FALSE)
-        strcat(name, ".session");
+    strcat(name, ".session");
 
     int result = delete_file(name);
-    if (result == SUCCESS)
-        printf("%s %s.", MSG_SESSION_ENDED, name);
+    if(result != SUCCESS)
+        printf("Failed to end session. Error code: %d", result);
     else
-        printf("%s %s %s %d", MSG_SESSION_FAILED_TO_END, name, MSG_ERROR_CODE, result);
+        printf("Ended session: %s.", name);
 
     free(name);
 }
@@ -81,18 +63,16 @@ void session_end(char* id) {
 void session_use(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
-
-    if(endsWith(name, ".session") == FALSE)
-        strcat(name, ".session");
+    strcat(name, ".session");
 
     if(session_exists(name) == TRUE) {
         int result = set_current(name);
-        if (result == SUCCESS)
-            printf("%s %s.", MSG_SESSION_USE_SUCCESSFUL, name);
+        if (result != SUCCESS)
+            printf("Failed to use session. Error code: %d", result);
         else
-            printf("%s %s %s %d", MSG_SESSION_FAILED_TO_USE, name, MSG_ERROR_CODE, result);
+            printf("Using session: %s.", name);
     }
-    else printf("%s %s", MSG_SESSION_DOES_NOT_EXIST, name);
+    else printf("Session: %s does not exist.", name);
 
     free(name);
 }
@@ -100,9 +80,7 @@ void session_use(char* id) {
 void session_run(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
-
-    if(endsWith(name, ".session") == FALSE)
-        strcat(name, ".session");
+    strcat(name, ".session");
 
     char** lines;
     size_t n;
@@ -116,7 +94,7 @@ void session_run(char* id) {
             // Add to the start as executed.
             int append_result = append_to_start(name, "executed");
             if(append_result != SUCCESS) {
-                printf("%s %s %d", MSG_SESSION_CANNOT_EXECUTE, MSG_ERROR_CODE, read_result);
+                printf("Cannot execute session. Error code: %d", read_result);
                 flag = 1;
             }
 
@@ -128,14 +106,14 @@ void session_run(char* id) {
                 int exec_result = execute(line);
 
                 if(exec_result != SUCCESS) {
-                    printf("%s Line %d: %s, %s. %s %d", MSG_SESSION_CANNOT_EXECUTE, i, line, MSG_SESSION_ABORT_REST, MSG_ERROR_CODE, read_result);
+                    printf("Cannot execute session line %d: %s, aborting the rest of the session. Error code: %d", i, line, read_result);
                     flag = 1;
                 }
             }
         }
-        else printf("%s", MSG_SESSION_ALREADY_EXECUTED);
+        else printf("Session is already executed.");
     }
-    else printf("%s %s %d", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, read_result);
+    else printf("Cannot read session. Error code: %d", read_result);
 
     free(name);
     for (int i = 0; i < n; ++i)
@@ -147,7 +125,7 @@ void session_current() {
     char* current = check_current();
     if(current == NULL) return;
     if(strcmp(current, "") == 0)
-        printf("%s", MSG_NO_CURRENT_SESSION);
+        printf("No current sessions.");
     else
         printf("%s", current);
 }
@@ -155,15 +133,13 @@ void session_current() {
 void session_show(char* id) {
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
-
-    if(endsWith(name, ".session") == FALSE)
-        strcat(name, ".session");
+    strcat(name, ".session");
 
     char** lines;
     size_t n;
     int result = read_session(name, &lines, &n);
     if(result != SUCCESS)
-        printf("%s %s %d", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, result);
+        printf("Cannot read session. Error code: %d", result);
 
     for(size_t i = 0; i < n; i++)
         printf("%s", lines[i]);

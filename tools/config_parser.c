@@ -3,17 +3,17 @@
 
 #include <config_parser.h>
 #include <file_handler.h>
+#include <codes.h>
 
 
-#define CONFIG_PATH         ".local/share/sketch/config.conf"
-
+#define CONFIG_FILE         "config.conf"
 #define CURRENT_SESSION_ID  "current_session:"
 
 
 int get_current(char** current) {
     char *config = NULL;
 
-    if (read_file(CONFIG_PATH, &config) == -1) return -1;
+    if (read_file(CONFIG_FILE, &config) == -1) return -1;
 
     // Find the location of current session in the file.
     char *location_of_interest = strstr(config, CURRENT_SESSION_ID);
@@ -41,7 +41,8 @@ int set_current(char* current) {
     strcat(new_current_session, current);
 
     // Make the changes in the config file.
-    if (write_file(CONFIG_PATH, new_current_session, new_current_session_s) == -1) return -1;
+    if (write_file(CONFIG_FILE, new_current_session, new_current_session_s) == -1) return -1;
 
+    free(new_current_session);
     return 0;
 }

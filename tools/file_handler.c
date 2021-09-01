@@ -10,15 +10,15 @@
 static int get_file_fd(char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
     char *username = getlogin();
-    char *path = calloc(strlen(file_path) + strlen(username) + strlen("/home/") + 2, sizeof(char));
+    size_t path_s = strlen(file_path) + strlen(username) + strlen("/home/") + strlen("/.local/share/sketch/");
+    char *path = calloc(path_s + 1, sizeof(char));
 
     // form the full path.
     strcat(path, "/home/");
     strcat(path, username);
-    strcat(path, "/");
+    strcat(path, "/.local/share/sketch/");
     strcat(path, file_path);
 
-    printf("%s\n", path);
     // open the config file.
     int fd = open(path, flag);
     struct stat config_stat;
