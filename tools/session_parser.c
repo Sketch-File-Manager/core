@@ -117,15 +117,14 @@ static int append(char *name, char *content, int is_start) {
     if (is_start == TRUE) {
         strcpy(new_file, content);
         strcat(new_file, "\n");
-        strcpy(new_file, session_file);
+        strcat(new_file, session_file);
     }
     else {
         strcpy(new_file, session_file);
         strcat(new_file, content);
         strcat(new_file, "\n");
     }
-
-    printf("%s\n", new_file);
+    
     if (write_file(relative_path, new_file, new_file_s + 1) == -1) return -1;
 
     free(relative_path);
