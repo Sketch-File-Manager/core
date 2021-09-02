@@ -39,21 +39,21 @@ struct command {
 
 static struct command commands[COMMAND_NUMBER] = {
         // session.
-        {.c_name = SESSION_START,   .c_argc = 0, .c_exec=(exec_general *) session_start},
-        {.c_name = SESSION_END,     .c_argc = 1, .c_exec=(exec_general *) session_end},
-        {.c_name = SESSION_USE,     .c_argc = 1, .c_exec=(exec_general *) session_use},
-        {.c_name = SESSION_RUN,     .c_argc = 1, .c_exec=(exec_general *) session_run},
-        {.c_name = SESSION_CURRENT, .c_argc = 0, .c_exec=(exec_general *) session_current},
-        {.c_name = SESSION_SHOW,    .c_argc = 1, .c_exec=(exec_general *) session_show},
+        {.c_name = SESSION_START,   .c_argc = 0, .c_exec = (exec_general *) session_start},
+        {.c_name = SESSION_END,     .c_argc = 1, .c_exec = (exec_general *) session_end},
+        {.c_name = SESSION_USE,     .c_argc = 1, .c_exec = (exec_general *) session_use},
+        {.c_name = SESSION_RUN,     .c_argc = 1, .c_exec = (exec_general *) session_run},
+        {.c_name = SESSION_CURRENT, .c_argc = 0, .c_exec = (exec_general *) session_current},
+        {.c_name = SESSION_SHOW,    .c_argc = 1, .c_exec = (exec_general *) session_show},
         // session commands.
-        {.c_name = COMMAND_EXIT,    .c_argc = 0, .c_exec=(exec_general *) command_exit},
-        {.c_name = COMMAND_UNDO,    .c_argc = 0, .c_exec=(exec_general *) command_undo},
-        {.c_name = COMMAND_MKDIR,   .c_argc = 2, .c_exec=(exec_general *) command_mkdir},
-        {.c_name = COMMAND_MKFILE,  .c_argc = 2, .c_exec=(exec_general *) command_mkfile},
-        {.c_name = COMMAND_COPY,    .c_argc = 2, .c_exec=(exec_general *) command_copy},
-        {.c_name = COMMAND_MOVE,    .c_argc = 2, .c_exec=(exec_general *) command_move},
-        {.c_name = COMMAND_RENAME,  .c_argc = 2, .c_exec=(exec_general *) command_rename},
-        {.c_name = COMMAND_EDIT,    .c_argc = 3, .c_exec=(exec_general *) command_edit}
+        {.c_name = COMMAND_EXIT,    .c_argc = 0, .c_exec = (exec_general *) command_exit},
+        {.c_name = COMMAND_UNDO,    .c_argc = 0, .c_exec = (exec_general *) command_undo},
+        {.c_name = COMMAND_MKDIR,   .c_argc = 2, .c_exec = (exec_general *) command_mkdir},
+        {.c_name = COMMAND_MKFILE,  .c_argc = 2, .c_exec = (exec_general *) command_mkfile},
+        {.c_name = COMMAND_COPY,    .c_argc = 2, .c_exec = (exec_general *) command_copy},
+        {.c_name = COMMAND_MOVE,    .c_argc = 2, .c_exec = (exec_general *) command_move},
+        {.c_name = COMMAND_RENAME,  .c_argc = 2, .c_exec = (exec_general *) command_rename},
+        {.c_name = COMMAND_EDIT,    .c_argc = 3, .c_exec = (exec_general *) command_edit}
 };
 
 static inline int find_command(char *name) {

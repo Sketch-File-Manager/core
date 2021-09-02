@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 
-int read_file(char *file_path, char **config_content);
+extern int read_file(char *file_path, char **config_content);
 
-int write_file(char *file_path, char *changes, size_t changes_len);
+extern int write_file(char *file_path, char *changes, size_t changes_len);
+
+extern void check_requirements();
 
 #endif
