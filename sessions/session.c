@@ -204,6 +204,6 @@ void session_list() {
         printf("Cannot read session. Error code: %d\n", result);
 
     for(size_t i = 0; i < n; i++)
-        printf("%s\n", lines[i]);
+        printf("%d. %s\n", (int)i, lines[i]);
     putchar('\n');
 }

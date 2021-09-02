@@ -11,6 +11,7 @@ session use `id` | Set a session with `id` as current (current-session file set 
 session run `id` | Execute a session with `id` (Read session file and execute).
 session current | Show the current session id.
 session show `id` | Shows the steps of a session with `id`.
+sessions list | List all sessions.
 
 #### Active session
 Command argument |  Description
