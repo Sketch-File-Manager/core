@@ -8,7 +8,7 @@
 
 #define SESSION_IN_USE                      "A session is already in use. Type exit to exit the current session."
 
-#define MSG_ERROR_CODE                      "Error code: "
+#define MSG_ERROR_CODE                      "Error code:"
 #define MSG_SESSION_CURRENT_NOT_FOUND       "Cannot get current session."
 
 #define MSG_SESSION_CREATED_SUCCESSFULLY    "Created session:"

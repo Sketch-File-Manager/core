@@ -7,6 +7,7 @@
 #include <executor.h>
 #include <codes.h>
 #include <time.h>
+#include <functions.h>
 
 static char *rand_string(size_t size){
     srand(time(NULL));
@@ -24,27 +25,13 @@ static char *rand_string(size_t size){
     return str;
 }
 
-static int endsWith(const char *str, const char *suffix){
-    if (!str || !suffix)
-        return FALSE;
-    size_t lenstr = strlen(str);
-    size_t lensuffix = strlen(suffix);
-    if (lensuffix >  lenstr)
-        return FALSE;
-
-    if(strncmp(str + lenstr - lensuffix, suffix, lensuffix) != 0)
-        return FALSE;
-
-    return TRUE;
-}
-
 static int check_current() {
     char* current;
     int config_result = get_current(&current);
     if(config_result != SUCCESS)
         return FALSE;
 
-    if(strcmp(current, "") != 0)
+    if(strcmp(current, "") == 0)
         return FALSE;
 
     return TRUE;
@@ -52,7 +39,7 @@ static int check_current() {
 
 void session_start() {
     if(check_current() == TRUE) {
-        printf("%s", SESSION_IN_USE);
+        printf("%s\n", SESSION_IN_USE);
         return;
     }
 
@@ -65,16 +52,16 @@ void session_start() {
 
     int result = create_file(name);
     if (result == SUCCESS)
-        printf("%s %s", MSG_SESSION_CREATED_SUCCESSFULLY, name);
+        printf("%s %s\n", MSG_SESSION_CREATED_SUCCESSFULLY, name);
     else
-        printf("%s %s %d", MSG_SESSION_FAILED_TO_CREATE, MSG_ERROR_CODE, result);
+        printf("%s %s %d\n", MSG_SESSION_FAILED_TO_CREATE, MSG_ERROR_CODE, result);
 
     free(name);
 }
 
 void session_end(char* id) {
     if(check_current() == TRUE) {
-        printf("%s", SESSION_IN_USE);
+        printf("%s\n", SESSION_IN_USE);
         return;
     }
 
@@ -86,16 +73,16 @@ void session_end(char* id) {
 
     int result = delete_file(name);
     if (result == SUCCESS)
-        printf("%s %s", MSG_SESSION_ENDED, name);
+        printf("%s %s\n", MSG_SESSION_ENDED, name);
     else
-        printf("%s %s %s %d", MSG_SESSION_FAILED_TO_END, name, MSG_ERROR_CODE, result);
+        printf("%s %s %s %d\n", MSG_SESSION_FAILED_TO_END, name, MSG_ERROR_CODE, result);
 
     free(name);
 }
 
 void session_use(char* id) {
     if(check_current() == TRUE) {
-        printf("%s", SESSION_IN_USE);
+        printf("%s\n", SESSION_IN_USE);
         return;
     }
 
@@ -108,18 +95,18 @@ void session_use(char* id) {
     if(session_exists(name) == TRUE) {
         int result = set_current(name);
         if (result == SUCCESS)
-            printf("%s %s", MSG_SESSION_USE_SUCCESSFUL, name);
+            printf("%s %s\n", MSG_SESSION_USE_SUCCESSFUL, name);
         else
-            printf("%s %s %s %d", MSG_SESSION_FAILED_TO_USE, name, MSG_ERROR_CODE, result);
+            printf("%s %s %s %d\n", MSG_SESSION_FAILED_TO_USE, name, MSG_ERROR_CODE, result);
     }
-    else printf("%s %s", MSG_SESSION_DOES_NOT_EXIST, name);
+    else printf("%s %s\n", MSG_SESSION_DOES_NOT_EXIST, name);
 
     free(name);
 }
 
 void session_run(char* id) {
     if(check_current() == TRUE) {
-        printf("%s", SESSION_IN_USE);
+        printf("%s\n", SESSION_IN_USE);
         return;
     }
 
@@ -141,7 +128,7 @@ void session_run(char* id) {
             // Add to the start as executed.
             int append_result = append_to_start(name, "executed");
             if(append_result != SUCCESS) {
-                printf("%s %s %d", MSG_SESSION_CANNOT_EXECUTE, MSG_ERROR_CODE, read_result);
+                printf("%s %s %d\n", MSG_SESSION_CANNOT_EXECUTE, MSG_ERROR_CODE, read_result);
                 flag = 1;
             }
 
@@ -153,14 +140,14 @@ void session_run(char* id) {
                 int exec_result = execute(line);
 
                 if(exec_result != SUCCESS) {
-                    printf("%s Line %d: %s, %s. %s %d", MSG_SESSION_CANNOT_EXECUTE, i, line, MSG_SESSION_ABORT_REST, MSG_ERROR_CODE, read_result);
+                    printf("%s Line %d: %s, %s. %s %d\n", MSG_SESSION_CANNOT_EXECUTE, i, line, MSG_SESSION_ABORT_REST, MSG_ERROR_CODE, read_result);
                     flag = 1;
                 }
             }
         }
-        else printf("%s", MSG_SESSION_ALREADY_EXECUTED);
+        else printf("%s\n", MSG_SESSION_ALREADY_EXECUTED);
     }
-    else printf("%s %s %d", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, read_result);
+    else printf("%s %s %d\n", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, read_result);
 
     free(name);
     for (int i = 0; i < n; ++i)
@@ -169,27 +156,22 @@ void session_run(char* id) {
 }
 
 void session_current() {
-    if(check_current() == TRUE) {
-        printf("%s", SESSION_IN_USE);
-        return;
-    }
-
     char* current;
     int config_result = get_current(&current);
     if(config_result != SUCCESS) {
-        printf("%s %s %d", MSG_SESSION_CURRENT_NOT_FOUND, MSG_ERROR_CODE, config_result);
+        printf("%s %s %d\n", MSG_SESSION_CURRENT_NOT_FOUND, MSG_ERROR_CODE, config_result);
         return;
     }
 
     if(strcmp(current, "") == 0)
-        printf("%s", MSG_NO_CURRENT_SESSION);
+        printf("%s\n", MSG_NO_CURRENT_SESSION);
     else
-        printf("%s", current);
+        printf("%s\n", current);
 }
 
 void session_show(char* id) {
     if(check_current() == TRUE) {
-        printf("%s", SESSION_IN_USE);
+        printf("%s\n", SESSION_IN_USE);
         return;
     }
 
@@ -203,10 +185,10 @@ void session_show(char* id) {
     size_t n;
     int result = read_session(name, &lines, &n);
     if(result != SUCCESS)
-        printf("Cannot read session. Error code: %d", result);
+        printf("Cannot read session. Error code: %d\n", result);
 
     for(size_t i = 0; i < n; i++)
-        printf("%s", lines[i]);
+        printf("%s\n", lines[i]);
     putchar('\n');
 
     free(name);

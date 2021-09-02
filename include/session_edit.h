@@ -54,6 +54,6 @@ extern void command_rename(char* src, char* name);
  *             -u or --unshift for appending at the start of the file.
  *             -w or --write for discarding old content and write the new.
  */
-extern void command_edit(char* src, char* content, char* flag);
+extern void command_edit(char* src, char* flag, char* content);
 
 #endif

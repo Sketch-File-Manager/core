@@ -24,7 +24,7 @@ int get_current(char** current) {
     if (current_session == NULL) {
         *current = calloc(1, sizeof(char));
         strcpy(*current, "");
-        return -1;
+        return SUCCESS;
     }
 
     // Allocate enough space for the current session.
