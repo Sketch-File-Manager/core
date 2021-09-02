@@ -97,7 +97,6 @@ int delete_last_line(char *name) {
     char tmp[strlen(session_file) + 1];
     strcpy(tmp, session_file);
 
-    printf("%d", (int) session_lines_s);
     session_lines[0] = strtok(tmp, "\n");
     for (size_t s = 1; s < session_lines_s - 1; s++) {
         session_lines[s] = strtok(NULL, "\n");

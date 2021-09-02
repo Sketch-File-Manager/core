@@ -3,12 +3,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#include <stdio.h>
-
 #include <file_handler.h>
 
 #define SKETCH_FOLDER "/.local/share/sketch/"
-#define SESSIONS_FOLDER "/.local/share/sketch/sessions/"
 
 static int get_file_fd(char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
@@ -88,34 +85,38 @@ static inline void create_dir(char *path) {
     free(sketch_path);
 }
 
-static inline void check_sketch_folder() {
-    create_dir(SKETCH_FOLDER);
+static inline void check_sketch_folder(char *sketch_path) {
+    create_dir(sketch_path);
 }
 
-static inline void check_config_file() {
+static inline void check_config_file(char *path) {
     char *username = getlogin();
-    size_t config_path_s = strlen("/home/") + strlen(username) + strlen(SKETCH_FOLDER) + strlen("config.conf");
+    size_t config_path_s = strlen("/home/") + strlen(username) + strlen(path);
     char *config_path = calloc(config_path_s + 1, sizeof(char));
 
     strcpy(config_path, "/home/");
     strcat(config_path, username);
-    strcat(config_path, SKETCH_FOLDER);
-    strcat(config_path, "config.conf");
+    strcat(config_path, path);
 
     // try to open the file, and in case that it does not exist create it.
     int config_fd = open(config_path, O_CREAT, 0700);
-    free(config_path);
+    char *first_write = "current:\n";
+
     close(config_fd);
+    if (write_file("config.conf", first_write, strlen(first_write))) return;
+
+    free(config_path);
+
 }
 
-static inline void check_session_folder() {
-    create_dir(SESSIONS_FOLDER);
+static inline void check_session_folder(char *session_path) {
+    create_dir(session_path);
 }
 
-
-void check_requirements() {
-    check_sketch_folder();
-    check_config_file();
-    check_session_folder();
+void check_requirements(char *config_path, char *sketch_path, char *sessions_path) {
+    check_sketch_folder(sketch_path);
+    check_config_file(config_path);
+    check_session_folder(sessions_path);
 }
+
 
