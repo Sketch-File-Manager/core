@@ -160,9 +160,20 @@ int read_session(char *name, char ***result, size_t *size) {
     if (read_file(relative_path, &session_file) == -1) return -1;
 
     size_t session_file_lines_s = get_session_lines(session_file);
-    char **lines = calloc(session_file_lines_s, sizeof(char *));
-
+    char **lines;
     char *current_line = strtok(session_file, "\n");
+
+    if (current_line == NULL) {
+        lines = calloc(1, sizeof(char *));
+        lines[0] = calloc(1, sizeof(char));
+        strcpy(lines[0], "");
+        *size = 0;
+        *result = lines;
+        return SUCCESS;
+    }
+    
+    lines = calloc(session_file_lines_s, sizeof(char *));
+
     lines[0] = calloc(strlen(current_line) + 1, sizeof(char));
     strcpy(lines[0], current_line);
     for (size_t line = 1; line < session_file_lines_s; line++) {
