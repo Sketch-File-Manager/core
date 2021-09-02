@@ -36,4 +36,9 @@ extern void session_current();
  */
 extern void session_show(char* id);
 
+/**
+ * List all the sessions
+ */
+extern void session_list();
+
 #endif

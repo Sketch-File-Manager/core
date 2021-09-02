@@ -183,6 +183,7 @@ void session_show(char* id) {
 
     char** lines;
     size_t n;
+
     int result = read_session(name, &lines, &n);
     if(result != SUCCESS)
         printf("Cannot read session. Error code: %d\n", result);
@@ -192,4 +193,17 @@ void session_show(char* id) {
     putchar('\n');
 
     free(name);
+}
+
+void session_list() {
+    char** lines;
+    size_t n;
+
+    int result = list_sessions(&lines, &n);
+    if(result != SUCCESS)
+        printf("Cannot read session. Error code: %d\n", result);
+
+    for(size_t i = 0; i < n; i++)
+        printf("%s\n", lines[i]);
+    putchar('\n');
 }

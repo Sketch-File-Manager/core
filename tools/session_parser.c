@@ -192,8 +192,13 @@ int session_exists(char* name) {
     char *absolute_path = get_absolute_path(name);
     int file_fd = open(absolute_path, O_RDONLY);
 
-    if (file_fd == -1) return 0;
+    if (file_fd == -1) return FALSE;
 
     close(file_fd);
-    return 1;
+    return TRUE;
+}
+
+int list_sessions(char ***result, size_t *size) {
+
+    return SUCCESS
 }

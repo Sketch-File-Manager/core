@@ -17,4 +17,6 @@ extern int read_session(char *name, char ***result, size_t *size);
 
 extern int session_exists(char* name);
 
+extern int list_sessions(char ***result, size_t *size);
+
 #endif
