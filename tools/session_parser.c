@@ -10,7 +10,7 @@
 #define SESSION_FOLDER      "sessions/"
 #define SESSION_LOCATION    "/.local/share/sketch/"
 
-static char *get_absolute_path(char *session_file_name) {
+static inline char *get_absolute_path(char *session_file_name) {
     char *username = getlogin();
     size_t absolute_path_s = strlen(username) + strlen(SESSION_FOLDER) + strlen("/home/") + strlen(SESSION_LOCATION) + strlen(session_file_name);
     char *absolute_path = calloc(absolute_path_s + 2, sizeof(char));
@@ -42,7 +42,7 @@ int create_file(char *name) {
     return 0;
 }
 
-static size_t get_session_lines(char *session_file) {
+static inline size_t get_session_lines(char *session_file) {
     char tmp[strlen(session_file) + 1];
     strcpy(tmp, session_file);
 
@@ -57,7 +57,7 @@ static size_t get_session_lines(char *session_file) {
     return size;
 }
 
-static char *double_array_to_string(char **d_array, size_t size) {
+static inline char *double_array_to_string(char **d_array, size_t size) {
     size_t total_size = 0;
 
     if (size == 1) {

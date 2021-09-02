@@ -25,14 +25,15 @@
 #define COMMAND_RENAME    "rename"
 #define COMMAND_EDIT      "edit"
 
+// Function pointer types.
 typedef void exec_general(void);
 typedef void exec_one_arg(char *);
 typedef void exec_two_arg(char *, char *);
 typedef void exec_three_arg(char *, char *, char *);
 
 struct command {
-    char *c_name;
-    int   c_argc;
+    char         *c_name;
+    int           c_argc;
     exec_general *c_exec;
 };
 
@@ -55,14 +56,14 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = COMMAND_EDIT,    .c_argc = 3, .c_exec=(exec_general *) command_edit}
 };
 
-static int find_command(char *name) {
+static inline int find_command(char *name) {
 
     for (int curr_command = 0; curr_command < COMMAND_NUMBER; curr_command++)
         if (strcmp(commands[curr_command].c_name, name) == 0) return curr_command;
     return -1;
 }
 
-static int parse_session(char **argv) {
+static inline int parse_session(char **argv) {
     if (argv[1] == NULL || argv[2] == NULL) return -1;
 
     // form the full result_command.

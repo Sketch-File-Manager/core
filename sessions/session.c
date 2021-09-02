@@ -6,8 +6,10 @@
 #include <stdio.h>
 #include <executor.h>
 #include <codes.h>
+#include <time.h>
 
 static char *rand_string(size_t size){
+    srand(time(NULL));
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
     char *str = (char*) calloc(size + 1, sizeof(char));
