@@ -41,7 +41,7 @@ int set_current(char* current) {
     strcat(new_current_session, current);
 
     // Make the changes in the config file.
-    if (write_file(CONFIG_FILE, new_current_session, new_current_session_s) == -1) return -1;
+    if (write_file(CONFIG_FILE, new_current_session, new_current_session_s + 1) == -1) return -1;
 
     free(new_current_session);
     return 0;

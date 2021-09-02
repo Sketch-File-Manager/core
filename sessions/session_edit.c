@@ -16,8 +16,13 @@ static char* check_current() {
 }
 
 void command_exit(){
+    char* current = check_current();
+    if(current == NULL) return;
+
     int result = set_current("");
-    if(result != SUCCESS)
+    if (result == SUCCESS)
+        printf("%s", MSG_EXIT_CURRENT_SESSION);
+    else
         printf("%s %S %d", MSG_CANNOT_EXIT_CURRENT_SESSION, MSG_ERROR_CODE, result);
 }
 

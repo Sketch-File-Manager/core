@@ -6,6 +6,7 @@
 #define TRUE 1
 #define FALSE -1
 
+#define SESSION_IN_USE                      "A session is already in use. Type exit to exit the current session."
 
 #define MSG_ERROR_CODE                      "Error code: "
 #define MSG_SESSION_CURRENT_NOT_FOUND       "Cannot get current session."
@@ -28,6 +29,7 @@
 
 #define MSG_NO_CURRENT_SESSION              "No current session is defined."
 
+#define MSG_EXIT_CURRENT_SESSION            "Exited current session."
 #define MSG_CANNOT_EXIT_CURRENT_SESSION     "Cannot exit current session."
 
 #define MSG_CANNOT_UNDO_COMMAND             "Cannot undo command in current session."
