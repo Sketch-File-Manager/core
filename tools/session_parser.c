@@ -200,5 +200,5 @@ int session_exists(char* name) {
 
 int list_sessions(char ***result, size_t *size) {
 
-    return SUCCESS
+    return SUCCESS;
 }

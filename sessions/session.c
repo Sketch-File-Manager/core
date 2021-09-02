@@ -186,7 +186,7 @@ void session_show(char* id) {
 
     int result = read_session(name, &lines, &n);
     if(result != SUCCESS)
-        printf("Cannot read session. Error code: %d\n", result);
+        printf("%s %s %d\n", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, result);
 
     for(size_t i = 0; i < n; i++)
         printf("%s\n", lines[i]);
@@ -201,7 +201,7 @@ void session_list() {
 
     int result = list_sessions(&lines, &n);
     if(result != SUCCESS)
-        printf("Cannot read session. Error code: %d\n", result);
+        printf("%s %s %d\n", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, result);
 
     for(size_t i = 0; i < n; i++)
         printf("%d. %s\n", (int)i, lines[i]);
