@@ -38,6 +38,7 @@ int create_file(char *name) {
     int new_fd = open(absolute, O_CREAT, 0700);
 
     close(new_fd);
+    free(absolute);
     return 0;
 }
 
