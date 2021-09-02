@@ -21,6 +21,12 @@ int get_current(char** current) {
     // get the current session.
     char *current_session = strtok(NULL, "\n");
 
+    if (current_session == NULL) {
+        *current = calloc(1, sizeof(char));
+        strcpy(*current, "");
+        return -1;
+    }
+
     // Allocate enough space for the current session.
     *current = calloc(strlen(current_session) + 1, sizeof(char));
     // set the current session to current.
