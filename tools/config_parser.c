@@ -4,16 +4,19 @@
 #include <config_parser.h>
 #include <file_handler.h>
 #include <codes.h>
+#include <functions.h>
 
 
 #define CONFIG_FILE         "config.conf"
+#define CONFIG_LOCATION     "/.local/share/sketch/"
 #define CURRENT_SESSION_ID  "current_session:"
 
 
 int get_current(char** current) {
     char *config = NULL;
+    char *path = get_absolute_path(CONFIG_FILE, CONFIG_LOCATION);
 
-    if (read_file(CONFIG_FILE, &config) == -1) return -1;
+    if (read_file(path, &config) == -1) return -1;
 
     // Find the location of current session in the file.
     char *location_of_interest = strstr(config, CURRENT_SESSION_ID);
@@ -40,15 +43,18 @@ int set_current(char* current) {
     // Calculate the size of the new current session.
     size_t new_current_session_s = strlen(current) + strlen(CURRENT_SESSION_ID);
     // Allocate enough memory for the new current session.
-    char *new_current_session = calloc(new_current_session_s + 2, sizeof(char));
+    char *new_current_session = calloc(new_current_session_s + 3, sizeof(char));
     // Set the new current session.
     strcpy(new_current_session, CURRENT_SESSION_ID);
     strcat(new_current_session, " ");
     strcat(new_current_session, current);
+    strcat(new_current_session, "\n");
 
+    char *absolute_path = get_absolute_path(CONFIG_FILE, CONFIG_LOCATION);
     // Make the changes in the config file.
-    if (write_file(CONFIG_FILE, new_current_session, new_current_session_s + 1) == -1) return -1;
+    if (write_file(absolute_path, new_current_session, new_current_session_s + 2) == -1) return -1;
 
     free(new_current_session);
+    free(absolute_path);
     return 0;
 }

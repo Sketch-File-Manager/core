@@ -4,20 +4,20 @@
 #include <sys/stat.h>
 
 #include <file_handler.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <functions.h>
 
-#define SKETCH_FOLDER "/.local/share/sketch/"
+#define SKETCH_LOCATION     "/.local/share/"
+#define CONFIG_LOCATION     "/.local/share/sketch/"
+#define SESSION_LOCATION    "/.local/share/sketch/"
+
 
 static int get_file_fd(char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
-    char *username = getlogin();
-    size_t path_s = strlen(file_path) + strlen(username) + strlen("/home/") + strlen(SKETCH_FOLDER);
+    size_t path_s = strlen(file_path);
     char *path = calloc(path_s + 1, sizeof(char));
-
-    // form the full path.
-    strcat(path, "/home/");
-    strcat(path, username);
-    strcat(path, SKETCH_FOLDER);
-    strcat(path, file_path);
+    strcpy(path, file_path);
 
     // open the config file.
     int fd = open(path, flag);
@@ -72,51 +72,70 @@ int write_file(char *file_path, char *changes, size_t changes_len) {
     return 0;
 }
 
-static inline void create_dir(char *path) {
-    char *username = getlogin();
-    size_t sketch_path_s = strlen("/home/") + strlen(username) + strlen(path);
-    char *sketch_path = calloc(sketch_path_s + 1, sizeof(char));
+static inline void create_dir(char *name, char *path) {
+    char *absolute_path = get_absolute_path(name, path);
 
-    strcpy(sketch_path, "/home/");
-    strcat(sketch_path, username);
-    strcat(sketch_path, path);
-
-    mkdir(sketch_path, 0700);
-    free(sketch_path);
+    // TODO check for errors.
+    mkdir(absolute_path, 0700);
+    free(absolute_path);
 }
 
-static inline void check_sketch_folder(char *sketch_path) {
-    create_dir(sketch_path);
+static inline void check_sketch_folder(char *sketch_folder_name) {
+    create_dir(sketch_folder_name, SKETCH_LOCATION);
 }
 
-static inline void check_config_file(char *path) {
-    char *username = getlogin();
-    size_t config_path_s = strlen("/home/") + strlen(username) + strlen(path);
-    char *config_path = calloc(config_path_s + 1, sizeof(char));
-
-    strcpy(config_path, "/home/");
-    strcat(config_path, username);
-    strcat(config_path, path);
+static inline void check_config_file(char *file_name) {
+    char *absolute_path = get_absolute_path(file_name, CONFIG_LOCATION);
 
     // try to open the file, and in case that it does not exist create it.
-    int config_fd = open(config_path, O_CREAT, 0700);
-    char *first_write = "current:\n";
+    int config_fd = open(absolute_path, O_CREAT, 0700);
+    char *first_write = "current_session:";
 
     close(config_fd);
-    if (write_file("config.conf", first_write, strlen(first_write))) return;
+    if (write_file(absolute_path, first_write, strlen(first_write))) return;
 
-    free(config_path);
+    free(absolute_path);
 
 }
 
-static inline void check_session_folder(char *session_path) {
-    create_dir(session_path);
+static inline void check_session_folder(char *session_folder_name) {
+    create_dir(session_folder_name, SESSION_LOCATION);
 }
 
-void check_requirements(char *config_path, char *sketch_path, char *sessions_path) {
-    check_sketch_folder(sketch_path);
-    check_config_file(config_path);
-    check_session_folder(sessions_path);
+void check_requirements(char *config_file, char *sketch_folder_name, char *sessions_folder_name) {
+    check_sketch_folder(sketch_folder_name);
+    check_config_file(config_file);
+    check_session_folder(sessions_folder_name);
 }
 
+int list_files(char *path, char ***result_files, size_t *size) {
+    DIR *dir = opendir(path);
+    struct dirent *dir_info;
+
+    if (dir == NULL) return -1;
+
+    size_t files_s = 1;
+    char **files = calloc(1, sizeof(char *));
+    char *current_file = NULL;
+    int index = 0;
+
+    while ((dir_info = readdir(dir)) != NULL) {
+        if (strcmp(dir_info->d_name, ".") == 0 || strcmp(dir_info->d_name, "..") == 0) continue;
+
+        current_file = dir_info->d_name;
+
+        files[index] = calloc(strlen(current_file) + 1, sizeof(char ));
+        strcpy(files[index], current_file);
+
+        ++files_s;
+        files = realloc(files, sizeof(char *) * files_s);
+        index++;
+    }
+    --files_s;
+    closedir(dir);
+    *size = files_s;
+    *result_files = files;
+
+    return 0;
+}
 

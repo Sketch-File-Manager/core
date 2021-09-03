@@ -2,13 +2,12 @@
 #include <file_handler.h>
 
 
-
 int main(int argc, char **argv) {
-    char *config_path = "/.local/share/sketch/config.conf";
-    char *sketch_path = "/.local/share/sketch/";
-    char *session_path = "/.local/share/sketch/sessions/";
+    char *config =  "config.conf";
+    char *sketch =  "sketch/";
+    char *session = "sessions/";
 
-    check_requirements(config_path, sketch_path, session_path);
+    check_requirements(config, sketch, session);
     parse(argc, argv);
     return 0;
 }

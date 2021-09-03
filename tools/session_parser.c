@@ -6,25 +6,13 @@
 #include <session_parser.h>
 #include <file_handler.h>
 #include <codes.h>
+#include <functions.h>
 
-#define SESSION_FOLDER      "sessions/"
-#define SESSION_LOCATION    "/.local/share/sketch/"
-
-static inline char *get_absolute_path(char *session_file_name) {
-    char *username = getlogin();
-    size_t absolute_path_s = strlen(username) + strlen(SESSION_FOLDER) + strlen("/home/") + strlen(SESSION_LOCATION) + strlen(session_file_name);
-    char *absolute_path = calloc(absolute_path_s + 2, sizeof(char));
-    strcpy(absolute_path, "/home/");
-    strcat(absolute_path, username);
-    strcat(absolute_path, SESSION_LOCATION);
-    strcat(absolute_path, SESSION_FOLDER);
-    strcat(absolute_path, session_file_name);
-
-    return absolute_path;
-}
+#define SESSION_FOLDER    "/.local/share/sketch/sessions/"
+#define SESSION_LOCATION  "/.local/share/sketch/"
 
 int delete_file(char *name) {
-    char *absolute_path = get_absolute_path(name);
+    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     // remove file with name.
     remove(absolute_path);
 
@@ -33,7 +21,7 @@ int delete_file(char *name) {
 }
 
 int create_file(char *name) {
-    char *absolute = get_absolute_path(name);
+    char *absolute = get_absolute_path(name, SESSION_FOLDER);
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
 
@@ -81,11 +69,8 @@ static inline char *double_array_to_string(char **d_array, size_t size) {
 }
 
 int delete_last_line(char *name) {
-    char *relative_path = calloc(strlen(SESSION_FOLDER) + strlen(name) + 1, sizeof(char));
+    char *relative_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
-
-    strcat(relative_path, SESSION_FOLDER);
-    strcat(relative_path, name);
 
     if (read_file(relative_path, &session_file) == -1) return -1;
 
@@ -113,11 +98,9 @@ int delete_last_line(char *name) {
 }
 
 static int append(char *name, char *content, int is_start) {
-    char *relative_path = calloc(strlen(SESSION_FOLDER) + strlen(name) + 1, sizeof(char));
+    char *relative_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
-    strcat(relative_path, SESSION_FOLDER);
-    strcat(relative_path, name);
     if (read_file(relative_path, &session_file) == -1) return -1;
 
     size_t new_file_s = strlen(content) + strlen(session_file);
@@ -150,11 +133,8 @@ int append_to_start(char *name, char *content) {
 }
 
 int read_session(char *name, char ***result, size_t *size) {
-    char *relative_path = calloc(strlen(SESSION_FOLDER) + strlen(name) + 1, sizeof(char));
+    char *relative_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
-
-    strcat(relative_path, SESSION_FOLDER);
-    strcat(relative_path, name);
 
     if (read_file(relative_path, &session_file) == -1) return -1;
 
@@ -189,7 +169,7 @@ int read_session(char *name, char ***result, size_t *size) {
 }
 
 int session_exists(char* name) {
-    char *absolute_path = get_absolute_path(name);
+    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     int file_fd = open(absolute_path, O_RDONLY);
 
     if (file_fd == -1) return FALSE;
@@ -199,6 +179,29 @@ int session_exists(char* name) {
 }
 
 int list_sessions(char ***result, size_t *size) {
+    char **files = NULL;
+    size_t files_s = 0;
+
+    char *path = get_absolute_path("sessions/", SESSION_LOCATION);
+    list_files(path, &files, &files_s);
+
+    size_t session_files_s = 1;
+    char **session_files = calloc(1, sizeof(char *));
+
+    for (int file = 0; file < files_s; file++) {
+        if (endsWith(files[file], ".session") == TRUE) {
+            session_files[session_files_s - 1] = calloc(strlen(files[file]) + 1, sizeof(char));
+            strcpy(session_files[session_files_s - 1], files[file]);
+            ++session_files_s;
+            session_files = realloc(session_files, sizeof(char *) * session_files_s);
+        }
+        free(files[file]);
+    }
+    free(files);
+    --session_files_s;
+
+    *size = session_files_s;
+    *result = session_files;
 
     return SUCCESS;
 }
