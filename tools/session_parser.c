@@ -30,23 +30,7 @@ int create_file(char *name) {
     return 0;
 }
 
-static inline size_t get_session_lines(char *session_file) {
-    char tmp[strlen(session_file) + 1];
-    strcpy(tmp, session_file);
-
-    char *current_line = strtok(tmp, "\n");
-    size_t size = 0;
-
-    while (current_line) {
-        ++size;
-        current_line = strtok(NULL, "\n");
-    }
-
-    return size;
-}
-
 static inline char *double_array_to_string(char **d_array, size_t size) {
-    size_t total_size = 0;
 
     if (size == 1) {
         char *tmp = calloc(strlen(d_array[0]) + 1, sizeof(char));
@@ -54,13 +38,14 @@ static inline char *double_array_to_string(char **d_array, size_t size) {
         return tmp;
     }
 
-    // calculate the total size of the new string.
-    for (int element = 0; element < size; element++) total_size += strlen(d_array[element]);
-
     // allocate the space of the new string.
-    char *string_form = calloc(total_size + size + 1, sizeof(char));
+    size_t total_size = 1 + size;
+    char *string_form = calloc(1 + size, sizeof(char));
     // save each element on the as sequence of strings.
     for (int element = 0; element < size; element++) {
+        // Increase the space dynamically.
+        total_size += strlen(d_array[element]);
+        string_form = realloc(string_form, sizeof(char) * total_size);
         strcat(string_form, d_array[element]);
         strcat(string_form, "\n");
     }
@@ -69,31 +54,54 @@ static inline char *double_array_to_string(char **d_array, size_t size) {
 }
 
 int delete_last_line(char *name) {
-    char *relative_path = get_absolute_path(name, SESSION_FOLDER);
+    // Get the absolute path.
+    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
-    if (read_file(relative_path, &session_file) == -1) return -1;
+    // read the file.
+    if (read_file(absolute_path, &session_file) == -1) return -1;
 
-    size_t session_lines_s = get_session_lines(session_file);
-    char **session_lines = calloc(session_lines_s, sizeof(char *));
+    // Allocate space for one element.
+    size_t session_lines_s = 1;
+    char **session_lines = calloc(1, sizeof(char *));
 
-    if (session_lines_s == 0) return -1;
+    // Get the first line.
+    char *current_line = strtok(session_file, "\n");
 
-    char tmp[strlen(session_file) + 1];
-    strcpy(tmp, session_file);
+    // If no line exist.
+    if (current_line == NULL) return  -1;
 
-    session_lines[0] = strtok(tmp, "\n");
-    for (size_t s = 1; s < session_lines_s - 1; s++) {
-        session_lines[s] = strtok(NULL, "\n");
+    // Fill the array with the lines in the session file.
+    for (size_t s = 0; current_line != NULL; s++) {
+        // Allocate space for the current line.
+        session_lines[s] = calloc(strlen(current_line) + 1, sizeof(char));
+        strcpy(session_lines[s], current_line);
+        // Increase the line number in the array, because we have more lines.
+        ++session_lines_s;
+        // Re allocate space to fit the new line.
+        session_lines = realloc(session_lines, sizeof(char *) * session_lines_s);
+        // Jump to the next line.
+        current_line = strtok(NULL, "\n");
     }
-    char *new_session_file = double_array_to_string(session_lines, session_lines_s - 1);
 
-    if (write_file(relative_path, new_session_file, strlen(new_session_file)) == -1) return -1;
+    // Get the changes in string form. We just get all the lines except the last one, because we want to delete the last line.
+    char *new_session_file = double_array_to_string(session_lines, session_lines_s - 2);
 
+    // Free
+    for (int fr = 0; fr < session_lines_s - 1; fr++) free(session_lines[fr]);
     free(session_file);
-    free(relative_path);
     free(session_lines);
+
+    // Write the changes.
+    if (write_file(absolute_path, new_session_file, strlen(new_session_file)) == -1) {
+        free(absolute_path);
+        free(new_session_file);
+        return -1;
+    }
+
+    free(absolute_path);
     free(new_session_file);
+
     return 0;
 }
 
@@ -133,12 +141,11 @@ int append_to_start(char *name, char *content) {
 }
 
 int read_session(char *name, char ***result, size_t *size) {
-    char *relative_path = get_absolute_path(name, SESSION_FOLDER);
+    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
-    if (read_file(relative_path, &session_file) == -1) return -1;
+    if (read_file(absolute_path, &session_file) == -1) return -1;
 
-    size_t session_file_lines_s = get_session_lines(session_file);
     char **lines;
     char *current_line = strtok(session_file, "\n");
 
@@ -150,13 +157,20 @@ int read_session(char *name, char ***result, size_t *size) {
         *result = lines;
         return SUCCESS;
     }
-    
-    lines = calloc(session_file_lines_s, sizeof(char *));
+
+    size_t session_file_lines_s = 1;
+    lines = calloc(1, sizeof(char *));
 
     lines[0] = calloc(strlen(current_line) + 1, sizeof(char));
     strcpy(lines[0], current_line);
-    for (size_t line = 1; line < session_file_lines_s; line++) {
+    for (size_t line = 1; ; line++) {
         current_line = strtok(NULL, "\n");
+        if (current_line == NULL) break;
+
+        // Increase the size of the array.
+        ++session_file_lines_s;
+        lines = realloc(lines, sizeof(char *) * session_file_lines_s);
+        // Allocate space for the new line.
         lines[line] = calloc(strlen(current_line) + 1, sizeof(char));
         strcpy(lines[line], current_line);
     }
@@ -164,7 +178,7 @@ int read_session(char *name, char ***result, size_t *size) {
     *result = lines;
 
     free(session_file);
-    free(relative_path);
+    free(absolute_path);
     return 0;
 }
 
