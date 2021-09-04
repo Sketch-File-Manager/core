@@ -39,7 +39,7 @@ int get_current(char** current) {
     return 0;
 }
 
-int set_current(char* current) {
+int set_current(const char* current) {
     // Calculate the size of the new current session.
     size_t new_current_session_s = strlen(current) + strlen(CURRENT_SESSION_ID);
     // Allocate enough memory for the new current session.

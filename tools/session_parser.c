@@ -11,7 +11,7 @@
 #define SESSION_FOLDER    "/.local/share/sketch/sessions/"
 #define SESSION_LOCATION  "/.local/share/sketch/"
 
-int delete_file(char *name) {
+int delete_file(const char *name) {
     char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     // remove file with name.
     remove(absolute_path);
@@ -20,7 +20,7 @@ int delete_file(char *name) {
     return 0;
 }
 
-int create_file(char *name) {
+int create_file(const char *name) {
     char *absolute = get_absolute_path(name, SESSION_FOLDER);
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
@@ -30,7 +30,7 @@ int create_file(char *name) {
     return 0;
 }
 
-static inline char *double_array_to_string(char **d_array, size_t size) {
+static inline char *double_array_to_string(const char **d_array, size_t size) {
 
     if (size == 1) {
         char *tmp = calloc(strlen(d_array[0]) + 1, sizeof(char));
@@ -53,7 +53,7 @@ static inline char *double_array_to_string(char **d_array, size_t size) {
     return string_form;
 }
 
-int delete_last_line(char *name) {
+int delete_last_line(const char *name) {
     // Get the absolute path.
     char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
@@ -85,7 +85,7 @@ int delete_last_line(char *name) {
     }
 
     // Get the changes in string form. We just get all the lines except the last one, because we want to delete the last line.
-    char *new_session_file = double_array_to_string(session_lines, session_lines_s - 2);
+    char *new_session_file = double_array_to_string((const char **) session_lines, session_lines_s - 2);
 
     // Free
     for (int fr = 0; fr < session_lines_s - 1; fr++) free(session_lines[fr]);
@@ -105,7 +105,7 @@ int delete_last_line(char *name) {
     return 0;
 }
 
-static int append(char *name, char *content, int is_start) {
+static int append(const char *name, const char *content, int is_start) {
     char *relative_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
@@ -132,15 +132,15 @@ static int append(char *name, char *content, int is_start) {
     return 0;
 }
 
-int append_to_end(char *name, char *content) {
+int append_to_end(const char *name, const char *content) {
     return append(name, content, FALSE);
 }
 
-int append_to_start(char *name, char *content) {
+int append_to_start(const char *name, const char *content) {
     return append(name, content, TRUE);
 }
 
-int read_session(char *name, char ***result, size_t *size) {
+int read_session(const char *name, char ***result, size_t *size) {
     char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
@@ -182,7 +182,7 @@ int read_session(char *name, char ***result, size_t *size) {
     return 0;
 }
 
-int session_exists(char* name) {
+int session_exists(const char* name) {
     char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
     int file_fd = open(absolute_path, O_RDONLY);
 

@@ -5,7 +5,6 @@
 
 #include <file_handler.h>
 #include <dirent.h>
-#include <stdio.h>
 #include <functions.h>
 
 #define SKETCH_LOCATION     "/.local/share/"
@@ -13,7 +12,7 @@
 #define SESSION_LOCATION    "/.local/share/sketch/"
 
 
-static int get_file_fd(char *file_path, int flag, size_t *file_len) {
+static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
     size_t path_s = strlen(file_path);
     char *path = calloc(path_s + 1, sizeof(char));
@@ -34,7 +33,7 @@ static int get_file_fd(char *file_path, int flag, size_t *file_len) {
     return fd;
 }
 
-int read_file(char *file_path, char **config_content) {
+int read_file(const char *file_path, char **config_content) {
     size_t file_len;
     // get the file descriptor of the config.
     int fd = get_file_fd(file_path, O_RDONLY, &file_len);
@@ -59,7 +58,7 @@ int read_file(char *file_path, char **config_content) {
     return 0;
 }
 
-int write_file(char *file_path, char *changes, size_t changes_len) {
+int write_file(const char *file_path, char *changes, size_t changes_len) {
     int config_fd = get_file_fd(file_path, O_RDWR | O_TRUNC, NULL);
 
     // check if something goes wrong.
@@ -72,7 +71,7 @@ int write_file(char *file_path, char *changes, size_t changes_len) {
     return 0;
 }
 
-static inline void create_dir(char *name, char *path) {
+static inline void create_dir(const char *name, const char *path) {
     char *absolute_path = get_absolute_path(name, path);
 
     // TODO check for errors.
@@ -80,11 +79,11 @@ static inline void create_dir(char *name, char *path) {
     free(absolute_path);
 }
 
-static inline void check_sketch_folder(char *sketch_folder_name) {
+static inline void check_sketch_folder(const char *sketch_folder_name) {
     create_dir(sketch_folder_name, SKETCH_LOCATION);
 }
 
-static inline void check_config_file(char *file_name) {
+static inline void check_config_file(const char *file_name) {
     char *absolute_path = get_absolute_path(file_name, CONFIG_LOCATION);
 
     // try to open the file, and in case that it does not exist create it.
@@ -98,17 +97,17 @@ static inline void check_config_file(char *file_name) {
 
 }
 
-static inline void check_session_folder(char *session_folder_name) {
+static inline void check_session_folder(const char *session_folder_name) {
     create_dir(session_folder_name, SESSION_LOCATION);
 }
 
-void check_requirements(char *config_file, char *sketch_folder_name, char *sessions_folder_name) {
+void check_requirements(const char *config_file, const char *sketch_folder_name, const char *sessions_folder_name) {
     check_sketch_folder(sketch_folder_name);
     check_config_file(config_file);
     check_session_folder(sessions_folder_name);
 }
 
-int list_files(char *path, char ***result_files, size_t *size) {
+int list_files(const char *path, char ***result_files, size_t *size) {
     DIR *dir = opendir(path);
     struct dirent *dir_info;
 
@@ -138,4 +137,3 @@ int list_files(char *path, char ***result_files, size_t *size) {
 
     return 0;
 }
-

@@ -3,7 +3,7 @@
 
 extern int endsWith(const char *str, const char *suffix);
 
-extern char *get_absolute_path(char *name, char *relative_path);
+extern char *get_absolute_path(const char *name, const char *relative_path);
 
 
 
