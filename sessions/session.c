@@ -73,9 +73,9 @@ void session_end(char* id) {
 
     int result = delete_file(name);
     if (result == SUCCESS)
-        printf("%s %s\n", MSG_SESSION_ENDED, name);
+        printf("%s\n", MSG_SESSION_ENDED);
     else
-        printf("%s %s %s %d\n", MSG_SESSION_FAILED_TO_END, name, MSG_ERROR_CODE, result);
+        printf("%s %s %d\n", MSG_SESSION_FAILED_TO_END, MSG_ERROR_CODE, result);
 
     free(name);
 }
@@ -97,9 +97,9 @@ void session_use(char* id) {
         if (result == SUCCESS)
             printf("%s %s\n", MSG_SESSION_USE_SUCCESSFUL, name);
         else
-            printf("%s %s %s %d\n", MSG_SESSION_FAILED_TO_USE, name, MSG_ERROR_CODE, result);
+            printf("%s %s %d\n", MSG_SESSION_FAILED_TO_USE, MSG_ERROR_CODE, result);
     }
-    else printf("%s %s\n", MSG_SESSION_DOES_NOT_EXIST, name);
+    else printf("%s\n", MSG_SESSION_DOES_NOT_EXIST);
 
     free(name);
 }
@@ -140,7 +140,7 @@ void session_run(char* id) {
                 int exec_result = execute(line);
 
                 if(exec_result != SUCCESS) {
-                    printf("%s Line %d: %s, %s. %s %d\n", MSG_SESSION_CANNOT_EXECUTE, i, line, MSG_SESSION_ABORT_REST, MSG_ERROR_CODE, read_result);
+                    printf("%s Line %d: %s, %s %s %d\n", MSG_SESSION_CANNOT_EXECUTE, i, line, MSG_SESSION_ABORT_REST, MSG_ERROR_CODE, read_result);
                     flag = 1;
                 }
             }
@@ -167,6 +167,8 @@ void session_current() {
         printf("%s\n", MSG_NO_CURRENT_SESSION);
     else
         printf("%s\n", current);
+
+    free(current);
 }
 
 void session_show(char* id) {
@@ -193,6 +195,9 @@ void session_show(char* id) {
     putchar('\n');
 
     free(name);
+    for (int i = 0; i < n; ++i)
+        free(lines[i]);
+    free(lines);
 }
 
 void session_list() {
@@ -204,6 +209,9 @@ void session_list() {
         printf("%s %s %d\n", MSG_SESSION_CANNOT_OPEN, MSG_ERROR_CODE, result);
 
     for(size_t i = 0; i < n; i++)
-        printf("%d. %s\n", (int)i, lines[i]);
-    putchar('\n');
+        printf("[%d] %s\n", ((int)i) + 1, lines[i]);
+
+    for (int i = 0; i < n; ++i)
+        free(lines[i]);
+    free(lines);
 }

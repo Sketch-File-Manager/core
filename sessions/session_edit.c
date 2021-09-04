@@ -15,6 +15,25 @@ static char* check_current() {
     return current;
 }
 
+static char* analyze_path_spaces(char* path) {
+    int space_count = 0;
+    for (int i = 0; path[i];  i++, path[i] == ' ' ? space_count : 0);
+
+    char* analyzed_path = (char*) calloc(strlen(path) + space_count + 1, sizeof(char));
+
+
+    for(int i = 0, k = 0; path[i]; i++, k++) {
+        if(path[i] == ' ') {
+            analyzed_path[k] = '\\';
+            k++;
+        }
+
+        analyzed_path[k] = path[i];
+    }
+
+    return path;
+}
+
 void command_exit(){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
@@ -35,15 +54,17 @@ void command_undo(){
         printf("%s %s %d\n", MSG_CANNOT_UNDO_COMMAND, MSG_ERROR_CODE, edit_result);
 }
 
-void command_mkdir(char* dst, char* folder){
+void command_mkdir(char* dst, char* folder, char* permissions){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(6 + strlen(dst) + 1 + strlen(folder) + 1, sizeof(char));
+    char* cmd = (char*) calloc(6 + strlen(dst) + 1 + strlen(folder) + 1 + strlen(permissions) + 1, sizeof(char));
     strcat(cmd, "mkdir ");
-    strcat(cmd, dst);
+    strcat(cmd, analyze_path_spaces(dst));
     strcat(cmd, " ");
-    strcat(cmd, folder);
+    strcat(cmd, analyze_path_spaces(folder));
+    strcat(cmd, " ");
+    strcat(cmd, permissions);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
@@ -52,15 +73,17 @@ void command_mkdir(char* dst, char* folder){
     free(cmd);
 }
 
-void command_mkfile(char* dst, char* file){
+void command_mkfile(char* dst, char* file, char* permissions){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(7 + strlen(dst) + 1 + strlen(file) + 1, sizeof(char));
+    char* cmd = (char*) calloc(7 + strlen(dst) + 1 + strlen(file) + 1 + strlen(permissions) + 1, sizeof(char));
     strcat(cmd, "mkfile ");
-    strcat(cmd, dst);
+    strcat(cmd, analyze_path_spaces(dst));
     strcat(cmd, " ");
-    strcat(cmd, file);
+    strcat(cmd, analyze_path_spaces(file));
+    strcat(cmd, " ");
+    strcat(cmd, permissions);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
@@ -69,15 +92,19 @@ void command_mkfile(char* dst, char* file){
     free(cmd);
 }
 
-void command_copy(char* src, char* dst){
+void command_copy(char* src, char* dst, char* permissions, char* recursive){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1, sizeof(char));
+    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
     strcat(cmd, "copy ");
-    strcat(cmd, src);
+    strcat(cmd, analyze_path_spaces(src));
     strcat(cmd, " ");
-    strcat(cmd, dst);
+    strcat(cmd, analyze_path_spaces(dst));
+    strcat(cmd, " ");
+    strcat(cmd, permissions);
+    strcat(cmd, " ");
+    strcat(cmd, recursive);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
@@ -86,15 +113,19 @@ void command_copy(char* src, char* dst){
     free(cmd);
 }
 
-void command_move(char* src, char* dst){
+void command_move(char* src, char* dst, char* permissions, char* recursive){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1, sizeof(char));
+    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
     strcat(cmd, "move ");
-    strcat(cmd, src);
+    strcat(cmd, analyze_path_spaces(src));
     strcat(cmd, " ");
-    strcat(cmd, dst);
+    strcat(cmd, analyze_path_spaces(dst));
+    strcat(cmd, " ");
+    strcat(cmd, permissions);
+    strcat(cmd, " ");
+    strcat(cmd, recursive);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
@@ -109,9 +140,9 @@ void command_rename(char* src, char* name){
 
     char* cmd = (char*) calloc(7 + strlen(src) + 1 + strlen(name) + 1, sizeof(char));
     strcat(cmd, "rename ");
-    strcat(cmd, src);
+    strcat(cmd, analyze_path_spaces(src));
     strcat(cmd, " ");
-    strcat(cmd, name);
+    strcat(cmd, analyze_path_spaces(name));
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
@@ -126,11 +157,35 @@ void command_edit(char* src, char* flag, char* content){
 
     char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(flag) + 1 + strlen(content) + 1, sizeof(char));
     strcat(cmd, "edit ");
-    strcat(cmd, src);
+    strcat(cmd, analyze_path_spaces(src));
     strcat(cmd, " ");
     strcat(cmd, flag);
     strcat(cmd, " ");
     strcat(cmd, content);
+
+    int result = append_to_end(current, cmd);
+    if(result != SUCCESS)
+        printf("%s %s %d\n", MSG_CANNOT_ADD_COMMAND, MSG_ERROR_CODE, result);
+
+    free(cmd);
+}
+
+void command_permission(char* src, char* permissions, char* recursive){
+    char* current = check_current();
+    if(strcmp(current, "") == 0) return;
+
+    if(strcmp(recursive, "0") != 0 && strcmp(recursive, "1") != 0) {
+        printf("%s\n", MSG_INVALID_RECURSIVE_OPTION);
+        return;
+    }
+
+    char* cmd = (char*) calloc(12 + strlen(src) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
+    strcat(cmd, "permissions ");
+    strcat(cmd, analyze_path_spaces(src));
+    strcat(cmd, " ");
+    strcat(cmd, permissions);
+    strcat(cmd, " ");
+    strcat(cmd, recursive);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
