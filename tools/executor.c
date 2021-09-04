@@ -77,12 +77,12 @@ int execute(char* command) {
     char** split = split_with_exception(command, ' ', '\\', &n);
 
     if(strcmp(split[0], "mkdir") == 0) {
-        char* path = fix_path(split[1], TRUE);
+        char* dst_folder = fix_path(split[1], TRUE);
         char* name = split[2];
         __mode_t permissions = parse_permission(split[3]);
 
-        char* folder_path = calloc(strlen(path) + strlen(name) + 1, sizeof(char));
-        strcpy(folder_path, path);
+        char* folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+        strcpy(folder_path, dst_folder);
         strcpy(folder_path, name);
 
         int result = mkdir(folder_path, permissions);
@@ -92,21 +92,45 @@ int execute(char* command) {
         return errno;
     }
     else if(strcmp(split[0], "mkfile") == 0) {
-        
+        char* dst_folder = fix_path(split[1], TRUE);
+        char* file = split[2];
+        __mode_t permissions = parse_permission(split[3]);
+
     }
     else if(strcmp(split[0], "copy") == 0) {
+        char* src = fix_path(split[1], TRUE);
+        char* dst_folder = fix_path(split[2], TRUE);
+        __mode_t permissions = parse_permission(split[3]);
+        unsigned int recursive = (unsigned char) split[4][0];
+
 
     }
     else if(strcmp(split[0], "move") == 0) {
+        char* src = fix_path(split[1], TRUE);
+        char* dst_folder = fix_path(split[2], TRUE);
+        __mode_t permissions = parse_permission(split[3]);
+        unsigned int recursive = (unsigned char) split[4][0];
+
 
     }
     else if(strcmp(split[0], "rename") == 0) {
+        char* src = fix_path(split[1], TRUE);
+        char* new_name = split[2];
+
 
     }
     else if(strcmp(split[0], "edit") == 0) {
+        char* src = fix_path(split[1], TRUE);
+        char* content = split[2];
+        char* flag = split[3];
+
 
     }
     else if(strcmp(split[0], "permissions") == 0) {
+        char* src = fix_path(split[1], TRUE);
+        __mode_t permissions = parse_permission(split[2]);
+        unsigned int recursive = (unsigned char) split[3][0];
+        
 
     }
 
