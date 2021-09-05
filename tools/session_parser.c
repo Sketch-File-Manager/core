@@ -12,7 +12,7 @@
 #define SESSION_LOCATION  "/.local/share/sketch/"
 
 int delete_file(const char *name) {
-    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
+    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
     // remove file with name.
     remove(absolute_path);
 
@@ -21,7 +21,7 @@ int delete_file(const char *name) {
 }
 
 int create_file(const char *name) {
-    char *absolute = get_absolute_path(name, SESSION_FOLDER);
+    char *absolute = add_home_directory_path(name, SESSION_FOLDER);
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
     if (new_fd == -1) {
@@ -62,7 +62,7 @@ static inline char *double_array_to_string(const char **d_array, size_t size) {
 
 int delete_last_line(const char *name) {
     // Get the absolute path.
-    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
+    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
     // read the file.
@@ -113,7 +113,7 @@ int delete_last_line(const char *name) {
 }
 
 static int append(const char *name, const char *content, int is_start) {
-    char *relative_path = get_absolute_path(name, SESSION_FOLDER);
+    char *relative_path = add_home_directory_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
     if (read_file(relative_path, &session_file) == -1) return -1;
@@ -148,7 +148,7 @@ int append_to_start(const char *name, const char *content) {
 }
 
 int read_session(const char *name, char ***result, size_t *size) {
-    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
+    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
     char *session_file = NULL;
 
     if (read_file(absolute_path, &session_file) == -1) return -1;
@@ -190,7 +190,7 @@ int read_session(const char *name, char ***result, size_t *size) {
 }
 
 int session_exists(const char* name) {
-    char *absolute_path = get_absolute_path(name, SESSION_FOLDER);
+    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
     int file_fd = open(absolute_path, O_RDONLY);
 
     if (file_fd == -1) return FALSE;
@@ -203,7 +203,7 @@ int list_sessions(char ***result, size_t *size) {
     char **files = NULL;
     size_t files_s = 0;
 
-    char *path = get_absolute_path("sessions/", SESSION_LOCATION);
+    char *path = add_home_directory_path("sessions/", SESSION_LOCATION);
     list_files(path, &files, &files_s);
 
     size_t session_files_s = 1;

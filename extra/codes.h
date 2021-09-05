@@ -3,6 +3,7 @@
 
 // Error codes
 #define SUCCESS 0
+#define UNKNOWN_COMMAND -1
 
 
 // Boolean types
@@ -12,7 +13,7 @@
 // Console messages (Will be change, so it will be easy to use grep command).
 #define SESSION_IN_USE                      "Session is already in use."
 
-#define MSG_ERROR_CODE                      "Error code:"
+#define MSG_ERROR_CODE                      "Errno:"
 #define MSG_SESSION_CURRENT_NOT_FOUND       "Cannot get current session."
 
 #define MSG_SESSION_CREATED_SUCCESSFULLY    "Session created successfully.\nSession id:"

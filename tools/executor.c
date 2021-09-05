@@ -73,6 +73,11 @@ static void read_contents_of(const char *path, perm_queue **queue, size_t queue_
     }
 }
 
+/**
+ * Sets the permission of a folder and it's sub-files and subfolders.
+ * @param path The main folder
+ * @param perms The permissions.
+ */
 static void set_perm_recursive(const char *path, __mode_t perms) {
 
     size_t queue_s = 1;
@@ -105,7 +110,14 @@ static void set_perm_recursive(const char *path, __mode_t perms) {
     free(queue);
 }
 
-
+/**
+ * Splits a string to an array of strings by a specific delimiter. It will skip the split by delimiter if the previous character is the same as the prev_delim_except.
+ * @param str The string that will be split.
+ * @param delimiter The delimiter.
+ * @param prev_delim_except The exception character that is located before the delimiter.
+ * @param n The size of the array that will be returned.
+ * @return A string array that contains the split form of the str.
+ */
 static char** split_with_exception(char* str, char delimiter, char prev_delim_except, size_t* n) {
     char** ret = (char**) calloc(1, sizeof (char*));
     int a = 0;
@@ -133,6 +145,11 @@ static char** split_with_exception(char* str, char delimiter, char prev_delim_ex
     return ret;
 }
 
+/**
+ * Translate a string of permissions to bitmask.
+ * @param p The permission string, e.x. "0700"
+ * @return The permission.
+ */
 static __mode_t parse_permission(char* p) {
     return (__mode_t) p;
 }
@@ -161,6 +178,7 @@ int execute(char* command) {
         char* file = split[2];
         __mode_t permissions = parse_permission(split[3]);
 
+        // TODO this wrong.
         int result = create_file(file);
         if (result == 0)
             return SUCCESS;
@@ -201,7 +219,7 @@ int execute(char* command) {
         char* src = fix_path(split[1], TRUE);
         __mode_t permissions = parse_permission(split[2]);
         unsigned int recursive = (unsigned char) split[3][0];
-        
+
 
     }
 
@@ -209,5 +227,5 @@ int execute(char* command) {
         free(split[i]);
     free(split);
 
-    return SUCCESS;
+    return UNKNOWN_COMMAND;
 }

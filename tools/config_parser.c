@@ -14,7 +14,7 @@
 
 int get_current(char** current) {
     char *config = NULL;
-    char *path = get_absolute_path(CONFIG_FILE, CONFIG_LOCATION);
+    char *path = add_home_directory_path(CONFIG_FILE, CONFIG_LOCATION);
 
     if (read_file(path, &config) == -1) return -1;
 
@@ -50,7 +50,7 @@ int set_current(const char* current) {
     strcat(new_current_session, current);
     strcat(new_current_session, "\n");
 
-    char *absolute_path = get_absolute_path(CONFIG_FILE, CONFIG_LOCATION);
+    char *absolute_path = add_home_directory_path(CONFIG_FILE, CONFIG_LOCATION);
     // Make the changes in the config file.
     if (write_file(absolute_path, new_current_session, new_current_session_s + 2) == -1) return -1;
 

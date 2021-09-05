@@ -22,7 +22,7 @@ int endsWith(const char *str, const char *suffix) {
     return TRUE;
 }
 
-char *get_absolute_path(const char *name, const char *relative_path) {
+char *add_home_directory_path(const char *name, const char *relative_path) {
     char *username = getlogin();
     size_t absolute_path_s = strlen("/home/") + strlen(username) + strlen(name) + strlen(relative_path);
     char *absolute_path = calloc(absolute_path_s + 2, sizeof(char));

@@ -72,7 +72,7 @@ int write_file(const char *file_path, char *changes, size_t changes_len) {
 }
 
 static inline void create_dir(const char *name, const char *path) {
-    char *absolute_path = get_absolute_path(name, path);
+    char *absolute_path = add_home_directory_path(name, path);
 
     // TODO check for errors.
     mkdir(absolute_path, 0700);
@@ -84,7 +84,7 @@ static inline void check_sketch_folder(const char *sketch_folder_name) {
 }
 
 static inline void check_config_file(const char *file_name) {
-    char *absolute_path = get_absolute_path(file_name, CONFIG_LOCATION);
+    char *absolute_path = add_home_directory_path(file_name, CONFIG_LOCATION);
 
     // try to open the file, and in case that it does not exist create it.
     int config_fd = open(absolute_path, O_CREAT, 0700);
