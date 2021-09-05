@@ -24,8 +24,15 @@ int create_file(const char *name) {
     char *absolute = get_absolute_path(name, SESSION_FOLDER);
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
+    if (new_fd == -1) {
+        free(absolute);
+        return -1;
+    }
 
-    close(new_fd);
+    if (close(new_fd) == -1) {
+        free(absolute);
+        return -1;
+    }
     free(absolute);
     return 0;
 }
