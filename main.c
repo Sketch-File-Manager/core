@@ -1,5 +1,6 @@
 #include <argument_parser.h>
 #include <file_handler.h>
+#include <logger.h>
 
 int main(int argc, char **argv) {
     char *config =  "config.conf";

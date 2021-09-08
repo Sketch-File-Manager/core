@@ -59,7 +59,7 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = SIMPLE_MOVE,        .c_argc = 4, .c_exec = (exec_general *) command_move},
         {.c_name = SIMPLE_RENAME,      .c_argc = 2, .c_exec = (exec_general *) command_rename},
         {.c_name = SIMPLE_EDIT,        .c_argc = 3, .c_exec = (exec_general *) command_edit},
-        {.c_name = SIMPLE_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) command_permissions}
+        {.c_name = SIMPLE_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) command_permissions},
 
         // session.
         {.c_name = SESSION_START,       .c_argc = 0, .c_exec = (exec_general *) session_start},
