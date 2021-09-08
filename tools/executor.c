@@ -74,18 +74,14 @@ int execute(char* command) {
     else if(strcmp(split[0], "copy") == 0) {
         char* src = fix_path(split[1], TRUE);
         char* dst_folder = fix_path(split[2], TRUE);
-        __mode_t permissions = parse_permission(split[3]);
-        unsigned int recursive = (unsigned char) split[4][0];
 
-        return command_copy(src, dst_folder, permissions, recursive);
+        return command_copy(src, dst_folder);
     }
     else if(strcmp(split[0], "move") == 0) {
         char* src = fix_path(split[1], TRUE);
         char* dst_folder = fix_path(split[2], TRUE);
-        __mode_t permissions = parse_permission(split[3]);
-        unsigned int recursive = (unsigned char) split[4][0];
 
-        return command_move(src, dst_folder, permissions, recursive);
+        return command_move(src, dst_folder);
     }
     else if(strcmp(split[0], "rename") == 0) {
         char* src = fix_path(split[1], TRUE);

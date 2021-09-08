@@ -31,19 +31,15 @@ extern void session_command_mkfile(char* dst, char* file, char* permissions);
  * Add cp command to the queue.
  * @param src The source folder or file.
  * @param dst The destination folder where the folder or file will be copied.
- * @param permissions The permissions number (e.x. 0700).
- * @param recursive If target is folder then recursive will change all the permissions in sub files and sub folders. 0 for false, 1 for true.
 */
-extern void session_command_copy(char* src, char* dst, char* permissions, char* recursive);
+extern void session_command_copy(char* src, char* dst);
 
 /**
  * Add mv command to the queue (without the rename function).
  * @param src The source folder or file.
  * @param dst The destination folder where the folder or file will be moved.
- * @param permissions The permissions number (e.x. 0700).
- * @param recursive If target is folder then recursive will change all the permissions in sub files and sub folders. 0 for false, 1 for true.
 */
-extern void session_command_move(char* src, char* dst, char* permissions, char* recursive);
+extern void session_command_move(char* src, char* dst);
 
 /**
  * Add renames a file or folder command to the queue.

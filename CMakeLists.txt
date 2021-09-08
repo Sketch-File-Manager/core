@@ -7,5 +7,6 @@ add_executable(sketch_core main.c sessions/session.c sessions/session_edit.c inc
 include_directories(include)
 include_directories(tools/include)
 include_directories(extra)
+include_directories(commands/)
 
 install(FILES build/sketch-core PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE DESTINATION /usr/bin/)

@@ -4,7 +4,10 @@
 #include <errno.h>
 #include <session_parser.h>
 #include <dirent.h>
-#include "commands.h"
+#include <fcntl.h>
+#include <commands.h>
+#include <file_handler.h>
+#include <stdio.h>
 
 typedef struct perm_queue {
     char   *p_path;
@@ -34,6 +37,7 @@ static void read_contents_of(const char *path, perm_queue **queue, size_t queue_
     }
 }
 
+
 /** ================ COMMANDS ================ */
 
 int command_mkdir(char* dst_folder, char* name, __mode_t permissions) {
@@ -49,14 +53,21 @@ int command_mkdir(char* dst_folder, char* name, __mode_t permissions) {
 }
 
 int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
+    char *destination = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+    strcpy(destination, dst_folder);
+    strcat(destination, name);
+
+    int new_fd = open(destination, O_CREAT, permissions);
+    if (new_fd == -1) return FALSE;
+
     return SUCCESS;
 }
 
-int command_copy(char* src, char* dst_folder, __mode_t permissions, unsigned int recursive) {
+int command_copy(char* src, char* dst_folder) {
     return SUCCESS;
 }
 
-int command_move(char* src, char* dst_folder, __mode_t permissions, unsigned int recursive) {
+int command_move(char* src, char* dst_folder) {
     return SUCCESS;
 }
 

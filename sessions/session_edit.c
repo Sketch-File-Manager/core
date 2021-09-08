@@ -92,19 +92,15 @@ void session_command_mkfile(char* dst, char* file, char* permissions){
     free(cmd);
 }
 
-void session_command_copy(char* src, char* dst, char* permissions, char* recursive){
+void session_command_copy(char* src, char* dst){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
+    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1, sizeof(char));
     strcat(cmd, "copy ");
     strcat(cmd, analyze_spaces_to_path(src));
     strcat(cmd, " ");
     strcat(cmd, analyze_spaces_to_path(dst));
-    strcat(cmd, " ");
-    strcat(cmd, permissions);
-    strcat(cmd, " ");
-    strcat(cmd, recursive);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
@@ -113,19 +109,15 @@ void session_command_copy(char* src, char* dst, char* permissions, char* recursi
     free(cmd);
 }
 
-void session_command_move(char* src, char* dst, char* permissions, char* recursive){
+void session_command_move(char* src, char* dst){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
+    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1, sizeof(char));
     strcat(cmd, "move ");
     strcat(cmd, analyze_spaces_to_path(src));
     strcat(cmd, " ");
     strcat(cmd, analyze_spaces_to_path(dst));
-    strcat(cmd, " ");
-    strcat(cmd, permissions);
-    strcat(cmd, " ");
-    strcat(cmd, recursive);
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
