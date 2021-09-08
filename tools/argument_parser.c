@@ -4,8 +4,19 @@
 #include <argument_parser.h>
 #include <session.h>
 #include <session_edit.h>
+#include <codes.h>
+#include "../commands/commands.h"
 
-#define COMMAND_NUMBER 16
+#define COMMAND_NUMBER 23
+
+// simple commands
+#define SIMPLE_MKDIR           "do mkdir"
+#define SIMPLE_MKFILE          "do mkfile"
+#define SIMPLE_COPY            "do copy"
+#define SIMPLE_MOVE            "do move"
+#define SIMPLE_RENAME          "do rename"
+#define SIMPLE_EDIT            "do edit"
+#define SIMPLE_PERMISSIONS     "do permissions"
 
 // session commands.
 #define SESSION_START           "session start"
@@ -41,6 +52,15 @@ struct command {
 };
 
 static struct command commands[COMMAND_NUMBER] = {
+        // simple commands.
+        {.c_name = SIMPLE_MKDIR,       .c_argc = 3, .c_exec = (exec_general *) command_mkdir},
+        {.c_name = SIMPLE_MKFILE,      .c_argc = 3, .c_exec = (exec_general *) command_mkfile},
+        {.c_name = SIMPLE_COPY,        .c_argc = 4, .c_exec = (exec_general *) command_copy},
+        {.c_name = SIMPLE_MOVE,        .c_argc = 4, .c_exec = (exec_general *) command_move},
+        {.c_name = SIMPLE_RENAME,      .c_argc = 2, .c_exec = (exec_general *) command_rename},
+        {.c_name = SIMPLE_EDIT,        .c_argc = 3, .c_exec = (exec_general *) command_edit},
+        {.c_name = SIMPLE_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) command_permissions}
+
         // session.
         {.c_name = SESSION_START,       .c_argc = 0, .c_exec = (exec_general *) session_start},
         {.c_name = SESSION_END,         .c_argc = 1, .c_exec = (exec_general *) session_end},
@@ -51,19 +71,18 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = SESSION_LIST,        .c_argc = 0, .c_exec = (exec_general *) session_list},
 
         // session commands.
-        {.c_name = COMMAND_EXIT,        .c_argc = 0, .c_exec = (exec_general *) command_exit},
-        {.c_name = COMMAND_UNDO,        .c_argc = 0, .c_exec = (exec_general *) command_undo},
-        {.c_name = COMMAND_MKDIR,       .c_argc = 3, .c_exec = (exec_general *) command_mkdir},
-        {.c_name = COMMAND_MKFILE,      .c_argc = 3, .c_exec = (exec_general *) command_mkfile},
-        {.c_name = COMMAND_COPY,        .c_argc = 4, .c_exec = (exec_general *) command_copy},
-        {.c_name = COMMAND_MOVE,        .c_argc = 4, .c_exec = (exec_general *) command_move},
-        {.c_name = COMMAND_RENAME,      .c_argc = 2, .c_exec = (exec_general *) command_rename},
-        {.c_name = COMMAND_EDIT,        .c_argc = 3, .c_exec = (exec_general *) command_edit},
-        {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) command_permission}
+        {.c_name = COMMAND_EXIT,        .c_argc = 0, .c_exec = (exec_general *) session_command_exit},
+        {.c_name = COMMAND_UNDO,        .c_argc = 0, .c_exec = (exec_general *) session_command_undo},
+        {.c_name = COMMAND_MKDIR,       .c_argc = 3, .c_exec = (exec_general *) session_command_mkdir},
+        {.c_name = COMMAND_MKFILE,      .c_argc = 3, .c_exec = (exec_general *) session_command_mkfile},
+        {.c_name = COMMAND_COPY,        .c_argc = 4, .c_exec = (exec_general *) session_command_copy},
+        {.c_name = COMMAND_MOVE,        .c_argc = 4, .c_exec = (exec_general *) session_command_move},
+        {.c_name = COMMAND_RENAME,      .c_argc = 2, .c_exec = (exec_general *) session_command_rename},
+        {.c_name = COMMAND_EDIT,        .c_argc = 3, .c_exec = (exec_general *) session_command_edit},
+        {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission}
 };
 
 static inline int find_command(char *name) {
-
     for (int curr_command = 0; curr_command < COMMAND_NUMBER; curr_command++)
         if (strcmp(commands[curr_command].c_name, name) == 0) return curr_command;
     return -1;
@@ -93,7 +112,7 @@ int parse(int argc, char **argv) {
         result_command = parse_session(argv);
         offset = 0;
         // check if the arguments is enough
-        if (commands[result_command].c_argc > (argc - 3)) return  -1; // TODO call the help function.
+        if (commands[result_command].c_argc > (argc - 3)) return -1; // TODO call the help function.
     }
     else {
         result_command = find_command(argv[1]);
@@ -111,5 +130,5 @@ int parse(int argc, char **argv) {
     else if (commands[result_command].c_argc == 3)  ((exec_three_arg *) commands[result_command].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
     else if (commands[result_command].c_argc == 4)  ((exec_four_arg *) commands[result_command].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
 
-    return 0;
+    return SUCCESS;
 }

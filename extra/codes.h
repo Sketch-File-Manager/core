@@ -5,7 +5,6 @@
 #define SUCCESS 0
 #define UNKNOWN_COMMAND -1
 
-
 // Boolean types
 #define TRUE 1
 #define FALSE -1

@@ -10,6 +10,11 @@
 extern int endsWith(const char *str, const char *suffix);
 
 /**
+ * Replace ~ with home directory and add / at the end if missing.
+ */
+extern char* fix_path(char* path, int add_slash);
+
+/**
  * Returns the path with the home directory at the start.
  * @param name The file's name.
  * @param relative_path The relative path.

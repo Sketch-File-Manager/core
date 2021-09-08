@@ -34,7 +34,7 @@ static char* analyze_spaces_to_path(char* path) {
     return path;
 }
 
-void command_exit(){
+void session_command_exit(){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -45,7 +45,7 @@ void command_exit(){
         printf("%s %S %d\n", MSG_CANNOT_EXIT_CURRENT_SESSION, MSG_ERROR_CODE, result);
 }
 
-void command_undo(){
+void session_command_undo(){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -54,7 +54,7 @@ void command_undo(){
         printf("%s %s %d\n", MSG_CANNOT_UNDO_COMMAND, MSG_ERROR_CODE, edit_result);
 }
 
-void command_mkdir(char* dst, char* folder, char* permissions){
+void session_command_mkdir(char* dst, char* folder, char* permissions){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -73,7 +73,7 @@ void command_mkdir(char* dst, char* folder, char* permissions){
     free(cmd);
 }
 
-void command_mkfile(char* dst, char* file, char* permissions){
+void session_command_mkfile(char* dst, char* file, char* permissions){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -92,7 +92,7 @@ void command_mkfile(char* dst, char* file, char* permissions){
     free(cmd);
 }
 
-void command_copy(char* src, char* dst, char* permissions, char* recursive){
+void session_command_copy(char* src, char* dst, char* permissions, char* recursive){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -113,7 +113,7 @@ void command_copy(char* src, char* dst, char* permissions, char* recursive){
     free(cmd);
 }
 
-void command_move(char* src, char* dst, char* permissions, char* recursive){
+void session_command_move(char* src, char* dst, char* permissions, char* recursive){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -134,7 +134,7 @@ void command_move(char* src, char* dst, char* permissions, char* recursive){
     free(cmd);
 }
 
-void command_rename(char* src, char* name){
+void session_command_rename(char* src, char* name){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -151,7 +151,7 @@ void command_rename(char* src, char* name){
     free(cmd);
 }
 
-void command_edit(char* src, char* flag, char* content){
+void session_command_edit(char* src, char* flag, char* content){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
@@ -170,7 +170,7 @@ void command_edit(char* src, char* flag, char* content){
     free(cmd);
 }
 
-void command_permission(char* src, char* permissions, char* recursive){
+void session_command_permission(char* src, char* permissions, char* recursive){
     char* current = check_current();
     if(strcmp(current, "") == 0) return;
 
