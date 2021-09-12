@@ -8,6 +8,7 @@
 #include <commands.h>
 #include <file_handler.h>
 #include <stdio.h>
+#include <unistd.h>
 
 typedef struct perm_queue {
     char   *p_path;
@@ -37,6 +38,22 @@ static void read_contents_of(const char *path, perm_queue **queue, size_t queue_
     }
 }
 
+static inline int copy_content_of(char *src, char *dst) {
+
+    // TODO extract the file name from the source file.
+    // TODO add the extracted name in the dst_file path.
+    int dst_fd = open(dst, O_CREAT, 700);
+    if (dst_fd == -1) return FALSE;
+
+    size_t src_file_s = strlen(src);
+
+    if (write_file(dst, src, src_file_s) == -1) return FALSE;
+    
+    close(dst_fd);
+
+    return TRUE;
+}
+
 
 /** ================ COMMANDS ================ */
 
@@ -64,6 +81,17 @@ int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
 }
 
 int command_copy(char* src, char* dst_folder) {
+    int src_fd = open(src, O_RDONLY);
+
+    if (src_fd == -1) return FALSE;
+
+    char *src_contents = NULL;
+
+    if (read_file(src, &src_contents) == -1) return FALSE;
+
+    copy_content_of(src_contents, dst_folder);
+
+    close(src_fd);
     return SUCCESS;
 }
 
