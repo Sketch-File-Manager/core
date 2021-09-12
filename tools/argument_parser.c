@@ -5,6 +5,7 @@
 #include <session.h>
 #include <session_edit.h>
 #include <codes.h>
+#include <logger.h>
 #include "../commands/commands.h"
 
 #define COMMAND_NUMBER 23
@@ -39,11 +40,11 @@
 #define COMMAND_PERMISSIONS     "permissions"
 
 // Function pointer types.
-typedef void exec_general(void);
-typedef void exec_one_arg(char *);
-typedef void exec_two_arg(char *, char *);
-typedef void exec_three_arg(char *, char *, char *);
-typedef void exec_four_arg(char *, char *, char *, char *);
+typedef int exec_general(void);
+typedef int exec_one_arg(char *);
+typedef int exec_two_arg(char *, char *);
+typedef int exec_three_arg(char *, char *, char *);
+typedef int exec_four_arg(char *, char *, char *, char *);
 
 struct command {
     char         *c_name;
@@ -82,13 +83,17 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission}
 };
 
+static void print_help() {
+    // TODO - print help table
+}
+
 static inline int find_command(char *name) {
     for (int curr_command = 0; curr_command < COMMAND_NUMBER; curr_command++)
         if (strcmp(commands[curr_command].c_name, name) == 0) return curr_command;
     return -1;
 }
 
-static inline int parse_session(char **argv) {
+static inline int parse_double(char **argv) {
     if (argv[1] == NULL || argv[2] == NULL) return -1;
 
     // form the full result_command.
@@ -105,30 +110,44 @@ static inline int parse_session(char **argv) {
 int parse(int argc, char **argv) {
     if (argv[1] == NULL) return -1;
 
-    int result_command;
-    int offset;
-
-    if (strcmp(argv[1], "session") == 0) {
-        result_command = parse_session(argv);
+    int index, offset;
+    if (strcmp(argv[1], "session") == 0 || strcmp(argv[1], "do") == 0) {
+        index = parse_double(argv);
         offset = 0;
+
         // check if the arguments is enough
-        if (commands[result_command].c_argc > (argc - 3)) return -1; // TODO call the help function.
+        if (commands[index].c_argc > (argc - 3)) {
+            print_help();
+            return WRONG_ARGUMENT_COMMAND;
+        }
     }
     else {
-        result_command = find_command(argv[1]);
+        index = find_command(argv[1]);
         offset = 1;
+
         // check if the arguments is enough
-        if (commands[result_command].c_argc > (argc - 2)) return -1; // TODO call the help function here.
+        if (commands[index].c_argc > (argc - 2))  {
+            print_help();
+            return WRONG_ARGUMENT_COMMAND;
+        }
     }
 
-    // check if the result_command exists.
-    if (result_command == -1) return -1; // TODO call the help function here.
+    // check if the index exists.
+    if (index == -1) {
+        print_help();
+        return WRONG_ARGUMENT_COMMAND;
+    }
 
-    if (commands[result_command].c_argc == 0) commands[result_command].c_exec();
-    else if (commands[result_command].c_argc == 1)  ((exec_one_arg *) commands[result_command].c_exec)(argv[3 - offset]);
-    else if (commands[result_command].c_argc == 2)  ((exec_two_arg *) commands[result_command].c_exec)(argv[3 - offset], argv[4 - offset]);
-    else if (commands[result_command].c_argc == 3)  ((exec_three_arg *) commands[result_command].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
-    else if (commands[result_command].c_argc == 4)  ((exec_four_arg *) commands[result_command].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
+    int result = SUCCESS;
+    if (commands[index].c_argc == 0) result = commands[index].c_exec();
+    else if (commands[index].c_argc == 1) result = ((exec_one_arg *) commands[index].c_exec)(argv[3 - offset]);
+    else if (commands[index].c_argc == 2) result = ((exec_two_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset]);
+    else if (commands[index].c_argc == 3) result = ((exec_three_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
+    else if (commands[index].c_argc == 4) result = ((exec_four_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
 
-    return SUCCESS;
+    // if is a simple command show some logs.
+    if(strcmp(argv[1], "do") == 0)
+        log(ERROR, "Failed to execute simple command with error code: ", result);
+
+    return result;
 }

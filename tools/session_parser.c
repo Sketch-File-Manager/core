@@ -7,34 +7,36 @@
 #include <file_handler.h>
 #include <codes.h>
 #include <functions.h>
+#include <errno.h>
 
 #define SESSION_FOLDER    "/.local/share/sketch/sessions/"
 #define SESSION_LOCATION  "/.local/share/sketch/"
 
 int delete_file(const char *name) {
-    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
+    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
     // remove file with name.
-    remove(absolute_path);
-
+    int result = remove(absolute_path);
     free(absolute_path);
-    return 0;
+
+    if(result == 0)
+        return SUCCESS;
+
+    return errno;
 }
 
 int create_file(const char *name) {
-    char *absolute = add_home_directory_path(name, SESSION_FOLDER);
+    char *absolute = merge_home_relative_filename(name, SESSION_FOLDER);
+
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
-    if (new_fd == -1) {
-        free(absolute);
-        return -1;
-    }
-
-    if (close(new_fd) == -1) {
-        free(absolute);
-        return -1;
-    }
     free(absolute);
-    return 0;
+
+    if (new_fd == -1)
+        return errno;
+    if (close(new_fd) == -1)
+        return errno;
+
+    return SUCCESS;
 }
 
 static inline char *double_array_to_string(const char **d_array, size_t size) {
@@ -62,11 +64,12 @@ static inline char *double_array_to_string(const char **d_array, size_t size) {
 
 int delete_last_line(const char *name) {
     // Get the absolute path.
-    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
+    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
     char *session_file = NULL;
 
     // read the file.
-    if (read_file(absolute_path, &session_file) == -1) return -1;
+    int read_result = read_file(absolute_path, &session_file);
+    if (read_result != SUCCESS) return read_result;
 
     // Allocate space for one element.
     size_t session_lines_s = 1;
@@ -76,7 +79,7 @@ int delete_last_line(const char *name) {
     char *current_line = strtok(session_file, "\n");
 
     // If no line exist.
-    if (current_line == NULL) return  -1;
+    if (current_line == NULL) return CANNOT_UNDO_ZERO_COMMANDS_FOUND;
 
     // Fill the array with the lines in the session file.
     for (size_t s = 0; current_line != NULL; s++) {
@@ -100,23 +103,22 @@ int delete_last_line(const char *name) {
     free(session_lines);
 
     // Write the changes.
-    if (write_file(absolute_path, new_session_file, strlen(new_session_file)) == -1) {
-        free(absolute_path);
-        free(new_session_file);
-        return -1;
-    }
-
+    int write_result = write_file(absolute_path, new_session_file, strlen(new_session_file));
     free(absolute_path);
     free(new_session_file);
 
-    return 0;
+    if (write_result != SUCCESS)
+        return write_result;
+
+    return SUCCESS;
 }
 
 static int append(const char *name, const char *content, int is_start) {
-    char *relative_path = add_home_directory_path(name, SESSION_FOLDER);
+    char *relative_path = merge_home_relative_filename(name, SESSION_FOLDER);
     char *session_file = NULL;
 
-    if (read_file(relative_path, &session_file) == -1) return -1;
+    int read_result = read_file(relative_path, &session_file);
+    if (read_result != SUCCESS) return read_result;
 
     size_t new_file_s = strlen(content) + strlen(session_file);
     char *new_file = calloc(new_file_s + 2, sizeof(char));
@@ -132,11 +134,13 @@ static int append(const char *name, const char *content, int is_start) {
         strcat(new_file, "\n");
     }
 
-    if (write_file(relative_path, new_file, new_file_s + 1) == -1) return -1;
-
+    int write_result = write_file(relative_path, new_file, new_file_s + 1);
     free(relative_path);
 
-    return 0;
+    if (write_result != SUCCESS)
+        return write_result;
+
+    return SUCCESS;
 }
 
 int append_to_end(const char *name, const char *content) {
@@ -148,10 +152,11 @@ int append_to_start(const char *name, const char *content) {
 }
 
 int read_session(const char *name, char ***result, size_t *size) {
-    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
+    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
     char *session_file = NULL;
 
-    if (read_file(absolute_path, &session_file) == -1) return -1;
+    int read_result = read_file(absolute_path, &session_file);
+    if (read_result != SUCCESS) return read_result;
 
     char **lines;
     char *current_line = strtok(session_file, "\n");
@@ -186,11 +191,11 @@ int read_session(const char *name, char ***result, size_t *size) {
 
     free(session_file);
     free(absolute_path);
-    return 0;
+    return SUCCESS;
 }
 
 int session_exists(const char* name) {
-    char *absolute_path = add_home_directory_path(name, SESSION_FOLDER);
+    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
     int file_fd = open(absolute_path, O_RDONLY);
 
     if (file_fd == -1) return FALSE;
@@ -203,26 +208,30 @@ int list_sessions(char ***result, size_t *size) {
     char **files = NULL;
     size_t files_s = 0;
 
-    char *path = add_home_directory_path("sessions/", SESSION_LOCATION);
-    list_files(path, &files, &files_s);
+    char *path = merge_home_relative_filename("sessions/", SESSION_LOCATION);
+    int list_result = list_files(path, &files, &files_s);
 
-    size_t session_files_s = 1;
-    char **session_files = calloc(1, sizeof(char *));
+    if(list_result == SUCCESS) {
+        size_t session_files_s = 1;
+        char **session_files = calloc(1, sizeof(char *));
 
-    for (int file = 0; file < files_s; file++) {
-        if (endsWith(files[file], ".session") == TRUE) {
-            session_files[session_files_s - 1] = calloc(strlen(files[file]) + 1, sizeof(char));
-            strcpy(session_files[session_files_s - 1], files[file]);
-            ++session_files_s;
-            session_files = realloc(session_files, sizeof(char *) * session_files_s);
+        for (int file = 0; file < files_s; file++) {
+            if (endsWith(files[file], ".session") == TRUE) {
+                session_files[session_files_s - 1] = calloc(strlen(files[file]) + 1, sizeof(char));
+                strcpy(session_files[session_files_s - 1], files[file]);
+                ++session_files_s;
+                session_files = realloc(session_files, sizeof(char *) * session_files_s);
+            }
+            free(files[file]);
         }
-        free(files[file]);
-    }
-    free(files);
-    --session_files_s;
+        free(files);
+        --session_files_s;
 
-    *size = session_files_s;
-    *result = session_files;
+        *size = session_files_s;
+        *result = session_files;
+    }
+    else return list_result;
+
 
     return SUCCESS;
 }

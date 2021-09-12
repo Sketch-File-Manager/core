@@ -16,11 +16,11 @@ extern char* fix_path(char* path, int add_slash);
 
 /**
  * Returns the path with the home directory at the start.
- * @param name The file's name.
+ * @param filename The file's filename.
  * @param relative_path The relative path.
  * @return The fixed path.
  */
-extern char *add_home_directory_path(const char *name, const char *relative_path);
+extern char *merge_home_relative_filename(const char *filename, const char *relative_path);
 
 
 

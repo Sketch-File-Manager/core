@@ -3,7 +3,9 @@
 
 // Error codes
 #define SUCCESS 0
-#define UNKNOWN_COMMAND -1
+#define WRONG_ARGUMENT_COMMAND -1
+#define UNKNOWN_COMMAND -2
+#define CANNOT_UNDO_ZERO_COMMANDS_FOUND -3
 
 // Boolean types
 #define TRUE 1

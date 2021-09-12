@@ -125,16 +125,18 @@ void session_run(char* id) {
                 flag = 1;
             }
 
-            // Execute with system call.
-            for (int i = 0; i < n; ++i) {
-                if(flag == 1) continue;
+            if(flag != 1) {
+                // Execute with system call.
+                for (int i = 0; i < n; ++i) {
+                    if (flag == 1) continue;
 
-                char* line = lines[i];
-                int exec_result = execute(line);
+                    char *line = lines[i];
+                    int exec_result = execute(line);
 
-                if(exec_result != SUCCESS) {
-                    log(ERROR, "Failed to execute a part of the session with error code: ", exec_result, "\nException line: ", i);
-                    flag = 1;
+                    if (exec_result != SUCCESS) {
+                        log(ERROR, "Failed to execute a part of the session with error code: ", exec_result, "\nException line: ", i);
+                        flag = 1;
+                    }
                 }
             }
         }

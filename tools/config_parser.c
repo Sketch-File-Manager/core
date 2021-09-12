@@ -6,17 +6,16 @@
 #include <codes.h>
 #include <functions.h>
 
-
 #define CONFIG_FILE         "config.conf"
 #define CONFIG_LOCATION     "/.local/share/sketch/"
 #define CURRENT_SESSION_ID  "current_session:"
 
-
 int get_current(char** current) {
     char *config = NULL;
-    char *path = add_home_directory_path(CONFIG_FILE, CONFIG_LOCATION);
+    char *path = merge_home_relative_filename(CONFIG_FILE, CONFIG_LOCATION);
 
-    if (read_file(path, &config) == -1) return -1;
+    int result = read_file(path, &config);
+    if (result != SUCCESS) return result;
 
     // Find the location of current session in the file.
     char *location_of_interest = strstr(config, CURRENT_SESSION_ID);
@@ -36,7 +35,7 @@ int get_current(char** current) {
     strcpy(*current, current_session);
 
     free(config);
-    return 0;
+    return SUCCESS;
 }
 
 int set_current(const char* current) {
@@ -50,11 +49,12 @@ int set_current(const char* current) {
     strcat(new_current_session, current);
     strcat(new_current_session, "\n");
 
-    char *absolute_path = add_home_directory_path(CONFIG_FILE, CONFIG_LOCATION);
-    // Make the changes in the config file.
-    if (write_file(absolute_path, new_current_session, new_current_session_s + 2) == -1) return -1;
+    char *absolute_path = merge_home_relative_filename(CONFIG_FILE, CONFIG_LOCATION);
 
+    // Make the changes in the config file.
+    int result = write_file(absolute_path, new_current_session, new_current_session_s + 2);
     free(new_current_session);
     free(absolute_path);
-    return 0;
+
+    return result;
 }

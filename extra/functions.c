@@ -52,15 +52,15 @@ char* fix_path(char* path, int add_slash) {
     return ret;
 }
 
-char *add_home_directory_path(const char *name, const char *relative_path) {
+char *merge_home_relative_filename(const char *filename, const char *relative_path) {
     char *username = getlogin();
-    size_t absolute_path_s = strlen("/home/") + strlen(username) + strlen(name) + strlen(relative_path);
+    size_t absolute_path_s = strlen("/home/") + strlen(username) + strlen(filename) + strlen(relative_path);
     char *absolute_path = calloc(absolute_path_s + 2, sizeof(char));
 
     strcpy(absolute_path, "/home/");
     strcat(absolute_path, username);
     strcat(absolute_path, relative_path);
-    strcat(absolute_path, name);
+    strcat(absolute_path, filename);
 
     return absolute_path;
 }
