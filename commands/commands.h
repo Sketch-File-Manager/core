@@ -17,4 +17,6 @@ extern int command_edit(char* src, char* content, char* flag);
 
 extern int command_permissions(char* src, __mode_t permissions, unsigned int recursive);
 
+extern int command_ls(char* directory);
+
 #endif //SKETCH_CORE_COMMANDS_H

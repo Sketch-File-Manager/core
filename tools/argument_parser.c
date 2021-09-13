@@ -8,7 +8,9 @@
 #include <logger.h>
 #include "../commands/commands.h"
 
-#define COMMAND_NUMBER 23
+#define VERSION "1.0.0"
+
+#define COMMAND_NUMBER 27
 
 // simple commands
 #define SIMPLE_MKDIR           "do mkdir"
@@ -18,6 +20,7 @@
 #define SIMPLE_RENAME          "do rename"
 #define SIMPLE_EDIT            "do edit"
 #define SIMPLE_PERMISSIONS     "do permissions"
+#define SIMPLE_LS              "do ls"
 
 // session commands.
 #define SESSION_START           "session start"
@@ -39,6 +42,11 @@
 #define COMMAND_EDIT            "edit"
 #define COMMAND_PERMISSIONS     "permissions"
 
+// options
+#define OPTION_HELP             "--help"
+#define OPTION_VERSION_FULL     "--version"
+#define OPTION_VERSION_TRUNC    "-v"
+
 // Function pointer types.
 typedef int exec_general(void);
 typedef int exec_one_arg(char *);
@@ -52,6 +60,65 @@ struct command {
     exec_general *c_exec;
 };
 
+static int print_help() {
+    printf("Usage: sketch-core [OPTIONS] COMMAND\n");
+    printf("\n");
+    printf("A cli file-manager using sessions\n");
+    printf("\n");
+    printf("Options:\n");
+    printf("      --help       Print this help summary page\n");
+    printf("  -v, --version    Print version information\n");
+    printf("\n");
+    printf("Simple Commands:\n");
+    printf("All simple commands are executed immediately\n");
+    printf("  do mkdir [dst] [name] [permissions]                   Make a directory with [name] and custom [permissions] under the [dst] folder\n");
+    printf("  do mkfile [dst] [name] [permissions]                  Make a file with [name] and custom [permissions] under the [dst] folder\n");
+    printf("  do copy [src] [dst]                                   Copy [src] (file or directory) under the [dst] folder\n");
+    printf("  do move [src] [dst]                                   Move [src] (file or directory) under the [dst] folder\n");
+    printf("  do rename [src] [new_name]                            Rename [src] (file or directory) with [new_name]\n");
+    printf("  do edit <flag> [src] [content]                        Change the contents of a [src] file\n");
+    printf("                                                            Flags: -a, --append: appends [content] to the end of the file\n");
+    printf("                                                                   -u, --unshift: appends [content] to the start of the file\n");
+    printf("                                                                   -w, --write: Discards old content and rewrite it with [content]\n");
+    printf("  do permissions [src] [permissions] [recursive]        Change the permissions of [src] (file or directory) to [permissions]\n");
+    printf("                                                            If [src] is a directory the [recursive] will be applied (0 or 1).\n");
+    printf("                                                                - If [recursive] is 1 then it will change the permissions of all the sub files and directories\n");
+    printf("                                                                - Default value for [recursive] is zero (0)\n");
+    printf("\n");
+    printf("Session Commands:\n");
+    printf("Session commands cannot be executed while a session is in use\n");
+    printf("  session start             Start a new session the id will be displayed\n");
+    printf("  session end [id]          End a session with using its [id]\n");
+    printf("  session use [id]          Sets a session with [id] as current session, current session will be editable\n");
+    printf("  session run [id]          Runs a session with [id], a session cannot be executed twice\n");
+    printf("  session current           Prints the id of the current session\n");
+    printf("  session show [id]         Shows the content of a session with [id]\n");
+    printf("  session list              List sessions\n");
+    printf("\n");
+    printf("Session Edit Commands:\n");
+    printf("Session edit commands are stored in a file and executed with the write order\n");
+    printf("  exit                                              Exit from the current session, the session will not be editable\n");
+    printf("  undo                                              Undo the last command\n");
+    printf("  mkdir [dst] [name] [permissions]                  Adds the simple commands 'mkdir' to the session\n");
+    printf("  mkfile [dst] [name] [permissions]                 Adds the simple commands 'mkfile' to the session\n");
+    printf("  copy [src] [dst]                                  Adds the simple commands 'copy' to the session\n");
+    printf("  move [src] [dst]                                  Adds the simple commands 'move' to the session\n");
+    printf("  rename [src] [new_name]                           Adds the simple commands 'rename' to the session\n");
+    printf("  edit <flag> [src] [content]                       Adds the simple commands 'edit' to the session\n");
+    printf("  permissions [src] [permissions] [recursive]       Adds the simple commands 'permissions' to the session\n");
+    printf("\n");
+    printf("Other:\n");
+    printf("If a file or directory name contains space then either use \\ before the space or put the directory inside double quotes\n");
+    printf("The format for the permissions must be in __mode_t, e.x. 0700\n");
+    printf("If the user has insufficient permissions to make the appropriate changes the command will not be executed\n");
+    return SUCCESS;
+}
+
+static int print_version() {
+    printf("Sketch core version %s", VERSION);
+    return SUCCESS;
+}
+
 static struct command commands[COMMAND_NUMBER] = {
         // simple commands.
         {.c_name = SIMPLE_MKDIR,       .c_argc = 3, .c_exec = (exec_general *) command_mkdir},
@@ -61,6 +128,7 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = SIMPLE_RENAME,      .c_argc = 2, .c_exec = (exec_general *) command_rename},
         {.c_name = SIMPLE_EDIT,        .c_argc = 3, .c_exec = (exec_general *) command_edit},
         {.c_name = SIMPLE_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) command_permissions},
+        {.c_name = SIMPLE_LS,          .c_argc = 1, .c_exec = (exec_general *) command_ls},
 
         // session.
         {.c_name = SESSION_START,       .c_argc = 0, .c_exec = (exec_general *) session_start},
@@ -80,12 +148,13 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = COMMAND_MOVE,        .c_argc = 4, .c_exec = (exec_general *) session_command_move},
         {.c_name = COMMAND_RENAME,      .c_argc = 2, .c_exec = (exec_general *) session_command_rename},
         {.c_name = COMMAND_EDIT,        .c_argc = 3, .c_exec = (exec_general *) session_command_edit},
-        {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission}
-};
+        {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission},
 
-static void print_help() {
-    // TODO - print help table
-}
+        // options
+        {.c_name = OPTION_HELP,           .c_argc = 0, .c_exec = (exec_general *) print_help},
+        {.c_name = OPTION_VERSION_FULL,   .c_argc = 0, .c_exec = (exec_general *) print_version},
+        {.c_name = OPTION_VERSION_TRUNC,  .c_argc = 0, .c_exec = (exec_general *) print_version}
+};
 
 static inline int find_command(char *name) {
     for (int curr_command = 0; curr_command < COMMAND_NUMBER; curr_command++)

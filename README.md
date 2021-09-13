@@ -1,4 +1,4 @@
-# Sketch core
+    # Sketch core
 
 ## Instruction set
 
@@ -9,7 +9,7 @@ Command |  Description
 ---------|--------------
 do mkdir `dst` `folder` `permissions` | Create a new `folder` to `dst`, if name contains space it should be inside quotes.
 do mkfile `dst` `file` `permissions` | Create a new `file` at `dst` directory, if name contains space it should be inside quotes.
-do copy `src` `dst` | Move a `src` (file or directory) to `dst` folder.
+do copy `src` `dst` | Copy a `src` (file or directory) to `dst` folder.
 do move `src` `dst` | Move a `src` (file or directory) to `dst` folder.
 do rename `src` `new_name` | Rename `src` (file or directory) to `new_name`
 do edit [flags] `src` `content` | Edit a `src` file and change its content. `-a` or `--append`: append to end. `-u` or `--unshift`: append to start. `-w` or `--write`: Discard old content and append new.

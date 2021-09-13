@@ -144,3 +144,8 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
 
     return SUCCESS;
 }
+
+int command_ls(char* directory) {
+
+    return SUCCESS;
+}

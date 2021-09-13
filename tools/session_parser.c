@@ -232,6 +232,5 @@ int list_sessions(char ***result, size_t *size) {
     }
     else return list_result;
 
-
     return SUCCESS;
 }
