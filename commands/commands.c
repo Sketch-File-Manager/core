@@ -10,10 +10,11 @@
 #include <unistd.h>
 #include <functions.h>
 #include <queue.h>
+#include <stdio.h>
 
 
 static void read_contents_of(const char *path, queue *c_queue) {
-    DIR *dir = NULL;
+    DIR *dir = opendir(path);
     struct dirent *dir_contents = NULL;
     char *tmp_path;
 
@@ -27,6 +28,20 @@ static void read_contents_of(const char *path, queue *c_queue) {
         // Add it to the queue.
         add(c_queue, tmp_path);
     }
+}
+
+static inline int is_directory(const char *path) {
+    struct stat path_stat;
+
+    if (stat(path, &path_stat) == -1)
+        return -1;
+
+    // do an and statement with bits of st_mode and bits of S_IFDIR.
+    // If is the same the result is ok, otherwise the result is zero.
+    if (path_stat.st_mode & S_IFDIR)
+        return 1;
+
+    return 0;
 }
 
 static inline int copy_file_content_of(char *src_file, char *dst_file) {
@@ -112,20 +127,15 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
         read_contents_of(src, c_queue);
 
         while (c_queue->size != 0) {
-            int result = chmod((const char *) c_queue->q_first_node, permissions);
+            int result = chmod((const char *) c_queue->q_first_node->q_item, permissions);
             if(result == -1)
                 return errno;
 
-            // temporary save the current dir.
-            // TODO check if the current element in the queue is directory.
-            /*if (queue[queue_s - 1]->p_is_dir == TRUE) {
-                tmp = calloc(strlen(queue[queue_s - 1]->p_path) + 1, sizeof(char));
-                strcpy(tmp, queue[queue_s - 1]->p_path);
-            }*/
-            // TODO check the same.
-            /*if (queue[queue_s - 1]->p_is_dir == TRUE)
-                read_contents_of(tmp, queue, queue_s);*/
-
+            if (is_directory((const char *) c_queue->q_first_node)) {
+                tmp = calloc(strlen((const char *) c_queue->q_first_node->q_item) + 1, sizeof(char));
+                strcpy(tmp, (const char *) c_queue->q_first_node->q_item);
+            }
+            
             pop(c_queue);
         }
         free(c_queue);
