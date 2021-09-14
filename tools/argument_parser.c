@@ -215,7 +215,7 @@ int parse(int argc, char **argv) {
     else if (commands[index].c_argc == 4) result = ((exec_four_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
 
     // if is a simple command show some logs.
-    if(strcmp(argv[1], "do") == 0)
+    if(strcmp(argv[1], "do") == 0 && result != SUCCESS)
         log(ERROR, "Failed to execute simple command with error code: ", result);
 
     return result;

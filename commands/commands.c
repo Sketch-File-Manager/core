@@ -140,6 +140,14 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
 }
 
 int command_ls(char* directory) {
+    char **list = NULL;
+    size_t list_s = 0;
+
+    int list_result = list_files(fix_path(directory, FALSE), &list, &list_s);
+    if(list_result != SUCCESS) return list_result;
+
+    for (int i = 0; i < list_s; i++)
+        printf("[%d] %s\n", (int)i, list[i]);
 
     return SUCCESS;
 }

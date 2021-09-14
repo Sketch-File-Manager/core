@@ -35,8 +35,8 @@ char* fix_path(char* path, int add_slash) {
         size_t path_s = strlen("/home/") + strlen(username) + strlen(ret);
         char* home_path = calloc(path_s, sizeof(char));
         strcpy(home_path, "/home/");
-        strcpy(home_path, username);
-        strcpy(home_path, ret);
+        strcat(home_path, username);
+        strcat(home_path, ret);
 
         ret = home_path;
     }
