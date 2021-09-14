@@ -22,6 +22,15 @@ extern char* fix_path(char* path, int add_slash);
  */
 extern char *merge_home_relative_filename(const char *filename, const char *relative_path);
 
+/**
+ * Splits a string to an array of strings by a specific delimiter. It will skip the split by delimiter if the previous character is the same as the prev_delim_except.
+ * @param str The string that will be split.
+ * @param delimiter The delimiter.
+ * @param prev_delim_except The exception character that is located before the delimiter.
+ * @param n The size of the array that will be returned.
+ * @return A string array that contains the split form of the str.
+ */
+extern char **split_with_exception(char* str, char delimiter, char prev_delim_except, size_t* n);
 
 
 #endif

@@ -64,3 +64,30 @@ char *merge_home_relative_filename(const char *filename, const char *relative_pa
 
     return absolute_path;
 }
+
+char** split_with_exception(char* str, char delimiter, char prev_delim_except, size_t* n) {
+    char** ret = (char**) calloc(1, sizeof (char*));
+    int a = 0;
+
+    char* token = calloc(strlen(str) + 1, sizeof(char));
+    int k = 0;
+    for (int i = 0; str[i]; i++) {
+        if(str[i] != delimiter || (i > 0 && str[i - 1] != prev_delim_except)) {
+            token[k] = str[i];
+            k++;
+            continue;
+        }
+
+        ret[a] = calloc(strlen(token) + 1, sizeof(char));
+        strcpy(ret[a], token);
+        ret = realloc(ret, (a + 1) + 1);
+        a++;
+
+        token = "";
+        k = 0;
+    }
+
+    *n = a + 1;
+    free(token);
+    return ret;
+}

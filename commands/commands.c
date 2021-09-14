@@ -8,50 +8,58 @@
 #include <commands.h>
 #include <file_handler.h>
 #include <unistd.h>
+#include <functions.h>
+#include <queue.h>
 
-typedef struct perm_queue {
-    char   *p_path;
-    int     p_is_dir;
-} perm_queue;
 
-static void read_contents_of(const char *path, perm_queue **queue, size_t queue_s) {
+static void read_contents_of(const char *path, queue *c_queue) {
     DIR *dir = NULL;
     struct dirent *dir_contents = NULL;
+    char *tmp_path;
 
     // Read the files and folder inside the dir.
     while ((dir_contents = readdir(dir)) != NULL) {
         // Save the path.
-        queue[queue_s - 1] = calloc(1, sizeof(perm_queue));
-        queue[queue_s - 1]->p_path = calloc(strlen(path) + strlen(dir_contents->d_name) + 1, sizeof(char));
-        strcpy(queue[queue_s - 1]->p_path, path);
-        strcat(queue[queue_s - 1]->p_path, dir_contents->d_name);
+        tmp_path = calloc(strlen(path) + strlen(dir_contents->d_name) + 1, sizeof(char));
+        strcpy(tmp_path, path);
+        strcat(tmp_path, dir_contents->d_name);
 
-        // Set True if the current content is folder.
-        if (dir_contents->d_type != DT_REG)
-            queue[queue_s - 1]->p_is_dir = TRUE;
-        else
-            queue[queue_s - 1]->p_is_dir = FALSE;
-
-        // Increase the size of queue.
-        queue = realloc(queue, ++queue_s);
+        // Add it to the queue.
+        add(c_queue, tmp_path);
     }
 }
 
-static inline int copy_content_of(char *src, char *dst) {
-    // TODO extract the file name from the source file.
-    // TODO add the extracted name in the dst_file path.
-    int dst_fd = open(dst, O_CREAT, 700);
+static inline int copy_file_content_of(char *src_file, char *dst_file) {
+
+    // Open the source file.
+    int src_fd = open(src_file, O_RDONLY);
+    if (src_fd == -1) return errno;
+
+    char *src_contents = NULL;
+
+    // Read the content of the source file.
+    int read_result = read_file(src_file, &src_contents);
+    if (read_result == -1) return read_result;
+
+
+    // Create a new file at the destination.
+    int dst_fd = open(dst_file, O_CREAT, 700);
     if (dst_fd == -1) return errno;
 
-    size_t src_file_s = strlen(src);
+    size_t src_file_s = strlen(src_file);
 
-    int result = write_file(dst, src, src_file_s);
+    // Write the contents of the src to destination.
+    int result = write_file(dst_file, src_file, src_file_s);
     if (result != SUCCESS) return result;
-    
+
+    close(src_fd);
     close(dst_fd);
     return SUCCESS;
 }
 
+static int copy_folder_content_of(char *src_folder, char *dst_folder) {
+    return SUCCESS;
+}
 
 /** ================ COMMANDS ================ */
 
@@ -79,16 +87,7 @@ int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
 }
 
 int command_copy(char* src, char* dst_folder) {
-    int src_fd = open(src, O_RDONLY);
-    if (src_fd == -1) return errno;
-
-    char *src_contents = NULL;
-
-    int read_result = read_file(src, &src_contents);
-    if (read_result == -1) return read_result;
-
-    int copy_result = copy_content_of(src_contents, dst_folder);
-    close(src_fd);
+    int copy_result = copy_file_content_of(src, dst_folder);
 
     return copy_result;
 }
@@ -107,34 +106,29 @@ int command_edit(char* src, char* content, char* flag) {
 
 int command_permissions(char* src, __mode_t permissions, unsigned int recursive) {
     if(recursive == 1) {
-        size_t queue_s = 1;
-        perm_queue **queue = calloc(1, sizeof(perm_queue *));
+        queue *c_queue = create_empty_queue();
         char *tmp;
         // Read the first contents.
-        read_contents_of(src, queue, queue_s);
+        read_contents_of(src, c_queue);
 
-        while (queue != NULL) {
-            int result = chmod(queue[queue_s - 1]->p_path, permissions);
+        while (c_queue->size != 0) {
+            int result = chmod((const char *) c_queue->q_first_node, permissions);
             if(result == -1)
                 return errno;
 
             // temporary save the current dir.
-            if (queue[queue_s - 1]->p_is_dir == TRUE) {
+            // TODO check if the current element in the queue is directory.
+            /*if (queue[queue_s - 1]->p_is_dir == TRUE) {
                 tmp = calloc(strlen(queue[queue_s - 1]->p_path) + 1, sizeof(char));
                 strcpy(tmp, queue[queue_s - 1]->p_path);
-            }
+            }*/
+            // TODO check the same.
+            /*if (queue[queue_s - 1]->p_is_dir == TRUE)
+                read_contents_of(tmp, queue, queue_s);*/
 
-            // free the current dir.
-            free(queue[queue_s - 1]->p_path);
-            free(queue[queue_s - 1]);
-
-            // decrease the size of the queue ( remove the last element ).
-            queue = realloc(queue, --queue_s);
-
-            if (queue[queue_s - 1]->p_is_dir == TRUE)
-                read_contents_of(tmp, queue, queue_s);
+            pop(c_queue);
         }
-        free(queue);
+        free(c_queue);
         return SUCCESS;
     }
 
