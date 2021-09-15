@@ -1,13 +1,36 @@
 #ifndef SKETCH_CORE_FUNCTIONS_H
 #define SKETCH_CORE_FUNCTIONS_H 1
 
+
+/**
+ * Checks if a string starts with another string.
+ * @param str The base string
+ * @param pre The prefix.
+ * @return TRUE or FALSE if it starts with or not
+ */
+extern int startsWith(const char *str, const char *pre);
+
 /**
  * Checks if a string ends with another string.
  * @param str The base string.
  * @param suffix The possible ending string.
- * @return TRUE or FALSE if it ends or not.
+ * @return TRUE or FALSE if it ends with or not.
  */
 extern int endsWith(const char *str, const char *suffix);
+
+/**
+ * Return the concat of two strings.
+ * @param str1 The str1 string
+ * @param str2 The str2 string.
+ * @return The concat of the the two strings.
+ */
+extern char* append(const char* str1, const char* str2);
+
+/**
+ * Return the home directory.
+ * @return The home directory.
+ */
+extern char* get_home_path();
 
 /**
  * Replace ~ with home directory and add / at the end if missing.
@@ -30,7 +53,13 @@ extern char *merge_home_relative_filename(const char *filename, const char *rela
  * @param n The size of the array that will be returned.
  * @return A string array that contains the split form of the str.
  */
-extern char **split_with_exception(char* str, char delimiter, char prev_delim_except, size_t* n);
+extern char **split(char* str, char delimiter, char prev_delim_except, size_t* n);
 
+/**
+ * Checks if a path is a directory.
+ * @param path The path to check.
+ * @return TRUE if the path is directory, FALSE otherwise.
+ */
+extern int is_dir(const char *path);
 
 #endif

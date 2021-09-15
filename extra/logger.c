@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include "logger.h"
+#include "include/logger.h"
 
-void log(int priority, char* message, ...) {
+void logger(int priority, char* message, ...) {
     printf("%d - ", priority);
 
     va_list args;

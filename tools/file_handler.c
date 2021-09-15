@@ -5,8 +5,8 @@
 
 #include <file_handler.h>
 #include <dirent.h>
-#include <functions.h>
-#include <codes.h>
+#include <include/functions.h>
+#include <include/codes.h>
 #include <errno.h>
 
 #define SKETCH_LOCATION     "/.local/share/"

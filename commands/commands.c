@@ -1,4 +1,4 @@
-#include <codes.h>
+#include <include/codes.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -8,8 +8,8 @@
 #include <commands.h>
 #include <file_handler.h>
 #include <unistd.h>
-#include <functions.h>
-#include <queue.h>
+#include <include/functions.h>
+#include <include/queue.h>
 #include <stdio.h>
 
 
@@ -28,20 +28,6 @@ static void read_contents_of(const char *path, queue *c_queue) {
         // Add it to the queue.
         add(c_queue, tmp_path);
     }
-}
-
-static inline int is_directory(const char *path) {
-    struct stat path_stat;
-
-    if (stat(path, &path_stat) == -1)
-        return -1;
-
-    // do an and statement with bits of st_mode and bits of S_IFDIR.
-    // If is the same the result is ok, otherwise the result is zero.
-    if (path_stat.st_mode & S_IFDIR)
-        return TRUE;
-
-    return FALSE;
 }
 
 static inline __mode_t get_permissions_of(const char *path) {
@@ -91,14 +77,14 @@ static int copy_content_of(char *src_folder, char *dst_folder) {
     char **current_path_split = NULL;
 
     while (queue->size != 0) {
-        current_path_split = split_with_exception((char *) queue->q_first_node, '/', NULL, &current_path_split_s);
+        current_path_split = split((char *) queue->q_first_node, '/', NULL, &current_path_split_s);
         // Get the permissions of the current path.
         current_path_perms = get_permissions_of((char *) queue->q_first_node);
         // Make the path to the new made directory or file.
         // File or directory name is located in the current_path_split[current_path_split_s - 1] based on split.
         send_to = calloc(strlen(dst_folder) + strlen(current_path_split[current_path_split_s - 1]) + 1, sizeof(char));
         // If the element that we are looking is directory. Then make a directory with the same name, under the new location.
-        if (is_directory((const char *) queue->q_first_node) == TRUE) {
+        if (is_dir((const char *) queue->q_first_node) == TRUE) {
             // Create the directory. ( destination path ).
             mkdir(send_to, current_path_perms);
             // Search for more files in the new directory. ( source path ).
@@ -174,7 +160,7 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
             if(result == -1)
                 return errno;
 
-            if (is_directory((const char *) c_queue->q_first_node) == TRUE) {
+            if (is_dir((const char *) c_queue->q_first_node) == TRUE) {
                 tmp = calloc(strlen((const char *) c_queue->q_first_node->q_item) + 1, sizeof(char));
                 strcpy(tmp, (const char *) c_queue->q_first_node->q_item);
                 read_contents_of(tmp, c_queue);

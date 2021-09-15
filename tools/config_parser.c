@@ -3,8 +3,8 @@
 
 #include <config_parser.h>
 #include <file_handler.h>
-#include <codes.h>
-#include <functions.h>
+#include <include/codes.h>
+#include <include/functions.h>
 
 #define CONFIG_FILE         "config.conf"
 #define CONFIG_LOCATION     "/.local/share/sketch/"

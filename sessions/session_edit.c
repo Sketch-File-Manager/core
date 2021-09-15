@@ -4,14 +4,14 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
-#include <codes.h>
-#include <logger.h>
+#include <include/codes.h>
+#include <include/logger.h>
 
 static char* check_current() {
     char* current;
     int result = get_current(&current);
     if(result != SUCCESS)
-        log(WARNING, "Failed to find current session with error code: ", result);
+        logger(WARNING, "Failed to find current session with error code: ", result);
 
     return current;
 }
@@ -39,9 +39,9 @@ void session_command_exit(){
 
     int result = set_current("");
     if (result == SUCCESS)
-        log(INFO, "Exited current session.");
+        logger(INFO, "Exited current session.");
     else
-        log(ERROR, "Failed to exit current session with error code: ", result);
+        logger(ERROR, "Failed to exit current session with error code: ", result);
 }
 
 void session_command_undo(){
@@ -50,7 +50,7 @@ void session_command_undo(){
 
     int result = delete_last_line(current);
     if(result != SUCCESS)
-        log(ERROR, "Failed to undo command with error code: ", result);
+        logger(ERROR, "Failed to undo command with error code: ", result);
 }
 
 void session_command_mkdir(char* dst, char* folder, char* permissions){
@@ -67,7 +67,7 @@ void session_command_mkdir(char* dst, char* folder, char* permissions){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }
@@ -86,7 +86,7 @@ void session_command_mkfile(char* dst, char* file, char* permissions){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }
@@ -103,7 +103,7 @@ void session_command_copy(char* src, char* dst){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }
@@ -120,7 +120,7 @@ void session_command_move(char* src, char* dst){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }
@@ -137,7 +137,7 @@ void session_command_rename(char* src, char* name){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }
@@ -156,7 +156,7 @@ void session_command_edit(char* src, char* flag, char* content){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }
@@ -166,7 +166,7 @@ void session_command_permission(char* src, char* permissions, char* recursive){
     if(strcmp(current, "") == 0) return;
 
     if(strcmp(recursive, "0") != 0 && strcmp(recursive, "1") != 0)
-        return log(ERROR, "Recursive must be 0 or 1");
+        return logger(ERROR, "Recursive must be 0 or 1");
 
     char* cmd = (char*) calloc(12 + strlen(src) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
     strcat(cmd, "permissions ");
@@ -178,7 +178,7 @@ void session_command_permission(char* src, char* permissions, char* recursive){
 
     int result = append_to_end(current, cmd);
     if(result != SUCCESS)
-        log(ERROR, "Failed to add command with error code: ", result);
+        logger(ERROR, "Failed to add command with error code: ", result);
 
     free(cmd);
 }

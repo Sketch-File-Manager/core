@@ -1,12 +1,9 @@
-//
-// Created by george on 9/2/21.
-//
-
 #include <string.h>
 #include <unistd.h>
 #include <malloc.h>
-#include "functions.h"
-#include <codes.h>
+#include "include/functions.h"
+#include <include/codes.h>
+#include <sys/stat.h>
 
 int endsWith(const char *str, const char *suffix) {
     if (!str || !suffix)
@@ -22,6 +19,30 @@ int endsWith(const char *str, const char *suffix) {
     return TRUE;
 }
 
+int startsWith(const char *str, const char *pre) {
+    size_t lenpre = strlen(pre),
+            lenstr = strlen(str);
+    return lenstr < lenpre ? FALSE : memcmp(pre, str, lenpre) == 0;
+}
+
+char* append(const char* str1, const char* str2) {
+    char* ret = calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
+    strcpy(ret, str1);
+    strcat(ret, str2);
+    return ret;
+}
+
+char* get_home_path() {
+    char *username = getlogin();
+    size_t path_s = strlen("/home/") + strlen(username) + 1 + 1;
+
+    char* path = calloc(path_s, sizeof(char));
+    strcpy(path, "/home/");
+    strcat(path, username);
+    strcat(path, "/");
+
+    return path;
+}
 
 char* fix_path(char* path, int add_slash) {
     char *ret = calloc(strlen(path) + 1, sizeof(char));
@@ -29,43 +50,26 @@ char* fix_path(char* path, int add_slash) {
 
     // If starts with ~ replace with /home/username
     if(ret[0] == '~'){
-        ret = ret + 1;
-        char *username = getlogin();
-
-        size_t path_s = strlen("/home/") + strlen(username) + strlen(ret);
-        char* home_path = calloc(path_s, sizeof(char));
-        strcpy(home_path, "/home/");
-        strcat(home_path, username);
-        strcat(home_path, ret);
-
-        ret = home_path;
+        ret = ret + 2; // Delete ~/
+        ret = append(get_home_path(), ret);
     }
 
     // Ends with /
-    if(add_slash == TRUE && endsWith(ret, "/") == FALSE) {
-        char* tmp = calloc(strlen(ret) + 2, sizeof(char));
-        strcpy(tmp, ret);
-        strcat(tmp, "/");
-        ret = tmp;
-    }
+    if(add_slash == TRUE && endsWith(ret, "/") == FALSE)
+        ret = append(ret, "/");
 
     return ret;
 }
 
 char *merge_home_relative_filename(const char *filename, const char *relative_path) {
-    char *username = getlogin();
-    size_t absolute_path_s = strlen("/home/") + strlen(username) + strlen(filename) + strlen(relative_path);
-    char *absolute_path = calloc(absolute_path_s + 2, sizeof(char));
+    // Remove /
+    if(startsWith(relative_path, "/") == TRUE)
+        relative_path += 1;
 
-    strcpy(absolute_path, "/home/");
-    strcat(absolute_path, username);
-    strcat(absolute_path, relative_path);
-    strcat(absolute_path, filename);
-
-    return absolute_path;
+    return append(get_home_path(), append(relative_path, filename));
 }
 
-char** split_with_exception(char* str, char delimiter, char prev_delim_except, size_t* n) {
+char** split(char* str, char delimiter, char prev_delim_except, size_t* n) {
     char** ret = (char**) calloc(1, sizeof (char*));
     int a = 0;
 
@@ -90,4 +94,18 @@ char** split_with_exception(char* str, char delimiter, char prev_delim_except, s
     *n = a + 1;
     free(token);
     return ret;
+}
+
+int is_dir(const char *path) {
+    struct stat path_stat;
+
+    if (stat(path, &path_stat) == -1)
+        return FALSE;
+
+    // do an and statement with bits of st_mode and bits of S_IFDIR.
+    // If is the same the result is ok, otherwise the result is zero.
+    if (path_stat.st_mode & S_IFDIR)
+        return TRUE;
+
+    return FALSE;
 }

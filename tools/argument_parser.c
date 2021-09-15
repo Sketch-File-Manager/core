@@ -4,8 +4,8 @@
 #include <argument_parser.h>
 #include <session.h>
 #include <session_edit.h>
-#include <codes.h>
-#include <logger.h>
+#include <include/codes.h>
+#include <include/logger.h>
 #include "../commands/commands.h"
 
 #define VERSION "1.0.0"
@@ -77,7 +77,7 @@ static int print_help() {
     printf("  do move [src] [dst]                                   Move [src] (file or directory) under the [dst] folder\n");
     printf("  do rename [src] [new_name]                            Rename [src] (file or directory) with [new_name]\n");
     printf("  do edit <flag> [src] [content]                        Change the contents of a [src] file\n");
-    printf("                                                            Flags: -a, --append: appends [content] to the end of the file\n");
+    printf("                                                            Flags: -a, --append_to: appends [content] to the end of the file\n");
     printf("                                                                   -u, --unshift: appends [content] to the start of the file\n");
     printf("                                                                   -w, --write: Discards old content and rewrite it with [content]\n");
     printf("  do permissions [src] [permissions] [recursive]        Change the permissions of [src] (file or directory) to [permissions]\n");
@@ -216,7 +216,7 @@ int parse(int argc, char **argv) {
 
     // if is a simple command show some logs.
     if(strcmp(argv[1], "do") == 0 && result != SUCCESS)
-        log(ERROR, "Failed to execute simple command with error code: ", result);
+        logger(ERROR, "Failed to execute simple command with error code: ", result);
 
     return result;
 }

@@ -6,6 +6,6 @@
 #define ERROR 2
 #define DEBUG 3
 
-extern void log(int priority, char* message, ...);
+extern void logger(int priority, char* message, ...);
 
 #endif //SKETCH_CORE_LOGGER_H

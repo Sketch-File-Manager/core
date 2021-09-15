@@ -5,10 +5,10 @@
 #include <config_parser.h>
 #include <stdio.h>
 #include <executor.h>
-#include <codes.h>
+#include <include/codes.h>
 #include <time.h>
-#include <functions.h>
-#include <logger.h>
+#include <include/functions.h>
+#include <include/logger.h>
 
 static char *rand_string(size_t size){
     srand(time(NULL));
@@ -40,7 +40,7 @@ static int check_current() {
 
 void session_start() {
     if(check_current() == TRUE)
-        return log(WARNING, "A session is already in use.");
+        return logger(WARNING, "A session is already in use.");
 
     int name_len = 10;
     char* name = (char*) calloc(name_len + 9 + 1, sizeof(char));
@@ -51,16 +51,16 @@ void session_start() {
 
     int result = create_file(name);
     if (result == SUCCESS)
-        log(INFO, "Session created successfully.\n", "New session id: ", name);
+        logger(INFO, "Session created successfully.\n", "New session id: ", name);
     else
-        log(ERROR, "Failed to create session with error code: ", result);
+        logger(ERROR, "Failed to create session with error code: ", result);
 
     free(name);
 }
 
 void session_end(char* id) {
     if(check_current() == TRUE)
-        return log(WARNING, "A session is already in use.");
+        return logger(WARNING, "A session is already in use.");
 
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
@@ -70,16 +70,16 @@ void session_end(char* id) {
 
     int result = delete_file(name);
     if (result == SUCCESS)
-        log(INFO, "Session ended.");
+        logger(INFO, "Session ended.");
     else
-        log(ERROR, "Session failed to end with error code: ", result);
+        logger(ERROR, "Session failed to end with error code: ", result);
 
     free(name);
 }
 
 void session_use(char* id) {
     if(check_current() == TRUE)
-        return log(WARNING, "A session is already in use.");
+        return logger(WARNING, "A session is already in use.");
 
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
@@ -90,18 +90,18 @@ void session_use(char* id) {
     if(session_exists(name) == TRUE) {
         int result = set_current(name);
         if (result == SUCCESS)
-            log(INFO, "Current session is set to: ", name);
+            logger(INFO, "Current session is set to: ", name);
         else
-            log(ERROR, "Failed to use session with error code: ", result);
+            logger(ERROR, "Failed to use session with error code: ", result);
     }
-    else log(WARNING, "Session does not exist.");
+    else logger(WARNING, "Session does not exist.");
 
     free(name);
 }
 
 void session_run(char* id) {
     if(check_current() == TRUE)
-        return log(WARNING, "A session is already in use.");
+        return logger(WARNING, "A session is already in use.");
 
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
@@ -121,7 +121,7 @@ void session_run(char* id) {
             // Add to the start as executed.
             int append_result = append_to_start(name, "executed");
             if(append_result != SUCCESS) {
-                log(ERROR, "Failed to execute session with error code: ", append_result);
+                logger(ERROR, "Failed to execute session with error code: ", append_result);
                 flag = 1;
             }
 
@@ -134,15 +134,16 @@ void session_run(char* id) {
                     int exec_result = execute(line);
 
                     if (exec_result != SUCCESS) {
-                        log(ERROR, "Failed to execute a part of the session with error code: ", exec_result, "\nException line: ", i);
+                        logger(ERROR, "Failed to execute a part of the session with error code: ", exec_result,
+                               "\nException line: ", i);
                         flag = 1;
                     }
                 }
             }
         }
-        else log(WARNING, "Session is already executed.");
+        else logger(WARNING, "Session is already executed.");
     }
-    else log(ERROR, "Failed to read session with error code: ", read_result);
+    else logger(ERROR, "Failed to read session with error code: ", read_result);
 
     free(name);
     for (int i = 0; i < n; ++i)
@@ -154,18 +155,18 @@ void session_current() {
     char* current;
     int config_result = get_current(&current);
     if(config_result != SUCCESS)
-        return log(ERROR, "Cannot access current session.");
+        return logger(ERROR, "Cannot access current session.");
 
     if(strcmp(current, "") == 0)
-        log(INFO, "No session is selected.");
-    else log(INFO, current);
+        logger(INFO, "No session is selected.");
+    else logger(INFO, current);
 
     free(current);
 }
 
 void session_show(char* id) {
     if(check_current() == TRUE)
-        return log(WARNING, "A session is already in use.");
+        return logger(WARNING, "A session is already in use.");
 
     char* name = (char*) calloc(strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
@@ -178,7 +179,7 @@ void session_show(char* id) {
 
     int result = read_session(name, &lines, &n);
     if(result != SUCCESS)
-        log(ERROR, "Failed to open session with error code: ", result);
+        logger(ERROR, "Failed to open session with error code: ", result);
     else {
         for (size_t i = 0; i < n; i++)
             printf("%s\n", lines[i]);
@@ -197,7 +198,7 @@ void session_list() {
 
     int result = list_sessions(&lines, &n);
     if(result != SUCCESS)
-        log(ERROR, "Failed to list sessions with error code: ", result);
+        logger(ERROR, "Failed to list sessions with error code: ", result);
 
     for(size_t i = 0; i < n; i++)
         printf("[%d] %s\n", ((int)i) + 1, lines[i]);

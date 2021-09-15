@@ -1,7 +1,7 @@
-#include <queue.h>
+#include <include/queue.h>
 #include <malloc.h>
 #include <memory.h>
-#include <codes.h>
+#include <include/codes.h>
 
 queue *create_empty_queue() {
     return calloc(1, sizeof(queue));

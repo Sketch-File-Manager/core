@@ -5,8 +5,8 @@
 
 #include <session_parser.h>
 #include <file_handler.h>
-#include <codes.h>
-#include <functions.h>
+#include <include/codes.h>
+#include <include/functions.h>
 #include <errno.h>
 
 #define SESSION_FOLDER    "/.local/share/sketch/sessions/"
@@ -113,7 +113,7 @@ int delete_last_line(const char *name) {
     return SUCCESS;
 }
 
-static int append(const char *name, const char *content, int is_start) {
+static int append_to(const char *name, const char *content, int is_start) {
     char *relative_path = merge_home_relative_filename(name, SESSION_FOLDER);
     char *session_file = NULL;
 
@@ -144,11 +144,11 @@ static int append(const char *name, const char *content, int is_start) {
 }
 
 int append_to_end(const char *name, const char *content) {
-    return append(name, content, FALSE);
+    return append_to(name, content, FALSE);
 }
 
 int append_to_start(const char *name, const char *content) {
-    return append(name, content, TRUE);
+    return append_to(name, content, TRUE);
 }
 
 int read_session(const char *name, char ***result, size_t *size) {

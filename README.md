@@ -12,7 +12,7 @@ do mkfile `dst` `file` `permissions` | Create a new `file` at `dst` directory, i
 do copy `src` `dst` | Copy a `src` (file or directory) to `dst` folder.
 do move `src` `dst` | Move a `src` (file or directory) to `dst` folder.
 do rename `src` `new_name` | Rename `src` (file or directory) to `new_name`
-do edit [flags] `src` `content` | Edit a `src` file and change its content. `-a` or `--append`: append to end. `-u` or `--unshift`: append to start. `-w` or `--write`: Discard old content and append new.
+do edit [flags] `src` `content` | Edit a `src` file and change its content. `-a` or `--append_to`: append_to to end. `-u` or `--unshift`: append_to to start. `-w` or `--write`: Discard old content and append_to new.
 do permissions `src` `permissions` `recursive` | Change permissions to src. If src is folder and recursive is `1` then all sub folders and files will receive the same permissions.
 
 ### Session commands

@@ -52,7 +52,7 @@ extern void session_command_rename(char* src, char* name);
  * Add edit file command to the queue.
  * @param src The source file that will be edited.
  * @param content The content that will be added.
- * @param flag -a or --append for appending to the end of the file.
+ * @param flag -a or --append_to for appending to the end of the file.
  *             -u or --unshift for appending at the start of the file.
  *             -w or --write for discarding old content and write the new.
  */
