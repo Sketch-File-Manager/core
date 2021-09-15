@@ -39,9 +39,18 @@ static inline int is_directory(const char *path) {
     // do an and statement with bits of st_mode and bits of S_IFDIR.
     // If is the same the result is ok, otherwise the result is zero.
     if (path_stat.st_mode & S_IFDIR)
-        return 1;
+        return TRUE;
 
-    return 0;
+    return FALSE;
+}
+
+static inline __mode_t get_permissions_of(const char *path) {
+    struct stat path_stat;
+
+    if (stat(path, &path_stat) == -1)
+        return -1;
+
+    return path_stat.st_mode;
 }
 
 static inline int copy_file_content_of(char *src_file, char *dst_file) {
@@ -56,9 +65,9 @@ static inline int copy_file_content_of(char *src_file, char *dst_file) {
     int read_result = read_file(src_file, &src_contents);
     if (read_result == -1) return read_result;
 
-
+    __mode_t file_permissions = get_permissions_of(src_file);
     // Create a new file at the destination.
-    int dst_fd = open(dst_file, O_CREAT, 700);
+    int dst_fd = open(dst_file, O_CREAT, file_permissions);
     if (dst_fd == -1) return errno;
 
     size_t src_file_s = strlen(src_file);
@@ -72,7 +81,41 @@ static inline int copy_file_content_of(char *src_file, char *dst_file) {
     return SUCCESS;
 }
 
-static int copy_folder_content_of(char *src_folder, char *dst_folder) {
+static int copy_content_of(char *src_folder, char *dst_folder) {
+    queue *queue = create_empty_queue();
+    read_contents_of(src_folder, queue);
+    char *send_to;
+
+    __mode_t current_path_perms;
+    size_t current_path_split_s = 0;
+    char **current_path_split = NULL;
+
+    while (queue->size != 0) {
+        current_path_split = split_with_exception((char *) queue->q_first_node, '/', NULL, &current_path_split_s);
+        // Get the permissions of the current path.
+        current_path_perms = get_permissions_of((char *) queue->q_first_node);
+        // Make the path to the new made directory or file.
+        // File or directory name is located in the current_path_split[current_path_split_s - 1] based on split.
+        send_to = calloc(strlen(dst_folder) + strlen(current_path_split[current_path_split_s - 1]) + 1, sizeof(char));
+        // If the element that we are looking is directory. Then make a directory with the same name, under the new location.
+        if (is_directory((const char *) queue->q_first_node) == TRUE) {
+            // Create the directory. ( destination path ).
+            mkdir(send_to, current_path_perms);
+            // Search for more files in the new directory. ( source path ).
+            read_contents_of((char *) queue->q_first_node, queue);
+        }
+        else copy_file_content_of((char *) queue->q_first_node, send_to);
+
+        free(send_to);
+        // Free the split.
+        for (int fr = 0; fr < current_path_split_s; fr++) {
+            free(current_path_split[fr]);
+            current_path_split_s = 0;
+        }
+
+        if (pop(queue) == -1) return 1;
+    }
+    
     return SUCCESS;
 }
 
@@ -102,7 +145,7 @@ int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
 }
 
 int command_copy(char* src, char* dst_folder) {
-    int copy_result = copy_file_content_of(src, dst_folder);
+    int copy_result = copy_content_of(src, dst_folder);
 
     return copy_result;
 }
@@ -131,11 +174,12 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
             if(result == -1)
                 return errno;
 
-            if (is_directory((const char *) c_queue->q_first_node)) {
+            if (is_directory((const char *) c_queue->q_first_node) == TRUE) {
                 tmp = calloc(strlen((const char *) c_queue->q_first_node->q_item) + 1, sizeof(char));
                 strcpy(tmp, (const char *) c_queue->q_first_node->q_item);
+                read_contents_of(tmp, c_queue);
             }
-            
+
             pop(c_queue);
         }
         free(c_queue);

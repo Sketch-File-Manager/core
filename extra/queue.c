@@ -28,23 +28,15 @@ int add(queue* c_queue, void *item) {
     return SUCCESS;
 }
 
-void* peek(queue c_queue) {
-    return c_queue.q_first_node->q_item;
-}
-
-/**
- * Pops the first item from the queue_node.
- * @param c_queue The queue_node.
- * @return The pointer of the item that popped.
- */
-void* pop(queue *c_queue) {
+int pop(queue *c_queue) {
     void *removed_item = c_queue->q_first_node->q_item;
 
-    if (removed_item == NULL || c_queue->size == 0) return NULL;
+    if (removed_item == NULL || c_queue->size == 0) return -1;
 
     --c_queue->size;
 
     c_queue->q_first_node = c_queue->q_first_node->q_next_node;
     free(c_queue->q_first_node);
-    return removed_item;
+
+    return SUCCESS;
 }

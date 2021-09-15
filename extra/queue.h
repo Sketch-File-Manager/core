@@ -24,17 +24,10 @@ extern queue *create_empty_queue();
 extern int add(queue* c_queue, void *item);
 
 /**
- * Take a peek at the first item of the queue_node.
- * @param c_queue The queue_node.
- * @return The pointer of the item.
- */
-extern void* peek(queue c_queue);
-
-/**
  * Pops the first item from the queue_node.
  * @param c_queue The queue_node.
  * @return The pointer of the item that popped.
  */
-extern void* pop(queue *c_queue);
+extern int pop(queue *c_queue);
 
 #endif
