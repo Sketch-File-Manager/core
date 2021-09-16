@@ -26,38 +26,35 @@ int startsWith(const char *str, const char *pre) {
     return lenstr < lenpre ? FALSE : memcmp(pre, str, lenpre) == 0;
 }
 
-char* append(const char* str1, const char* str2) {
+inline char* str_copy(const char* src) {
+    char* dst = calloc(strlen(src) + 1, sizeof(char));
+    strcpy(dst, src);
+    return dst;
+}
+
+inline char* str_append(const char* str1, const char* str2) {
     char* ret = calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
     strcpy(ret, str1);
     strcat(ret, str2);
     return ret;
 }
 
-char* get_home_path() {
-    char *username = getlogin();
-    size_t path_s = strlen("/home/") + strlen(username) + 1 + 1;
-
-    char* path = calloc(path_s, sizeof(char));
-    strcpy(path, "/home/");
-    strcat(path, username);
-    strcat(path, "/");
-
-    return path;
+inline char* get_home_path() {
+    return str_append("/home/", str_append(getlogin(), "/"));
 }
 
 char* fix_path(char* path, int add_slash) {
-    char *ret = calloc(strlen(path) + 1, sizeof(char));
-    strcpy(ret, path);
+    char* ret = str_copy(path);
 
     // If starts with ~ replace with /home/username
     if(ret[0] == '~'){
         ret = ret + 2; // Delete ~/
-        ret = append(get_home_path(), ret);
+        ret = str_append(get_home_path(), ret);
     }
 
     // Ends with /
     if(add_slash == TRUE && endsWith(ret, "/") == FALSE)
-        ret = append(ret, "/");
+        ret = str_append(ret, "/");
 
     return ret;
 }
@@ -67,7 +64,7 @@ char *merge_home_relative_filename(const char *filename, const char *relative_pa
     if(startsWith(relative_path, "/") == TRUE)
         relative_path += 1;
 
-    return append(get_home_path(), append(relative_path, filename));
+    return str_append(get_home_path(), str_append(relative_path, filename));
 }
 
 char** split(char* str, char delimiter, char prev_delim_except, size_t* n) {
@@ -83,8 +80,7 @@ char** split(char* str, char delimiter, char prev_delim_except, size_t* n) {
             continue;
         }
 
-        ret[a] = calloc(strlen(token) + 1, sizeof(char));
-        strcpy(ret[a], token);
+        ret[a] = str_copy(token);
         ret = realloc(ret, (a + 1) + 1);
         a++;
 
@@ -119,10 +115,7 @@ void read_contents_of(const char *path, queue *c_queue) {
     // Read the files and folder inside the dir.
     while ((dir_contents = readdir(dir)) != NULL) {
         // Save the path.
-        tmp_path = calloc(strlen(path) + strlen(dir_contents->d_name) + 1, sizeof(char));
-        strcpy(tmp_path, path);
-        strcat(tmp_path, dir_contents->d_name);
-
+        tmp_path = str_append(path, dir_contents->d_name);
         // Add it to the queue.
         add(c_queue, tmp_path);
     }

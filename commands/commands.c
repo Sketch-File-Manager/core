@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <include/functions.h>
 #include <include/queue.h>
-#include <stdio.h>
 
 
 static inline __mode_t get_permissions_of(const char *path) {
@@ -23,7 +22,6 @@ static inline __mode_t get_permissions_of(const char *path) {
 }
 
 static inline int copy_file_content_of(char *src_file, char *dst_file) {
-
     // Open the source file.
     int src_fd = open(src_file, O_RDONLY);
     if (src_fd == -1) return errno;
@@ -50,9 +48,34 @@ static inline int copy_file_content_of(char *src_file, char *dst_file) {
     return SUCCESS;
 }
 
-static int copy_content_of(char *src_folder, char *dst_folder) {
+/** ================ COMMANDS ================ */
+
+int command_mkdir(char* dst_folder, char* name, __mode_t permissions) {
+    char* folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+    strcpy(folder_path, dst_folder);
+    strcpy(folder_path, name);
+
+    int result = mkdir(folder_path, permissions);
+    if(result == 0)
+        return SUCCESS;
+
+    return errno;
+}
+
+int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
+    char *destination = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+    strcpy(destination, dst_folder);
+    strcat(destination, name);
+
+    int new_fd = open(destination, O_CREAT, permissions);
+    if (new_fd == -1) return errno;
+
+    return SUCCESS;
+}
+
+int command_copy(char* src, char* dst_folder) {
     queue *c_queue = create_empty_queue();
-    read_contents_of(src_folder, c_queue);
+    read_contents_of(src, c_queue);
     char *send_to;
 
     __mode_t current_path_perms;
@@ -85,37 +108,6 @@ static int copy_content_of(char *src_folder, char *dst_folder) {
     free(c_queue);
 
     return SUCCESS;
-}
-
-/** ================ COMMANDS ================ */
-
-int command_mkdir(char* dst_folder, char* name, __mode_t permissions) {
-    char* folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
-    strcpy(folder_path, dst_folder);
-    strcpy(folder_path, name);
-
-    int result = mkdir(folder_path, permissions);
-    if(result == 0)
-        return SUCCESS;
-
-    return errno;
-}
-
-int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
-    char *destination = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
-    strcpy(destination, dst_folder);
-    strcat(destination, name);
-
-    int new_fd = open(destination, O_CREAT, permissions);
-    if (new_fd == -1) return errno;
-
-    return SUCCESS;
-}
-
-int command_copy(char* src, char* dst_folder) {
-    int copy_result = copy_content_of(src, dst_folder);
-
-    return copy_result;
 }
 
 int command_move(char* src, char* dst_folder) {
@@ -162,14 +154,19 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
 }
 
 int command_ls(char* directory) {
-    char **list = NULL;
-    size_t list_s = 0;
-
-    int list_result = list_files(fix_path(directory, FALSE), &list, &list_s);
-    if(list_result != SUCCESS) return list_result;
-
-    for (int i = 0; i < list_s; i++)
-        printf("[%d] %s\n", (int)i, list[i]);
+//    file_info** list;
+//    int result = get_info_of(directory, &list);
+//    if(result != SUCCESS)
+//        return result
+//
+//
+//    size_t list_s = 0;
+//
+//    int list_result = list_files(fix_path(directory, FALSE), &list, &list_s);
+//    if(list_result != SUCCESS) return list_result;
+//
+//    for (int i = 0; i < list_s; i++)
+//        printf("[%d] %s\n", (int)i, list[i]);
 
     return SUCCESS;
 }

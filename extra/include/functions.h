@@ -26,13 +26,20 @@ extern int endsWith(const char *str, const char *suffix);
  * @param str2 The str2 string.
  * @return The concat of the the two strings.
  */
-extern char* append(const char* str1, const char* str2);
+extern inline char* str_append(const char* str1, const char* str2);
+
+/**
+ * Return a copy of a string.
+ * @param src The string that will be copied.
+ * @return The duplicate.
+ */
+extern inline char* str_copy(const char* src);
 
 /**
  * Return the home directory.
  * @return The home directory.
  */
-extern char* get_home_path();
+extern inline char* get_home_path();
 
 /**
  * Replace ~ with home directory and add / at the end if missing.

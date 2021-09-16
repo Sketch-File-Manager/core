@@ -17,9 +17,7 @@
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
-    size_t path_s = strlen(file_path);
-    char *path = calloc(path_s + 1, sizeof(char));
-    strcpy(path, file_path);
+    char *path = str_copy(file_path);
 
     // open the config file.
     int fd = open(path, flag);
@@ -126,8 +124,7 @@ int list_files(const char *path, char ***result_files, size_t *size) {
 
         current_file = dir_info->d_name;
 
-        files[index] = calloc(strlen(current_file) + 1, sizeof(char ));
-        strcpy(files[index], current_file);
+        files[index] = str_copy(current_file);
 
         ++files_s;
         files = realloc(files, sizeof(char *) * files_s);
@@ -141,7 +138,6 @@ int list_files(const char *path, char ***result_files, size_t *size) {
     return SUCCESS;
 }
 
-
 int get_info_of(char *path, file_info **files) {
     struct stat curr_element_stat;
     queue *c_queue = create_empty_queue();
@@ -153,12 +149,12 @@ int get_info_of(char *path, file_info **files) {
     size_t curr_element_name_s;
     int current_path = 0;
     while (c_queue->size != 0) {
-        if (stat((const char *) peek(c_queue), &curr_element_stat) == -1) return -1;
+        int result = stat((const char *) peek(c_queue), &curr_element_stat);
+        if (result == -1) return errno;
 
         curr_element_name = split((char *) peek(c_queue), '/', NULL, &curr_element_name_s);
 
-        files[current_path]->f_name = calloc(strlen(curr_element_name[curr_element_name_s - 1]) + 1, sizeof(char));
-        strcpy(files[current_path]->f_name, curr_element_name[curr_element_name_s - 1]);
+        files[current_path]->f_name = str_copy(curr_element_name[curr_element_name_s - 1]);
         files[current_path]->f_user_id = curr_element_stat.st_uid;
         files[current_path]->f_group_id = curr_element_stat.st_gid;
         files[current_path]->f_permissions = curr_element_stat.st_mode;
