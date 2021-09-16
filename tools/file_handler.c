@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <include/functions.h>
 #include <include/codes.h>
+#include <include/queue.h>
 #include <errno.h>
 
 #define SKETCH_LOCATION     "/.local/share/"
@@ -136,6 +137,44 @@ int list_files(const char *path, char ***result_files, size_t *size) {
     closedir(dir);
     *size = files_s;
     *result_files = files;
+
+    return SUCCESS;
+}
+
+
+int get_info_of(char *path, file_info **files) {
+    struct stat curr_element_stat;
+    queue *c_queue = create_empty_queue();
+    files = calloc(1, sizeof(file_info *));
+
+    read_contents_of(path, c_queue);
+
+    char **curr_element_name; // file or directory name.
+    size_t curr_element_name_s;
+    int current_path = 0;
+    while (c_queue->size != 0) {
+        if (stat((const char *) peek(c_queue), &curr_element_stat) == -1) return -1;
+
+        curr_element_name = split((char *) peek(c_queue), '/', NULL, &curr_element_name_s);
+
+        files[current_path]->f_name = calloc(strlen(curr_element_name[curr_element_name_s - 1]) + 1, sizeof(char));
+        strcpy(files[current_path]->f_name, curr_element_name[curr_element_name_s - 1]);
+        files[current_path]->f_user_id = curr_element_stat.st_uid;
+        files[current_path]->f_group_id = curr_element_stat.st_gid;
+        files[current_path]->f_permissions = curr_element_stat.st_mode;
+        files[current_path]->f_last_access = curr_element_stat.st_atim;
+        files[current_path]->f_last_modify = curr_element_stat.st_mtim;
+        files[current_path]->f_last_access = curr_element_stat.st_ctim;
+
+        if (is_dir((const char *) pop(c_queue)))
+            read_contents_of((char *) peek(c_queue), c_queue);
+
+        for (int fr = 0; fr < curr_element_name_s; fr++) free(curr_element_name[fr]);
+
+        free(curr_element_name);
+
+        files = realloc(files, sizeof(char) * current_path);
+    }
 
     return SUCCESS;
 }

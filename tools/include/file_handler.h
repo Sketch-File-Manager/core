@@ -3,6 +3,20 @@
 
 #include <stdlib.h>
 
+typedef struct file_info {
+    // Basic info of file.
+    char            *f_name;
+    mode_t           f_permissions;
+    uid_t            f_user_id;
+    gid_t            f_group_id;
+    // Times.
+    struct timespec  f_last_access;
+    struct timespec  f_last_modify;
+    struct timespec  f_status_change;
+} file_info;
+
+extern int get_info_of(char *path, file_info **files);
+
 /**
  * Read a files content.
  * @param file_path The file path

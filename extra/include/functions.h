@@ -2,6 +2,8 @@
 #define SKETCH_CORE_FUNCTIONS_H 1
 
 
+#include <include/queue.h>
+
 /**
  * Checks if a string starts with another string.
  * @param str The base string
@@ -61,5 +63,7 @@ extern char **split(char* str, char delimiter, char prev_delim_except, size_t* n
  * @return TRUE if the path is directory, FALSE otherwise.
  */
 extern int is_dir(const char *path);
+
+void read_contents_of(const char *path, queue *c_queue);
 
 #endif

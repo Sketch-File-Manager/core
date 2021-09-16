@@ -4,6 +4,7 @@
 #include "include/functions.h"
 #include <include/codes.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 int endsWith(const char *str, const char *suffix) {
     if (!str || !suffix)
@@ -108,4 +109,21 @@ int is_dir(const char *path) {
         return TRUE;
 
     return FALSE;
+}
+
+void read_contents_of(const char *path, queue *c_queue) {
+    DIR *dir = opendir(path);
+    struct dirent *dir_contents = NULL;
+    char *tmp_path;
+
+    // Read the files and folder inside the dir.
+    while ((dir_contents = readdir(dir)) != NULL) {
+        // Save the path.
+        tmp_path = calloc(strlen(path) + strlen(dir_contents->d_name) + 1, sizeof(char));
+        strcpy(tmp_path, path);
+        strcat(tmp_path, dir_contents->d_name);
+
+        // Add it to the queue.
+        add(c_queue, tmp_path);
+    }
 }

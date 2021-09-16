@@ -15,6 +15,8 @@ typedef struct queue {
 
 extern queue *create_empty_queue();
 
+extern void *peek(queue *c_queue);
+
 /**
  * Add a new item to the queue_node.
  * @param c_queue The queue_node.
@@ -28,6 +30,6 @@ extern int add(queue* c_queue, void *item);
  * @param c_queue The queue_node.
  * @return The pointer of the item that popped.
  */
-extern int pop(queue *c_queue);
+extern void *pop(queue *c_queue);
 
 #endif

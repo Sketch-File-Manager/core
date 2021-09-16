@@ -28,15 +28,19 @@ int add(queue* c_queue, void *item) {
     return SUCCESS;
 }
 
-int pop(queue *c_queue) {
+void *peek(queue *c_queue) {
+    return c_queue->q_first_node->q_item;
+}
+
+void *pop(queue *c_queue) {
     void *removed_item = c_queue->q_first_node->q_item;
 
-    if (removed_item == NULL || c_queue->size == 0) return -1;
+    if (removed_item == NULL || c_queue->size == 0) return NULL;
 
     --c_queue->size;
 
     c_queue->q_first_node = c_queue->q_first_node->q_next_node;
     free(c_queue->q_first_node);
 
-    return SUCCESS;
+    return removed_item;
 }
