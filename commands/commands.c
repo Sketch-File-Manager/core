@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <include/functions.h>
 #include <include/queue.h>
+#include <stdio.h>
 
 
 static inline __mode_t get_permissions_of(const char *path) {
@@ -111,6 +112,15 @@ int command_copy(char* src, char* dst_folder) {
 }
 
 int command_move(char* src, char* dst_folder) {
+    command_copy(src, dst_folder);
+
+    if (is_dir(src) == TRUE) {
+        if (rmdir(src) == -1) return -1;
+    }
+    else {
+        delete_file(src);
+    }
+
     return SUCCESS;
 }
 

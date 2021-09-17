@@ -138,10 +138,10 @@ int list_files(const char *path, char ***result_files, size_t *size) {
     return SUCCESS;
 }
 
-int get_info_of(char *path, file_info **files) {
+int get_info_of(char *path, file_info ***files) {
     struct stat curr_element_stat;
     queue *c_queue = create_empty_queue();
-    files = calloc(1, sizeof(file_info *));
+    *files = calloc(1, sizeof(file_info *));
 
     read_contents_of(path, c_queue);
 
@@ -154,13 +154,13 @@ int get_info_of(char *path, file_info **files) {
 
         curr_element_name = split((char *) peek(c_queue), '/', NULL, &curr_element_name_s);
 
-        files[current_path]->f_name = str_copy(curr_element_name[curr_element_name_s - 1]);
-        files[current_path]->f_user_id = curr_element_stat.st_uid;
-        files[current_path]->f_group_id = curr_element_stat.st_gid;
-        files[current_path]->f_permissions = curr_element_stat.st_mode;
-        files[current_path]->f_last_access = curr_element_stat.st_atim;
-        files[current_path]->f_last_modify = curr_element_stat.st_mtim;
-        files[current_path]->f_last_access = curr_element_stat.st_ctim;
+        (*files[current_path])->f_name = str_copy(curr_element_name[curr_element_name_s - 1]);
+        (*files[current_path])->f_user_id = curr_element_stat.st_uid;
+        (*files[current_path])->f_group_id = curr_element_stat.st_gid;
+        (*files[current_path])->f_permissions = curr_element_stat.st_mode;
+        (*files[current_path])->f_last_access = curr_element_stat.st_atim;
+        (*files[current_path])->f_last_modify = curr_element_stat.st_mtim;
+        (*files[current_path])->f_last_access = curr_element_stat.st_ctim;
 
         if (is_dir((const char *) pop(c_queue)))
             read_contents_of((char *) peek(c_queue), c_queue);

@@ -15,7 +15,7 @@ typedef struct file_info {
     struct timespec  f_status_change;
 } file_info;
 
-extern int get_info_of(char *path, file_info **files);
+extern int get_info_of(char *path, file_info ***files);
 
 /**
  * Read a files content.
