@@ -138,7 +138,7 @@ int list_files(const char *path, char ***result_files, size_t *size) {
     return SUCCESS;
 }
 
-int get_info_of(char *path, file_info ***files) {
+int get_info_of(char *path, file_info ***files, size_t *size) {
     struct stat curr_element_stat;
     queue *c_queue = create_empty_queue();
     *files = calloc(1, sizeof(file_info *));
@@ -171,6 +171,8 @@ int get_info_of(char *path, file_info ***files) {
 
         files = realloc(files, sizeof(char) * current_path);
     }
+    size = calloc(1, sizeof(size_t));
+    *size = current_path;
 
     return SUCCESS;
 }
