@@ -152,7 +152,7 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         int result = stat((const char *) peek(c_queue), &curr_element_stat);
         if (result == -1) return errno;
 
-        curr_element_name = split((char *) peek(c_queue), '/', NULL, &curr_element_name_s);
+        curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
         (*files[current_path])->f_name = str_copy(curr_element_name[curr_element_name_s - 1]);
         (*files[current_path])->f_user_id = curr_element_stat.st_uid;
@@ -161,6 +161,9 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         (*files[current_path])->f_last_access = curr_element_stat.st_atim;
         (*files[current_path])->f_last_modify = curr_element_stat.st_mtim;
         (*files[current_path])->f_last_access = curr_element_stat.st_ctim;
+        (*files[current_path])->f_serial_number = curr_element_stat.st_ino;
+        (*files[current_path])->link_count = curr_element_stat.st_nlink;
+        (*files[current_path])->f_size = curr_element_stat.st_size;
 
         if (is_dir((const char *) pop(c_queue)))
             read_contents_of((char *) peek(c_queue), c_queue);
@@ -171,7 +174,6 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
         files = realloc(files, sizeof(char) * current_path);
     }
-    size = calloc(1, sizeof(size_t));
     *size = current_path;
 
     return SUCCESS;

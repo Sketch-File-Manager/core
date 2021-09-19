@@ -26,20 +26,20 @@ extern int endsWith(const char *str, const char *suffix);
  * @param str2 The str2 string.
  * @return The concat of the the two strings.
  */
-extern inline char* str_append(const char* str1, const char* str2);
+extern char* str_append(const char* str1, const char* str2);
 
 /**
  * Return a copy of a string.
  * @param src The string that will be copied.
  * @return The duplicate.
  */
-extern inline char* str_copy(const char* src);
+extern char* str_copy(const char* src);
 
 /**
  * Return the home directory.
  * @return The home directory.
  */
-extern inline char* get_home_path();
+extern char* get_home_path();
 
 /**
  * Replace ~ with home directory and add / at the end if missing.
@@ -55,14 +55,14 @@ extern char* fix_path(char* path, int add_slash);
 extern char *merge_home_relative_filename(const char *filename, const char *relative_path);
 
 /**
- * Splits a string to an array of strings by a specific delimiter. It will skip the split by delimiter if the previous character is the same as the prev_delim_except.
- * @param str The string that will be split.
+ * Splits a string to an array of strings by a specific delimiter. It will skip the split_except by delimiter if the previous character is the same as the prev_delim_except.
+ * @param str The string that will be split_except.
  * @param delimiter The delimiter.
  * @param prev_delim_except The exception character that is located before the delimiter.
  * @param n The size of the array that will be returned.
- * @return A string array that contains the split form of the str.
+ * @return A string array that contains the split_except form of the str.
  */
-extern char **split(char* str, char delimiter, char prev_delim_except, size_t* n);
+extern char **split_except(char* str, char delimiter, char prev_delim_except, size_t* n);
 
 /**
  * Checks if a path is a directory.
@@ -71,6 +71,6 @@ extern char **split(char* str, char delimiter, char prev_delim_except, size_t* n
  */
 extern int is_dir(const char *path);
 
-void read_contents_of(const char *path, queue *c_queue);
+extern void read_contents_of(const char *path, queue *c_queue);
 
 #endif

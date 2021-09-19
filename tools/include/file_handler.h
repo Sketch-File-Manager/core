@@ -13,6 +13,15 @@ typedef struct file_info {
     struct timespec  f_last_access;
     struct timespec  f_last_modify;
     struct timespec  f_status_change;
+
+    // File serial number
+    __ino_t f_serial_number;
+
+    // Link count
+    __nlink_t link_count;
+
+    // File size (bytes)
+    __off_t f_size;
 } file_info;
 
 extern int get_info_of(char *path, file_info ***files, size_t *size);

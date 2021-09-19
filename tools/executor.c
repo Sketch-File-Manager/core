@@ -19,7 +19,7 @@ static __mode_t parse_permission(char* p) {
 
 int execute(char* command) {
     size_t n;
-    char** array = split(command, ' ', '\\', &n);
+    char** array = split_except(command, ' ', '\\', &n);
 
     if(strcmp(array[0], "mkdir") == 0) {
         char* dst_folder = fix_path(array[1], TRUE);

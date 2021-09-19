@@ -7,7 +7,8 @@ void logger(int priority, char* message, ...) {
 
     va_list args;
     va_start(args, message);
-    printf("%s", va_arg(args, char*));
+    char* msg = va_arg(args, char*);
+    printf("%s", msg);
     va_end(args);
 
     putchar('\n');

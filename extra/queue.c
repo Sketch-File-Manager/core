@@ -15,15 +15,26 @@ int add(queue* c_queue, void *item) {
     new_node->q_item = item;
     new_node->q_next_node = NULL;
 
-    if (c_queue->size == 1 && c_queue->q_first_node->q_item != NULL) {
+    if(c_queue->size == 0) {
+        // Init start node
         c_queue->q_first_node = new_node;
+
+        // Init end node
+        c_queue->q_last_node = new_node;
+        c_queue->q_last_node->q_next_node = new_node;
+
+        // Increase size
+        ++c_queue->size;
+
         return SUCCESS;
     }
 
-    // Connect the new c_queue to the last c_queue.
-    ++c_queue->size;
+    // Rewrite last node
     c_queue->q_last_node->q_next_node = new_node;
     c_queue->q_last_node = new_node;
+
+    // Change size
+    ++c_queue->size;
 
     return SUCCESS;
 }

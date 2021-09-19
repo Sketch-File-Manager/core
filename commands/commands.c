@@ -84,11 +84,11 @@ int command_copy(char* src, char* dst_folder) {
     char **current_path_split = NULL;
 
     while (c_queue->size != 0) {
-        current_path_split = split((char *) peek(c_queue), '/', NULL, &current_path_split_s);
+        current_path_split = split_except((char *) peek(c_queue), '/', NULL, &current_path_split_s);
         // Get the permissions of the current path.
         current_path_perms = get_permissions_of((char *) peek(c_queue));
         // Make the path to the new made directory or file.
-        // File or directory name is located in the current_path_split[current_path_split_s - 1] based on split.
+        // File or directory name is located in the current_path_split[current_path_split_s - 1] based on split_except.
         send_to = calloc(strlen(dst_folder) + strlen(current_path_split[current_path_split_s - 1]) + 1, sizeof(char));
         // If the element that we are looking is directory. Then make a directory with the same name, under the new location.
         if (is_dir((const char *) pop(c_queue)) == TRUE) {
@@ -100,7 +100,7 @@ int command_copy(char* src, char* dst_folder) {
         else copy_file_content_of((char *) peek(c_queue), send_to);
 
         free(send_to);
-        // Free the split.
+        // Free the split_except.
         for (int fr = 0; fr < current_path_split_s; fr++) {
             free(current_path_split[fr]);
             current_path_split_s = 0;
@@ -164,19 +164,34 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
 }
 
 int command_ls(char* directory) {
-//    file_info** list;
-//    int result = get_info_of(directory, &list);
-//    if(result != SUCCESS)
-//        return result
-//
-//
-//    size_t list_s = 0;
-//
-//    int list_result = list_files(fix_path(directory, FALSE), &list, &list_s);
-//    if(list_result != SUCCESS) return list_result;
-//
-//    for (int i = 0; i < list_s; i++)
-//        printf("[%d] %s\n", (int)i, list[i]);
+    file_info** list;
+    size_t list_s = 0;
+    int result = get_info_of(fix_path(directory, TRUE), &list, &list_s);
+    if(result != SUCCESS)
+        return result;
+
+    printf("[\n");
+    for (int i = 0; i < list_s; i++) {
+        printf("  {\n");
+        // General
+        printf("    \"name\": \"%s\"\n", list[i]->f_name);
+        printf("    \"location\": \"%s\"\n", fix_path(directory, TRUE));
+        printf("    \"permissions\": \"%s\"\n", list[i]->f_permissions);
+        printf("    \"size\": \"%ld\"\n", list[i]->f_size);
+        // Owners' ids
+        printf("    \"group_id\": \"%u\"\n", list[i]->f_group_id);
+        printf("    \"user_id\": \"%u\"\n", list[i]->f_user_id);
+        // Timespec
+        printf("    \"last_access\": \"%ld.%.9ld\"\n", list[i]->f_last_access.tv_sec, list[i]->f_last_access.tv_nsec);
+        printf("    \"last_modify\": \"%ld.%.9ld\"\n", list[i]->f_last_modify.tv_sec, list[i]->f_last_modify.tv_nsec);
+        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec, list[i]->f_status_change.tv_nsec);
+        // Other
+        printf("    \"serial_number\": \"%lu\"\n", list[i]->f_serial_number);
+        printf("    \"link_count\": \"%lu\"\n", list[i]->link_count);
+
+        printf("  }\n");
+    }
+    printf("]\n");
 
     return SUCCESS;
 }

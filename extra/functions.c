@@ -26,20 +26,20 @@ int startsWith(const char *str, const char *pre) {
     return lenstr < lenpre ? FALSE : memcmp(pre, str, lenpre) == 0;
 }
 
-inline char* str_copy(const char* src) {
+char* str_copy(const char* src) {
     char* dst = calloc(strlen(src) + 1, sizeof(char));
     strcpy(dst, src);
     return dst;
 }
 
-inline char* str_append(const char* str1, const char* str2) {
+char* str_append(const char* str1, const char* str2) {
     char* ret = calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
     strcpy(ret, str1);
     strcat(ret, str2);
     return ret;
 }
 
-inline char* get_home_path() {
+char* get_home_path() {
     return str_append("/home/", str_append(getlogin(), "/"));
 }
 
@@ -67,24 +67,25 @@ char *merge_home_relative_filename(const char *filename, const char *relative_pa
     return str_append(get_home_path(), str_append(relative_path, filename));
 }
 
-char** split(char* str, char delimiter, char prev_delim_except, size_t* n) {
+char** split_except(char* str, char delimiter, char prev_delim_except, size_t* n) {
     char** ret = (char**) calloc(1, sizeof (char*));
     int a = 0;
+    *n = 0;
 
     char* token = calloc(strlen(str) + 1, sizeof(char));
     int k = 0;
     for (int i = 0; str[i]; i++) {
-        if(str[i] != delimiter || (i > 0 && str[i - 1] != prev_delim_except)) {
+        if(str[i] != delimiter || (i > 0 && str[i - 1] == prev_delim_except)) {
             token[k] = str[i];
             k++;
             continue;
         }
 
         ret[a] = str_copy(token);
-        ret = realloc(ret, (a + 1) + 1);
         a++;
+        ret = realloc(ret, a + 1);
 
-        token = "";
+        token = str_copy("");
         k = 0;
     }
 
