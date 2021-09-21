@@ -13,14 +13,14 @@
 #define COMMAND_NUMBER 27
 
 // simple commands
-#define SIMPLE_MKDIR           "do mkdir"
-#define SIMPLE_MKFILE          "do mkfile"
-#define SIMPLE_COPY            "do copy"
-#define SIMPLE_MOVE            "do move"
-#define SIMPLE_RENAME          "do rename"
-#define SIMPLE_EDIT            "do edit"
-#define SIMPLE_PERMISSIONS     "do permissions"
-#define SIMPLE_LS              "do ls"
+#define SIMPLE_MKDIR            "do mkdir"
+#define SIMPLE_MKFILE           "do mkfile"
+#define SIMPLE_COPY             "do copy"
+#define SIMPLE_MOVE             "do move"
+#define SIMPLE_RENAME           "do rename"
+#define SIMPLE_EDIT             "do edit"
+#define SIMPLE_PERMISSIONS      "do permissions"
+#define SIMPLE_LS               "do ls"
 
 // session commands.
 #define SESSION_START           "session start"
@@ -121,34 +121,34 @@ static int print_version() {
 
 static struct command commands[COMMAND_NUMBER] = {
         // simple commands.
-        {.c_name = SIMPLE_MKDIR,       .c_argc = 3, .c_exec = (exec_general *) command_mkdir},
-        {.c_name = SIMPLE_MKFILE,      .c_argc = 3, .c_exec = (exec_general *) command_mkfile},
-        {.c_name = SIMPLE_COPY,        .c_argc = 4, .c_exec = (exec_general *) command_copy},
-        {.c_name = SIMPLE_MOVE,        .c_argc = 4, .c_exec = (exec_general *) command_move},
-        {.c_name = SIMPLE_RENAME,      .c_argc = 2, .c_exec = (exec_general *) command_rename},
-        {.c_name = SIMPLE_EDIT,        .c_argc = 3, .c_exec = (exec_general *) command_edit},
-        {.c_name = SIMPLE_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) command_permissions},
-        {.c_name = SIMPLE_LS,          .c_argc = 1, .c_exec = (exec_general *) command_ls},
+        {.c_name = SIMPLE_MKDIR,          .c_argc = 3, .c_exec = (exec_general *) command_mkdir},
+        {.c_name = SIMPLE_MKFILE,         .c_argc = 3, .c_exec = (exec_general *) command_mkfile},
+        {.c_name = SIMPLE_COPY,           .c_argc = 4, .c_exec = (exec_general *) command_copy},
+        {.c_name = SIMPLE_MOVE,           .c_argc = 4, .c_exec = (exec_general *) command_move},
+        {.c_name = SIMPLE_RENAME,         .c_argc = 2, .c_exec = (exec_general *) command_rename},
+        {.c_name = SIMPLE_EDIT,           .c_argc = 3, .c_exec = (exec_general *) command_edit},
+        {.c_name = SIMPLE_PERMISSIONS,    .c_argc = 3, .c_exec = (exec_general *) command_permissions},
+        {.c_name = SIMPLE_LS,             .c_argc = 1, .c_exec = (exec_general *) command_ls},
 
         // session.
-        {.c_name = SESSION_START,       .c_argc = 0, .c_exec = (exec_general *) session_start},
-        {.c_name = SESSION_END,         .c_argc = 1, .c_exec = (exec_general *) session_end},
-        {.c_name = SESSION_USE,         .c_argc = 1, .c_exec = (exec_general *) session_use},
-        {.c_name = SESSION_RUN,         .c_argc = 1, .c_exec = (exec_general *) session_run},
-        {.c_name = SESSION_CURRENT,     .c_argc = 0, .c_exec = (exec_general *) session_current},
-        {.c_name = SESSION_SHOW,        .c_argc = 1, .c_exec = (exec_general *) session_show},
-        {.c_name = SESSION_LIST,        .c_argc = 0, .c_exec = (exec_general *) session_list},
+        {.c_name = SESSION_START,         .c_argc = 0, .c_exec = (exec_general *) session_start},
+        {.c_name = SESSION_END,           .c_argc = 1, .c_exec = (exec_general *) session_end},
+        {.c_name = SESSION_USE,           .c_argc = 1, .c_exec = (exec_general *) session_use},
+        {.c_name = SESSION_RUN,           .c_argc = 1, .c_exec = (exec_general *) session_run},
+        {.c_name = SESSION_CURRENT,       .c_argc = 0, .c_exec = (exec_general *) session_current},
+        {.c_name = SESSION_SHOW,          .c_argc = 1, .c_exec = (exec_general *) session_show},
+        {.c_name = SESSION_LIST,          .c_argc = 0, .c_exec = (exec_general *) session_list},
 
         // session commands.
-        {.c_name = COMMAND_EXIT,        .c_argc = 0, .c_exec = (exec_general *) session_command_exit},
-        {.c_name = COMMAND_UNDO,        .c_argc = 0, .c_exec = (exec_general *) session_command_undo},
-        {.c_name = COMMAND_MKDIR,       .c_argc = 3, .c_exec = (exec_general *) session_command_mkdir},
-        {.c_name = COMMAND_MKFILE,      .c_argc = 3, .c_exec = (exec_general *) session_command_mkfile},
-        {.c_name = COMMAND_COPY,        .c_argc = 4, .c_exec = (exec_general *) session_command_copy},
-        {.c_name = COMMAND_MOVE,        .c_argc = 4, .c_exec = (exec_general *) session_command_move},
-        {.c_name = COMMAND_RENAME,      .c_argc = 2, .c_exec = (exec_general *) session_command_rename},
-        {.c_name = COMMAND_EDIT,        .c_argc = 3, .c_exec = (exec_general *) session_command_edit},
-        {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission},
+        {.c_name = COMMAND_EXIT,          .c_argc = 0, .c_exec = (exec_general *) session_command_exit},
+        {.c_name = COMMAND_UNDO,          .c_argc = 0, .c_exec = (exec_general *) session_command_undo},
+        {.c_name = COMMAND_MKDIR,         .c_argc = 3, .c_exec = (exec_general *) session_command_mkdir},
+        {.c_name = COMMAND_MKFILE,        .c_argc = 3, .c_exec = (exec_general *) session_command_mkfile},
+        {.c_name = COMMAND_COPY,          .c_argc = 4, .c_exec = (exec_general *) session_command_copy},
+        {.c_name = COMMAND_MOVE,          .c_argc = 4, .c_exec = (exec_general *) session_command_move},
+        {.c_name = COMMAND_RENAME,        .c_argc = 2, .c_exec = (exec_general *) session_command_rename},
+        {.c_name = COMMAND_EDIT,          .c_argc = 3, .c_exec = (exec_general *) session_command_edit},
+        {.c_name = COMMAND_PERMISSIONS,   .c_argc = 3,  .c_exec = (exec_general *) session_command_permission},
 
         // options
         {.c_name = OPTION_HELP,           .c_argc = 0, .c_exec = (exec_general *) print_help},
@@ -210,10 +210,10 @@ int parse(int argc, char **argv) {
     int result = SUCCESS;
     if (commands[index].c_argc == 0) result = commands[index].c_exec();
     else if (commands[index].c_argc == 1) result = ((exec_one_arg *) commands[index].c_exec)(argv[3 - offset]);
-    else if (commands[index].c_argc == 2) result = ((exec_two_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset]);
+    /*else if (commands[index].c_argc == 2) result = ((exec_two_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset]);
     else if (commands[index].c_argc == 3) result = ((exec_three_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
     else if (commands[index].c_argc == 4) result = ((exec_four_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
-
+*/
     // if is a simple command show some logs.
     if(strcmp(argv[1], "do") == 0 && result != SUCCESS)
         logger(ERROR, "Failed to execute simple command with error code: ", result);

@@ -18,7 +18,7 @@ typedef struct file_info {
     __ino_t f_serial_number;
 
     // Link count
-    __nlink_t link_count;
+    __nlink_t f_link_count;
 
     // File size (bytes)
     __off_t f_size;

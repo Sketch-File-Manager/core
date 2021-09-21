@@ -84,7 +84,7 @@ int command_copy(char* src, char* dst_folder) {
     char **current_path_split = NULL;
 
     while (c_queue->size != 0) {
-        current_path_split = split_except((char *) peek(c_queue), '/', NULL, &current_path_split_s);
+        current_path_split = split_except((char *) peek(c_queue), '/', '\0', &current_path_split_s);
         // Get the permissions of the current path.
         current_path_perms = get_permissions_of((char *) peek(c_queue));
         // Make the path to the new made directory or file.
@@ -166,7 +166,8 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
 int command_ls(char* directory) {
     file_info** list;
     size_t list_s = 0;
-    int result = get_info_of(fix_path(directory, TRUE), &list, &list_s);
+    char *fix = fix_path(directory, TRUE);
+    int result = get_info_of(fix, &list, &list_s);
     if(result != SUCCESS)
         return result;
 
@@ -176,7 +177,7 @@ int command_ls(char* directory) {
         // General
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
         printf("    \"location\": \"%s\"\n", fix_path(directory, TRUE));
-        printf("    \"permissions\": \"%s\"\n", list[i]->f_permissions);
+        printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions);
         printf("    \"size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
         printf("    \"group_id\": \"%u\"\n", list[i]->f_group_id);
@@ -187,11 +188,13 @@ int command_ls(char* directory) {
         printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec, list[i]->f_status_change.tv_nsec);
         // Other
         printf("    \"serial_number\": \"%lu\"\n", list[i]->f_serial_number);
-        printf("    \"link_count\": \"%lu\"\n", list[i]->link_count);
+        printf("    \"f_link_count\": \"%lu\"\n", list[i]->f_link_count);
 
         printf("  }\n");
     }
     printf("]\n");
+
+    //free(list);
 
     return SUCCESS;
 }

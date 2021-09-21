@@ -40,6 +40,9 @@ int add(queue* c_queue, void *item) {
 }
 
 void *peek(queue *c_queue) {
+    if (c_queue->q_first_node->q_item == NULL)
+        return NULL;
+
     return c_queue->q_first_node->q_item;
 }
 
@@ -50,8 +53,10 @@ void *pop(queue *c_queue) {
 
     --c_queue->size;
 
+    queue_node  *tmp_node = c_queue->q_first_node;
     c_queue->q_first_node = c_queue->q_first_node->q_next_node;
-    free(c_queue->q_first_node);
+
+    free(tmp_node);
 
     return removed_item;
 }

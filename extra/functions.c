@@ -74,7 +74,8 @@ char** split_except(char* str, char delimiter, char prev_delim_except, size_t* n
 
     char* token = calloc(strlen(str) + 1, sizeof(char));
     int k = 0;
-    for (int i = 0; str[i]; i++) {
+
+    for (int i = 0; str[i] != '\0'; i++) {
         if(str[i] != delimiter || (i > 0 && str[i - 1] == prev_delim_except)) {
             token[k] = str[i];
             k++;
@@ -83,12 +84,15 @@ char** split_except(char* str, char delimiter, char prev_delim_except, size_t* n
 
         ret[a] = str_copy(token);
         a++;
-        ret = realloc(ret, a + 1);
-
-        token = str_copy("");
+        ret = realloc(ret, (a + 1) * sizeof(char *));
+        // Free the previous pointer.
+        free(token);
+        // Allocate space for new token.
+        token = calloc(strlen(str) + 1, sizeof(char));
         k = 0;
     }
 
+    ret[a] = str_copy(token);
     *n = a + 1;
     free(token);
     return ret;
@@ -102,10 +106,10 @@ int is_dir(const char *path) {
 
     // do an and statement with bits of st_mode and bits of S_IFDIR.
     // If is the same the result is ok, otherwise the result is zero.
-    if (path_stat.st_mode & S_IFDIR)
+    if (path_stat.st_mode == S_IFDIR)
         return TRUE;
 
-    return FALSE;
+    return SUCCESS;
 }
 
 void read_contents_of(const char *path, queue *c_queue) {
