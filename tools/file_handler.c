@@ -9,7 +9,6 @@
 #include <include/codes.h>
 #include <include/queue.h>
 #include <errno.h>
-#include <stdio.h>
 
 #define SKETCH_LOCATION     "/.local/share/"
 #define CONFIG_LOCATION     "/.local/share/sketch/"
@@ -151,8 +150,6 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     char **curr_element_name; // file or directory name.
     size_t curr_element_name_s;
 
-    char *current_item_from_queue;
-
     int current_path = 0;
     while (c_queue->size != 0) {
         int result = stat((const char *) peek(c_queue), &curr_element_stat);
@@ -171,14 +168,8 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         tmp_files[current_path]->f_link_count = curr_element_stat.st_nlink;
         tmp_files[current_path]->f_size = curr_element_stat.st_size;
 
-        if (is_dir((const char *) pop(c_queue))) {
-            current_item_from_queue = (char *) peek(c_queue);
-            if (current_item_from_queue == NULL)
-                return -1;
-
+        if (is_dir((const char *) pop(c_queue)))
             read_contents_of((char *) peek(c_queue), c_queue);
-        }
-
 
         for (int fr = 0; fr < curr_element_name_s; fr++) free(curr_element_name[fr]);
 

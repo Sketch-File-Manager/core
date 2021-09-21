@@ -40,9 +40,6 @@ int add(queue* c_queue, void *item) {
 }
 
 void *peek(queue *c_queue) {
-    if (c_queue->q_first_node->q_item == NULL)
-        return NULL;
-
     return c_queue->q_first_node->q_item;
 }
 
