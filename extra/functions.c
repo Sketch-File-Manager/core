@@ -93,6 +93,7 @@ char** split_except(char* str, char delimiter, char prev_delim_except, size_t* n
     }
 
     ret[a] = str_copy(token);
+
     *n = a + 1;
     free(token);
     return ret;
