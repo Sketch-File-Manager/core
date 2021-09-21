@@ -149,6 +149,7 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
     char **curr_element_name; // file or directory name.
     size_t curr_element_name_s;
+    char *removed_item;
 
     int current_path = 0;
     while (c_queue->size != 0) {
@@ -168,18 +169,24 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         tmp_files[current_path]->f_link_count = curr_element_stat.st_nlink;
         tmp_files[current_path]->f_size = curr_element_stat.st_size;
 
-        if (is_dir((const char *) pop(c_queue)))
+        removed_item = pop(c_queue);
+        if (is_dir((const char *) removed_item))
             read_contents_of((char *) peek(c_queue), c_queue);
 
         for (int fr = 0; fr < curr_element_name_s; fr++) free(curr_element_name[fr]);
 
         free(curr_element_name);
+        free(removed_item);
         ++current_path;
         tmp_files = realloc(tmp_files, sizeof(file_info *) * (current_path + 1));
         tmp_files[current_path] = calloc(1, sizeof(file_info));
+
+        break;
     }
     *size = current_path;
     *files = tmp_files;
+
+    free(c_queue);
 
     return SUCCESS;
 }

@@ -8,9 +8,9 @@
 #include <include/logger.h>
 #include "../commands/commands.h"
 
-#define VERSION "1.0.0"
+#define VERSION                 "1.0.0"
 
-#define COMMAND_NUMBER 27
+#define COMMAND_NUMBER          27
 
 // simple commands
 #define SIMPLE_MKDIR            "do mkdir"
@@ -210,10 +210,9 @@ int parse(int argc, char **argv) {
     int result = SUCCESS;
     if (commands[index].c_argc == 0) result = commands[index].c_exec();
     else if (commands[index].c_argc == 1) result = ((exec_one_arg *) commands[index].c_exec)(argv[3 - offset]);
-    /*else if (commands[index].c_argc == 2) result = ((exec_two_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset]);
+    else if (commands[index].c_argc == 2) result = ((exec_two_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset]);
     else if (commands[index].c_argc == 3) result = ((exec_three_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset]);
     else if (commands[index].c_argc == 4) result = ((exec_four_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
-*/
     // if is a simple command show some logs.
     if(strcmp(argv[1], "do") == 0 && result != SUCCESS)
         logger(ERROR, "Failed to execute simple command with error code: ", result);

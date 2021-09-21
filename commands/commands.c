@@ -194,7 +194,13 @@ int command_ls(char* directory) {
     }
     printf("]\n");
 
-    //free(list);
+    for (int element = 0; element < list_s; element++) {
+        free(list[element]->f_name);
+        free(list[element]);
+    }
+
+    free(list);
+    free(fix);
 
     return SUCCESS;
 }

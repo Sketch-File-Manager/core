@@ -44,6 +44,7 @@ char* get_home_path() {
 }
 
 char* fix_path(char* path, int add_slash) {
+    // TODO Make better memory allocation.
     char* ret = str_copy(path);
 
     // If starts with ~ replace with /home/username
