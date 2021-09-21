@@ -50,7 +50,7 @@ void *pop(queue *c_queue) {
 
     --c_queue->size;
 
-    queue_node  *tmp_node = c_queue->q_first_node;
+    queue_node *tmp_node = c_queue->q_first_node;
     c_queue->q_first_node = c_queue->q_first_node->q_next_node;
 
     free(tmp_node);

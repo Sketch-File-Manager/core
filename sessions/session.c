@@ -6,25 +6,8 @@
 #include <stdio.h>
 #include <executor.h>
 #include <include/codes.h>
-#include <time.h>
 #include <include/functions.h>
 #include <include/logger.h>
-
-static char *rand_string(size_t size){
-    srand(time(NULL));
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-
-    char *str = (char*) calloc(size + 1, sizeof(char));
-    if (size) {
-        --size;
-        for (size_t n = 0; n < size; n++) {
-            int key = rand() % (int) (sizeof charset - 1);
-            str[n] = charset[key];
-        }
-        str[size] = '\0';
-    }
-    return str;
-}
 
 static int check_current() {
     char* current;

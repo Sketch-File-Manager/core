@@ -1,6 +1,4 @@
 #include <string.h>
-#include <stdio.h>
-
 #include <config_parser.h>
 #include <file_handler.h>
 #include <include/codes.h>

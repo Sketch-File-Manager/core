@@ -2,7 +2,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
 #include <file_handler.h>
 #include <dirent.h>
 #include <include/functions.h>
@@ -17,7 +16,8 @@
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
-    char *path = str_copy(file_path);
+    char *path = NULL;
+    str_append(&path, file_path);
 
     // open the config file.
     int fd = open(path, flag);
@@ -124,7 +124,7 @@ int list_files(const char *path, char ***result_files, size_t *size) {
 
         current_file = dir_info->d_name;
 
-        files[index] = str_copy(current_file);
+        str_append(&files[index], current_file);
 
         ++files_s;
         files = realloc(files, sizeof(char *) * files_s);
@@ -158,7 +158,7 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
         curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
-        tmp_files[current_path]->f_name = str_copy(curr_element_name[curr_element_name_s - 1]);
+        str_append(&(tmp_files[current_path]->f_name), curr_element_name[curr_element_name_s - 1]);
         tmp_files[current_path]->f_user_id = curr_element_stat.st_uid;
         tmp_files[current_path]->f_group_id = curr_element_stat.st_gid;
         tmp_files[current_path]->f_permissions = curr_element_stat.st_mode;
@@ -171,17 +171,16 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
         removed_item = pop(c_queue);
         if (is_dir((const char *) removed_item))
-            read_contents_of((char *) peek(c_queue), c_queue);
+            read_contents_of((const char *) peek(c_queue), c_queue);
 
         for (int fr = 0; fr < curr_element_name_s; fr++) free(curr_element_name[fr]);
 
         free(curr_element_name);
         free(removed_item);
+
         ++current_path;
         tmp_files = realloc(tmp_files, sizeof(file_info *) * (current_path + 1));
         tmp_files[current_path] = calloc(1, sizeof(file_info));
-
-        break;
     }
     *size = current_path;
     *files = tmp_files;

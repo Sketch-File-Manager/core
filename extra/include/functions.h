@@ -26,14 +26,7 @@ extern int endsWith(const char *str, const char *suffix);
  * @param str2 The str2 string.
  * @return The concat of the the two strings.
  */
-extern char* str_append(const char* str1, const char* str2);
-
-/**
- * Return a copy of a string.
- * @param src The string that will be copied.
- * @return The duplicate.
- */
-extern char* str_copy(const char* src);
+extern void str_append(char** str1, const char* str2);
 
 /**
  * Return the home directory.
@@ -44,7 +37,7 @@ extern char* get_home_path();
 /**
  * Replace ~ with home directory and add / at the end if missing.
  */
-extern char* fix_path(char* path, int add_slash);
+extern char* fix_path(const char* path, int add_slash);
 
 /**
  * Returns the path with the home directory at the start.
@@ -72,5 +65,7 @@ extern char **split_except(char* str, char delimiter, char prev_delim_except, si
 extern int is_dir(const char *path);
 
 extern void read_contents_of(const char *path, queue *c_queue);
+
+extern char *rand_string(size_t size);
 
 #endif
