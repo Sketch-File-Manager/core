@@ -1,11 +1,11 @@
 #include <string.h>
 #include <unistd.h>
+#include <malloc.h>
 #include "include/functions.h"
 #include <include/codes.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdarg.h>
 
 int endsWith(const char *str, const char *suffix) {
     if (!str || !suffix)
@@ -27,53 +27,51 @@ int startsWith(const char *str, const char *pre) {
     return lenstr < lenpre ? FALSE : memcmp(pre, str, lenpre) == 0;
 }
 
-void str_append(char** str1, const char* str2) {
-    if(*str1 == NULL)
-        *str1 = calloc(strlen(str2) + 1, sizeof(char));
-    else
-        *str1 = realloc(*str1, (strlen(*str1) + strlen(str2) + 1) * sizeof(char));
+char* str_copy(const char* src) {
+    char* dst = calloc(strlen(src) + 1, sizeof(char));
+    strcpy(dst, src);
+    return dst;
+}
 
-    strcat(*str1, str2);
+char* str_add(const char* str1, const char* str2, ...) {
+    char* ret = calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
+    strcpy(ret, str1);
+
+    va_list args;
+    va_start(args, str2);
+    char* str = va_arg(args, char*);
+    ret = realloc(ret, strlen(ret) + strlen(str) + 1);
+    strcat(ret, str);
+    va_end(args);
+
+    return ret;
 }
 
 char* get_home_path() {
-    char* path = NULL;
-    str_append(&path, "/home/");
-    str_append(&path, getlogin());
-    str_append(&path, "/");
-    return path;
+    return str_add("/home/", getlogin(), "/");
 }
 
 char* fix_path(const char* path, int add_slash) {
     char* ret = NULL;
 
-    // If starts with ~/ replace with /home/{username}/
-    if(path[0] == '~' && strlen(path) > 1) {
+    // If starts with ~ replace with /home/username
+    if(path[0] == '~') {
         char* home = get_home_path();
-        str_append(&ret, home);
-        str_append(&ret, path + 2);
+        ret = str_add(home, path + 2);  // Delete ~/
         free(home);
     }
 
     // Ends with /
-    if(add_slash == TRUE && endsWith(path, "/") == FALSE)
-        str_append(&ret, "/");
+    if(add_slash == TRUE && endsWith(path, "/") == FALSE) {
+        char* tmp = str_add(ret, "/");
+        if(ret != NULL)
+            free(ret);
 
-    return ret;
-}
+        ret = tmp;
+    }
 
-char *merge_home_relative_filename(const char *filename, const char *relative_path) {
-    // Remove /
-    if(startsWith(relative_path, "/") == TRUE)
-        relative_path += 1;
-
-    char* ret = NULL;
-    char* home = get_home_path();
-    str_append(&ret, home);
-    free(home);
-
-    str_append(&ret, relative_path);
-    str_append(&ret, filename);
+    if(ret == NULL)
+        return str_add(path, "");
 
     return ret;
 }
@@ -93,7 +91,7 @@ char** split_except(char* str, char delimiter, char prev_delim_except, size_t* n
             continue;
         }
 
-        str_append(&ret[a], token);
+        ret[a] = str_copy(token);
         a++;
         ret = realloc(ret, (a + 1) * sizeof(char *));
         // Free the previous pointer.
@@ -103,7 +101,7 @@ char** split_except(char* str, char delimiter, char prev_delim_except, size_t* n
         k = 0;
     }
 
-    str_append(&ret[a], token);
+    ret[a] = str_copy(token);
 
     *n = a + 1;
     free(token);
@@ -121,7 +119,7 @@ int is_dir(const char *path) {
     if (path_stat.st_mode == S_IFDIR)
         return TRUE;
 
-    return FALSE;
+    return SUCCESS;
 }
 
 void read_contents_of(const char *path, queue *c_queue) {
@@ -132,26 +130,8 @@ void read_contents_of(const char *path, queue *c_queue) {
     // Read the files and folder inside the dir.
     while ((dir_contents = readdir(dir)) != NULL) {
         // Save the path.
-        tmp_path = NULL;
-        str_append(&tmp_path, path);
-        str_append(&tmp_path, dir_contents->d_name);
+        tmp_path = str_add(path, dir_contents->d_name);
         // Add it to the queue.
         add(c_queue, tmp_path);
     }
-}
-
-char *rand_string(size_t size) {
-    srand(time(NULL));
-    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-
-    char *str = (char*) calloc(size + 1, sizeof(char));
-    if (size) {
-        --size;
-        for (size_t n = 0; n < size; n++) {
-            int key = rand() % (int) (sizeof charset - 1);
-            str[n] = charset[key];
-        }
-        str[size] = '\0';
-    }
-    return str;
 }

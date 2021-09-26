@@ -1,16 +1,20 @@
 #include <string.h>
+#include <stdio.h>
+
 #include <config_parser.h>
 #include <file_handler.h>
 #include <include/codes.h>
 #include <include/functions.h>
 
 #define CONFIG_FILE         "config.conf"
-#define CONFIG_LOCATION     "/.local/share/sketch/"
+#define CONFIG_LOCATION     ".local/share/sketch/"
 #define CURRENT_SESSION_ID  "current_session:"
 
 int get_current(char** current) {
     char *config = NULL;
-    char *path = merge_home_relative_filename(CONFIG_FILE, CONFIG_LOCATION);
+    char* home = get_home_path();
+    char* path = str_add(home, CONFIG_LOCATION, CONFIG_FILE);
+    free(home);
 
     int result = read_file(path, &config);
     if (result != SUCCESS) return result;
@@ -33,6 +37,7 @@ int get_current(char** current) {
     strcpy(*current, current_session);
 
     free(config);
+    free(path);
     return SUCCESS;
 }
 
@@ -47,7 +52,9 @@ int set_current(const char* current) {
     strcat(new_current_session, current);
     strcat(new_current_session, "\n");
 
-    char *absolute_path = merge_home_relative_filename(CONFIG_FILE, CONFIG_LOCATION);
+    char* home = get_home_path();
+    char *absolute_path = str_add(home, CONFIG_LOCATION, CONFIG_FILE);
+    free(home);
 
     // Make the changes in the config file.
     int result = write_file(absolute_path, new_current_session, new_current_session_s + 2);

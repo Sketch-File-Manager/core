@@ -1,6 +1,7 @@
 #include <session_edit.h>
 #include <session_parser.h>
 #include <config_parser.h>
+#include <stdio.h>
 #include <malloc.h>
 #include <string.h>
 #include <include/codes.h>

@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <session_parser.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <commands.h>
 #include <file_handler.h>
@@ -21,7 +22,7 @@ static inline __mode_t get_permissions_of(const char *path) {
     return path_stat.st_mode;
 }
 
-static int copy_file_content_of(char *src_file, char *dst_file) {
+static inline int copy_file_content_of(char *src_file, char *dst_file) {
     // Open the source file.
     int src_fd = open(src_file, O_RDONLY);
     if (src_fd == -1) return errno;
@@ -96,20 +97,7 @@ int command_copy(char* src, char* dst_folder) {
             // Search for more files in the new directory. ( source path ).
             read_contents_of((char *) peek(c_queue), c_queue);
         }
-        else {
-            int result = copy_file_content_of((char *) peek(c_queue), send_to);
-            if(result != SUCCESS) {
-                free(send_to);
-                // Free the split_except.
-                for (int fr = 0; fr < current_path_split_s; fr++) {
-                    free(current_path_split[fr]);
-                    current_path_split_s = 0;
-                }
-                free(c_queue);
-
-                return result;
-            }
-        }
+        else copy_file_content_of((char *) peek(c_queue), send_to);
 
         free(send_to);
         // Free the split_except.
@@ -189,7 +177,7 @@ int command_ls(char* directory) {
         // General
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
         printf("    \"location\": \"%s\"\n", fix_path(directory, TRUE));
-        printf("    \"permissions\": \"%3o\"\n", list[i]->f_permissions&0777);
+        printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions);
         printf("    \"size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
         printf("    \"group_id\": \"%u\"\n", list[i]->f_group_id);

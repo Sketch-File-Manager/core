@@ -13,7 +13,10 @@
 #define SESSION_LOCATION  "/.local/share/sketch/"
 
 int delete_file(const char *name) {
-    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
+    char* home = get_home_path();
+    char *absolute_path = str_add(home, SESSION_FOLDER, name);
+    free(home);
+
     // remove file with name.
     int result = remove(absolute_path);
     free(absolute_path);
@@ -25,7 +28,9 @@ int delete_file(const char *name) {
 }
 
 int create_file(const char *name) {
-    char *absolute = merge_home_relative_filename(name, SESSION_FOLDER);
+    char* home = get_home_path();
+    char *absolute = str_add(home, SESSION_FOLDER, name);
+    free(home);
 
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
@@ -64,7 +69,9 @@ static inline char *double_array_to_string(const char **d_array, size_t size) {
 
 int delete_last_line(const char *name) {
     // Get the absolute path.
-    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
+    char* home = get_home_path();
+    char *absolute_path = str_add(home, SESSION_FOLDER, name);
+    free(home);
     char *session_file = NULL;
 
     // read the file.
@@ -114,7 +121,10 @@ int delete_last_line(const char *name) {
 }
 
 static int append_to(const char *name, const char *content, int is_start) {
-    char *relative_path = merge_home_relative_filename(name, SESSION_FOLDER);
+    char* home = get_home_path();
+    char *relative_path = str_add(home, SESSION_FOLDER, name);
+    free(home);
+
     char *session_file = NULL;
 
     int read_result = read_file(relative_path, &session_file);
@@ -152,7 +162,10 @@ int append_to_start(const char *name, const char *content) {
 }
 
 int read_session(const char *name, char ***result, size_t *size) {
-    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
+    char* home = get_home_path();
+    char *absolute_path = str_add(home, SESSION_FOLDER, name);
+    free(home);
+
     char *session_file = NULL;
 
     int read_result = read_file(absolute_path, &session_file);
@@ -195,7 +208,10 @@ int read_session(const char *name, char ***result, size_t *size) {
 }
 
 int session_exists(const char* name) {
-    char *absolute_path = merge_home_relative_filename(name, SESSION_FOLDER);
+    char* home = get_home_path();
+    char *absolute_path = str_add(home, SESSION_FOLDER, name);
+    free(home);
+
     int file_fd = open(absolute_path, O_RDONLY);
 
     if (file_fd == -1) return FALSE;
@@ -208,7 +224,10 @@ int list_sessions(char ***result, size_t *size) {
     char **files = NULL;
     size_t files_s = 0;
 
-    char *path = merge_home_relative_filename("sessions/", SESSION_LOCATION);
+    char* home = get_home_path();
+    char *path = str_add(home,  SESSION_LOCATION, "sessions/");
+    free(home);
+
     int list_result = list_files(path, &files, &files_s);
 
     if(list_result == SUCCESS) {
@@ -232,5 +251,6 @@ int list_sessions(char ***result, size_t *size) {
     }
     else return list_result;
 
+    free(path);
     return SUCCESS;
 }
