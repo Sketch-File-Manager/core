@@ -3,6 +3,7 @@
 ## Instruction set
 
 ### Simple commands
+
 Simple commands are executed immediately.
 
 Command |  Description
@@ -16,6 +17,7 @@ do edit [flags] `src` `content` | Edit a `src` file and change its content. `-a`
 do permissions `src` `permissions` `recursive` | Change permissions to src. If src is folder and recursive is `1` then all sub folders and files will receive the same permissions.
 
 ### Session commands
+
 Session commands are used to create a session of commands that will be executed when the user decides to.
 
 Command |  Description
@@ -29,7 +31,9 @@ session show `id` | Shows the steps of a session with `id`.
 session list | List all sessions.
 
 #### Active session commands
-Active session commands are all the `simple commands` without the `do` prefix and the commands below. Every time a command is requested it will be saved in a session file.
+
+Active session commands are all the `simple commands` without the `do` prefix and the commands below. Every time a
+command is requested it will be saved in a session file.
 
 Command |  Description
 ---------|--------------

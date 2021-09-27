@@ -1,184 +1,155 @@
 #include <session_edit.h>
 #include <session_parser.h>
 #include <config_parser.h>
-#include <stdio.h>
 #include <malloc.h>
 #include <string.h>
 #include <include/codes.h>
 #include <include/logger.h>
+#include <include/functions.h>
 
-static char* check_current() {
-    char* current;
+static char *check_current() {
+    char *current;
     int result = get_current(&current);
-    if(result != SUCCESS)
-        logger(WARNING, "Failed to find current session with error code: ", result);
+    if (result != SUCCESS)
+        logger(WARNING, "Failed to find current session with error code: ", result, NULL);
 
     return current;
 }
 
-static char* analyze_spaces_to_path(char* path) {
-    int space_count = 0;
-    // count spaces
-    for (int i = 0; path[i];  i++, path[i] == ' ' ? space_count++ : 0);
-
-    char* analyzed_path = (char*) calloc(strlen(path) + space_count + 1, sizeof(char));
-    for(int i = 0, k = 0; path[i]; i++, k++) {
-        if(path[i] == ' ') {
-            analyzed_path[k] = '\\';
-            k++;
-        }
-        analyzed_path[k] = path[i];
-    }
-
-    return path;
-}
-
-void session_command_exit(){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_exit() {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
     int result = set_current("");
     if (result == SUCCESS)
-        logger(INFO, "Exited current session.");
+        logger(INFO, "Exited current session.", NULL);
     else
-        logger(ERROR, "Failed to exit current session with error code: ", result);
+        logger(ERROR, "Failed to exit current session with error code: ", result, NULL);
 }
 
-void session_command_undo(){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_undo() {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
     int result = delete_last_line(current);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to undo command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to undo command with error code: ", result, NULL);
 }
 
-void session_command_mkdir(char* dst, char* folder, char* permissions){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_mkdir(char *dst, char *folder, char *permissions) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(6 + strlen(dst) + 1 + strlen(folder) + 1 + strlen(permissions) + 1, sizeof(char));
-    strcat(cmd, "mkdir ");
-    strcat(cmd, analyze_spaces_to_path(dst));
-    strcat(cmd, " ");
-    strcat(cmd, analyze_spaces_to_path(folder));
-    strcat(cmd, " ");
-    strcat(cmd, permissions);
+    char *a_dst = analyze_spaces_to_path(dst);
+    char *a_folder = analyze_spaces_to_path(folder);
+    char *cmd = str_add("mkdir ", a_dst, " ", a_folder, " ", permissions, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_dst);
+    free(a_folder);
     free(cmd);
 }
 
-void session_command_mkfile(char* dst, char* file, char* permissions){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_mkfile(char *dst, char *file, char *permissions) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(7 + strlen(dst) + 1 + strlen(file) + 1 + strlen(permissions) + 1, sizeof(char));
-    strcat(cmd, "mkfile ");
-    strcat(cmd, analyze_spaces_to_path(dst));
-    strcat(cmd, " ");
-    strcat(cmd, analyze_spaces_to_path(file));
-    strcat(cmd, " ");
-    strcat(cmd, permissions);
+    char *a_dst = analyze_spaces_to_path(dst);
+    char *a_file = analyze_spaces_to_path(file);
+    char *cmd = str_add("mkfile ", a_dst, " ", a_file, " ", permissions, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_dst);
+    free(a_file);
     free(cmd);
 }
 
-void session_command_copy(char* src, char* dst){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_copy(char *src, char *dst) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1, sizeof(char));
-    strcat(cmd, "copy ");
-    strcat(cmd, analyze_spaces_to_path(src));
-    strcat(cmd, " ");
-    strcat(cmd, analyze_spaces_to_path(dst));
+    char *a_src = analyze_spaces_to_path(src);
+    char *a_dst = analyze_spaces_to_path(dst);
+    char *cmd = str_add("copy ", a_src, " ", a_dst, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_src);
+    free(a_dst);
     free(cmd);
 }
 
-void session_command_move(char* src, char* dst){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_move(char *src, char *dst) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(dst) + 1, sizeof(char));
-    strcat(cmd, "move ");
-    strcat(cmd, analyze_spaces_to_path(src));
-    strcat(cmd, " ");
-    strcat(cmd, analyze_spaces_to_path(dst));
+    char *a_src = analyze_spaces_to_path(src);
+    char *a_dst = analyze_spaces_to_path(dst);
+    char *cmd = str_add("move ", a_src, " ", a_dst, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_src);
+    free(a_dst);
     free(cmd);
 }
 
-void session_command_rename(char* src, char* name){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_rename(char *src, char *name) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(7 + strlen(src) + 1 + strlen(name) + 1, sizeof(char));
-    strcat(cmd, "rename ");
-    strcat(cmd, analyze_spaces_to_path(src));
-    strcat(cmd, " ");
-    strcat(cmd, analyze_spaces_to_path(name));
+    char *a_src = analyze_spaces_to_path(src);
+    char *cmd = str_add("rename ", a_src, " ", name, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_src);
     free(cmd);
 }
 
-void session_command_edit(char* src, char* flag, char* content){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_edit(char *src, char *flag, char *content) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    char* cmd = (char*) calloc(5 + strlen(src) + 1 + strlen(flag) + 1 + strlen(content) + 1, sizeof(char));
-    strcat(cmd, "edit ");
-    strcat(cmd, analyze_spaces_to_path(src));
-    strcat(cmd, " ");
-    strcat(cmd, analyze_spaces_to_path(content));
-    strcat(cmd, " ");
-    strcat(cmd, flag);
+    char *a_src = analyze_spaces_to_path(src);
+    char *a_content = analyze_spaces_to_path(content);
+    char *cmd = str_add("edit ", a_src, " ", flag, " ", a_content, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_src);
+    free(a_content);
     free(cmd);
 }
 
-void session_command_permission(char* src, char* permissions, char* recursive){
-    char* current = check_current();
-    if(strcmp(current, "") == 0) return;
+void session_command_permission(char *src, char *permissions, char *recursive) {
+    char *current = check_current();
+    if (strcmp(current, "") == 0) return;
 
-    if(strcmp(recursive, "0") != 0 && strcmp(recursive, "1") != 0)
-        return logger(ERROR, "Recursive must be 0 or 1");
+    if (strcmp(recursive, "0") != 0 && strcmp(recursive, "1") != 0)
+        return logger(ERROR, "Recursive must be 0 or 1", NULL);
 
-    char* cmd = (char*) calloc(12 + strlen(src) + 1 + strlen(permissions) + 1 + strlen(recursive) + 1, sizeof(char));
-    strcat(cmd, "permissions ");
-    strcat(cmd, analyze_spaces_to_path(src));
-    strcat(cmd, " ");
-    strcat(cmd, permissions);
-    strcat(cmd, " ");
-    strcat(cmd, recursive);
+    char *a_src = analyze_spaces_to_path(src);
+    char *cmd = str_add("permissions ", a_src, " ", permissions, " ", recursive, NULL);
 
     int result = append_to_end(current, cmd);
-    if(result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result);
+    if (result != SUCCESS)
+        logger(ERROR, "Failed to add command with error code: ", result, NULL);
 
+    free(a_src);
     free(cmd);
 }

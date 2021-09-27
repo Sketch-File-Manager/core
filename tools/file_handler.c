@@ -2,7 +2,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-
 #include <file_handler.h>
 #include <dirent.h>
 #include <include/functions.h>
@@ -10,14 +9,9 @@
 #include <include/queue.h>
 #include <errno.h>
 
-#define SKETCH_LOCATION     ".local/share/"
-#define CONFIG_LOCATION     ".local/share/sketch/"
-#define SESSION_LOCATION    ".local/share/sketch/"
-
-
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
-    char *path = str_copy(file_path);
+    char *path = str_add(file_path, NULL);
 
     // open the config file.
     int fd = open(path, flag);
@@ -74,22 +68,22 @@ int write_file(const char *file_path, char *changes, size_t changes_len) {
 }
 
 static inline void create_dir(const char *name, const char *path) {
-    char* home = get_home_path();
-    char *absolute_path = str_add(home, path, name);
-    free(home);
+    char *with_home = fix_path(path, TRUE);
+    char *absolute_path = str_add(with_home, name, NULL);
+    free(with_home);
 
     // TODO check for errors.
     mkdir(absolute_path, 0700);
     free(absolute_path);
 }
 
-static inline void check_sketch_folder(const char *sketch_folder_name) {
+void check_requirements(const char *config_file, const char *sketch_folder_name) {
+    // Sketch folder
     create_dir(sketch_folder_name, SKETCH_LOCATION);
-}
 
-static inline void check_config_file(const char *filename) {
-    char* home = get_home_path();
-    char *absolute_path = str_add(home, CONFIG_LOCATION, filename);
+    // Config file
+    char *home = get_home_path();
+    char *absolute_path = str_add(home, CONFIG_LOCATION, config_file, NULL);
     free(home);
 
     // try to open the file, and in case that it does not exist create it.
@@ -100,19 +94,12 @@ static inline void check_config_file(const char *filename) {
     if (write_file(absolute_path, first_write, strlen(first_write))) return;
 
     free(absolute_path);
+
+    // Session folder
+    mkdir(SESSION_FOLDER_LOCATION, 0700);
 }
 
-static inline void check_session_folder(const char *session_folder_name) {
-    create_dir(session_folder_name, SESSION_LOCATION);
-}
-
-void check_requirements(const char *config_file, const char *sketch_folder_name, const char *sessions_folder_name) {
-    check_sketch_folder(sketch_folder_name);
-    check_config_file(config_file);
-    check_session_folder(sessions_folder_name);
-}
-
-int list_files(const char *path, char ***result_files, size_t *size) {
+int list_files_names(const char *path, char ***result_files, size_t *size) {
     DIR *dir = opendir(path);
     struct dirent *dir_info;
 
@@ -128,7 +115,7 @@ int list_files(const char *path, char ***result_files, size_t *size) {
 
         current_file = dir_info->d_name;
 
-        files[index] = str_copy(current_file);
+        files[index] = str_add(current_file, NULL);
 
         ++files_s;
         files = realloc(files, sizeof(char *) * files_s);
@@ -162,7 +149,7 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
         curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
-        tmp_files[current_path]->f_name = str_copy(curr_element_name[curr_element_name_s - 1]);
+        tmp_files[current_path]->f_name = str_add(curr_element_name[curr_element_name_s - 1], NULL);
         tmp_files[current_path]->f_user_id = curr_element_stat.st_uid;
         tmp_files[current_path]->f_group_id = curr_element_stat.st_gid;
         tmp_files[current_path]->f_permissions = curr_element_stat.st_mode;

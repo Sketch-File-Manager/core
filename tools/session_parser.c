@@ -9,28 +9,25 @@
 #include <include/functions.h>
 #include <errno.h>
 
-#define SESSION_FOLDER    "/.local/share/sketch/sessions/"
-#define SESSION_LOCATION  "/.local/share/sketch/"
-
 int delete_file(const char *name) {
-    char* home = get_home_path();
-    char *absolute_path = str_add(home, SESSION_FOLDER, name);
-    free(home);
+    char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
+    char *absolute_path = str_add(with_home, SESSION_FOLDER_LOCATION, name, NULL);
+    free(with_home);
 
     // remove file with name.
     int result = remove(absolute_path);
     free(absolute_path);
 
-    if(result == 0)
+    if (result == 0)
         return SUCCESS;
 
     return errno;
 }
 
 int create_file(const char *name) {
-    char* home = get_home_path();
-    char *absolute = str_add(home, SESSION_FOLDER, name);
-    free(home);
+    char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
+    char *absolute = str_add(with_home, SESSION_FOLDER_LOCATION, name, NULL);
+    free(with_home);
 
     // make a new file with name.
     int new_fd = open(absolute, O_CREAT, 0700);
@@ -69,13 +66,13 @@ static inline char *double_array_to_string(const char **d_array, size_t size) {
 
 int delete_last_line(const char *name) {
     // Get the absolute path.
-    char* home = get_home_path();
-    char *absolute_path = str_add(home, SESSION_FOLDER, name);
-    free(home);
+    char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
+    char *absolute = str_add(with_home, SESSION_FOLDER_LOCATION, name, NULL);
+    free(with_home);
     char *session_file = NULL;
 
     // read the file.
-    int read_result = read_file(absolute_path, &session_file);
+    int read_result = read_file(absolute, &session_file);
     if (read_result != SUCCESS) return read_result;
 
     // Allocate space for one element.
@@ -110,8 +107,8 @@ int delete_last_line(const char *name) {
     free(session_lines);
 
     // Write the changes.
-    int write_result = write_file(absolute_path, new_session_file, strlen(new_session_file));
-    free(absolute_path);
+    int write_result = write_file(absolute, new_session_file, strlen(new_session_file));
+    free(absolute);
     free(new_session_file);
 
     if (write_result != SUCCESS)
@@ -121,13 +118,13 @@ int delete_last_line(const char *name) {
 }
 
 static int append_to(const char *name, const char *content, int is_start) {
-    char* home = get_home_path();
-    char *relative_path = str_add(home, SESSION_FOLDER, name);
-    free(home);
+    char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
+    char *relative = str_add(with_home, SESSION_FOLDER_LOCATION, name, NULL);
+    free(with_home);
 
     char *session_file = NULL;
 
-    int read_result = read_file(relative_path, &session_file);
+    int read_result = read_file(relative, &session_file);
     if (read_result != SUCCESS) return read_result;
 
     size_t new_file_s = strlen(content) + strlen(session_file);
@@ -137,15 +134,14 @@ static int append_to(const char *name, const char *content, int is_start) {
         strcpy(new_file, content);
         strcat(new_file, "\n");
         strcat(new_file, session_file);
-    }
-    else {
+    } else {
         strcpy(new_file, session_file);
         strcat(new_file, content);
         strcat(new_file, "\n");
     }
 
-    int write_result = write_file(relative_path, new_file, new_file_s + 1);
-    free(relative_path);
+    int write_result = write_file(relative, new_file, new_file_s + 1);
+    free(relative);
 
     if (write_result != SUCCESS)
         return write_result;
@@ -162,13 +158,13 @@ int append_to_start(const char *name, const char *content) {
 }
 
 int read_session(const char *name, char ***result, size_t *size) {
-    char* home = get_home_path();
-    char *absolute_path = str_add(home, SESSION_FOLDER, name);
-    free(home);
+    char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
+    char *absolute = str_add(with_home, SESSION_FOLDER_LOCATION, name, NULL);
+    free(with_home);
 
     char *session_file = NULL;
 
-    int read_result = read_file(absolute_path, &session_file);
+    int read_result = read_file(absolute, &session_file);
     if (read_result != SUCCESS) return read_result;
 
     char **lines;
@@ -188,7 +184,7 @@ int read_session(const char *name, char ***result, size_t *size) {
 
     lines[0] = calloc(strlen(current_line) + 1, sizeof(char));
     strcpy(lines[0], current_line);
-    for (size_t line = 1; ; line++) {
+    for (size_t line = 1;; line++) {
         current_line = strtok(NULL, "\n");
         if (current_line == NULL) break;
 
@@ -203,16 +199,16 @@ int read_session(const char *name, char ***result, size_t *size) {
     *result = lines;
 
     free(session_file);
-    free(absolute_path);
+    free(absolute);
     return SUCCESS;
 }
 
-int session_exists(const char* name) {
-    char* home = get_home_path();
-    char *absolute_path = str_add(home, SESSION_FOLDER, name);
-    free(home);
+int session_exists(const char *name) {
+    char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
+    char *absolute = str_add(with_home, SESSION_FOLDER_LOCATION, name, NULL);
+    free(with_home);
 
-    int file_fd = open(absolute_path, O_RDONLY);
+    int file_fd = open(absolute, O_RDONLY);
 
     if (file_fd == -1) return FALSE;
 
@@ -224,13 +220,11 @@ int list_sessions(char ***result, size_t *size) {
     char **files = NULL;
     size_t files_s = 0;
 
-    char* home = get_home_path();
-    char *path = str_add(home,  SESSION_LOCATION, "sessions/");
-    free(home);
+    char *path = fix_path(SESSION_FOLDER_LOCATION, TRUE);
 
-    int list_result = list_files(path, &files, &files_s);
+    int list_result = list_files_names(path, &files, &files_s);
 
-    if(list_result == SUCCESS) {
+    if (list_result == SUCCESS) {
         size_t session_files_s = 1;
         char **session_files = calloc(1, sizeof(char *));
 
@@ -248,8 +242,7 @@ int list_sessions(char ***result, size_t *size) {
 
         *size = session_files_s;
         *result = session_files;
-    }
-    else return list_result;
+    } else return list_result;
 
     free(path);
     return SUCCESS;

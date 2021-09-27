@@ -54,7 +54,7 @@ extern int read_session(const char *name, char ***result, size_t *size);
  * @param name The session's name.
  * @return TRUE or FALSE if the session exist or not.
  */
-extern int session_exists(const char* name);
+extern int session_exists(const char *name);
 
 /**
  * Retrieves all the active sessions' names.

@@ -13,16 +13,7 @@
 #include <stdio.h>
 
 
-static inline __mode_t get_permissions_of(const char *path) {
-    struct stat path_stat;
-
-    if (stat(path, &path_stat) == -1)
-        return -1;
-
-    return path_stat.st_mode;
-}
-
-static inline int copy_file_content_of(char *src_file, char *dst_file) {
+static int copy_file_content_of(char *src_file, char *dst_file) {
     // Open the source file.
     int src_fd = open(src_file, O_RDONLY);
     if (src_fd == -1) return errno;
@@ -51,19 +42,19 @@ static inline int copy_file_content_of(char *src_file, char *dst_file) {
 
 /** ================ COMMANDS ================ */
 
-int command_mkdir(char* dst_folder, char* name, __mode_t permissions) {
-    char* folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+int command_mkdir(char *dst_folder, char *name, __mode_t permissions) {
+    char *folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
     strcpy(folder_path, dst_folder);
     strcpy(folder_path, name);
 
     int result = mkdir(folder_path, permissions);
-    if(result == 0)
+    if (result == 0)
         return SUCCESS;
 
     return errno;
 }
 
-int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
+int command_mkfile(char *dst_folder, char *name, __mode_t permissions) {
     char *destination = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
     strcpy(destination, dst_folder);
     strcat(destination, name);
@@ -74,7 +65,7 @@ int command_mkfile(char* dst_folder, char* name, __mode_t permissions) {
     return SUCCESS;
 }
 
-int command_copy(char* src, char* dst_folder) {
+int command_copy(char *src, char *dst_folder) {
     queue *c_queue = create_empty_queue();
     read_contents_of(src, c_queue);
     char *send_to;
@@ -83,6 +74,7 @@ int command_copy(char* src, char* dst_folder) {
     size_t current_path_split_s = 0;
     char **current_path_split = NULL;
 
+    int result = SUCCESS;
     while (c_queue->size != 0) {
         current_path_split = split_except((char *) peek(c_queue), '/', '\0', &current_path_split_s);
         // Get the permissions of the current path.
@@ -96,8 +88,8 @@ int command_copy(char* src, char* dst_folder) {
             mkdir(send_to, current_path_perms);
             // Search for more files in the new directory. ( source path ).
             read_contents_of((char *) peek(c_queue), c_queue);
-        }
-        else copy_file_content_of((char *) peek(c_queue), send_to);
+        } else result = copy_file_content_of((char *) peek(c_queue), send_to);
+
 
         free(send_to);
         // Free the split_except.
@@ -105,35 +97,41 @@ int command_copy(char* src, char* dst_folder) {
             free(current_path_split[fr]);
             current_path_split_s = 0;
         }
+
+        if (result != SUCCESS) {
+            free(c_queue);
+            return result;
+        }
     }
     free(c_queue);
 
     return SUCCESS;
 }
 
-int command_move(char* src, char* dst_folder) {
+int command_move(char *src, char *dst_folder) {
     command_copy(src, dst_folder);
 
     if (is_dir(src) == TRUE) {
         if (rmdir(src) == -1) return -1;
-    }
-    else {
+    } else {
         delete_file(src);
     }
 
     return SUCCESS;
 }
 
-int command_rename(char* src, char* new_name) {
+int command_rename(char *src, char *new_name) {
+    // TODO - rename
     return SUCCESS;
 }
 
-int command_edit(char* src, char* content, char* flag) {
+int command_edit(char *src, char *content, char *flag) {
+    // TODO - edit
     return SUCCESS;
 }
 
-int command_permissions(char* src, __mode_t permissions, unsigned int recursive) {
-    if(recursive == 1) {
+int command_permissions(char *src, __mode_t permissions, unsigned int recursive) {
+    if (recursive == 1) {
         queue *c_queue = create_empty_queue();
         char *tmp;
         // Read the first contents.
@@ -141,7 +139,7 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
 
         while (c_queue->size != 0) {
             int result = chmod((const char *) peek(c_queue), permissions);
-            if(result == -1)
+            if (result == -1)
                 return errno;
 
             if (is_dir((const char *) peek(c_queue)) == TRUE) {
@@ -157,18 +155,18 @@ int command_permissions(char* src, __mode_t permissions, unsigned int recursive)
     }
 
     int result = chmod(src, permissions);
-    if(result == -1)
+    if (result == -1)
         return errno;
 
     return SUCCESS;
 }
 
-int command_ls(char* directory) {
-    file_info** list;
+int command_ls(char *directory) {
+    file_info **list;
     size_t list_s = 0;
     char *fix = fix_path(directory, TRUE);
     int result = get_info_of(fix, &list, &list_s);
-    if(result != SUCCESS)
+    if (result != SUCCESS)
         return result;
 
     printf("[\n");
@@ -177,7 +175,7 @@ int command_ls(char* directory) {
         // General
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
         printf("    \"location\": \"%s\"\n", fix_path(directory, TRUE));
-        printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions);
+        printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions&0777);
         printf("    \"size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
         printf("    \"group_id\": \"%u\"\n", list[i]->f_group_id);
@@ -185,7 +183,8 @@ int command_ls(char* directory) {
         // Timespec
         printf("    \"last_access\": \"%ld.%.9ld\"\n", list[i]->f_last_access.tv_sec, list[i]->f_last_access.tv_nsec);
         printf("    \"last_modify\": \"%ld.%.9ld\"\n", list[i]->f_last_modify.tv_sec, list[i]->f_last_modify.tv_nsec);
-        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec, list[i]->f_status_change.tv_nsec);
+        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec,
+               list[i]->f_status_change.tv_nsec);
         // Other
         printf("    \"serial_number\": \"%lu\"\n", list[i]->f_serial_number);
         printf("    \"f_link_count\": \"%lu\"\n", list[i]->f_link_count);

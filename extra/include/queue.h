@@ -2,14 +2,14 @@
 #define SKETCH_CORE_QUEUE_H
 
 typedef struct queue_node {
-    void               *q_item;
-    struct queue_node  *q_next_node;
+    void *q_item;
+    struct queue_node *q_next_node;
 } queue_node;
 
 typedef struct queue {
-    queue_node  *q_first_node;
-    queue_node  *q_last_node;
-    int          size;
+    queue_node *q_first_node;
+    queue_node *q_last_node;
+    int size;
 } queue;
 
 
@@ -23,7 +23,7 @@ extern void *peek(queue *c_queue);
  * @param new_item The new item.
  * @return SUCCESS if item is added successfully or -1.
  */
-extern int add(queue* c_queue, void *item);
+extern int add(queue *c_queue, void *item);
 
 /**
  * Pops the first item from the queue_node.

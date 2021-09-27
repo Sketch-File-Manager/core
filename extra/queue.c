@@ -7,7 +7,7 @@ queue *create_empty_queue() {
     return calloc(1, sizeof(queue));
 }
 
-int add(queue* c_queue, void *item) {
+int add(queue *c_queue, void *item) {
     if (c_queue == NULL || item == NULL) return -1;
 
     // Make the new c_queue to hold the new item.
@@ -15,7 +15,7 @@ int add(queue* c_queue, void *item) {
     new_node->q_item = item;
     new_node->q_next_node = NULL;
 
-    if(c_queue->size == 0) {
+    if (c_queue->size == 0) {
         // Init start node
         c_queue->q_first_node = new_node;
 
@@ -50,7 +50,7 @@ void *pop(queue *c_queue) {
 
     --c_queue->size;
 
-    queue_node  *tmp_node = c_queue->q_first_node;
+    queue_node *tmp_node = c_queue->q_first_node;
     c_queue->q_first_node = c_queue->q_first_node->q_next_node;
 
     free(tmp_node);

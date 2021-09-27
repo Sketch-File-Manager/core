@@ -26,25 +26,18 @@ extern int endsWith(const char *str, const char *suffix);
  * @param str2 The str2 string.
  * @return The concat of the the two strings.
  */
-extern char* str_add(const char* str1, ...);
-
-/**
- * Return a copy of a string.
- * @param src The string that will be copied.
- * @return The duplicate.
- */
-extern char* str_copy(const char* src);
+extern char *str_add(const char *str1, ...);
 
 /**
  * Return the home directory.
  * @return The home directory.
  */
-extern char* get_home_path();
+extern char *get_home_path();
 
 /**
  * Replace ~ with home directory and add / at the end if missing.
  */
-extern char* fix_path(const char* path, int add_slash);
+extern char *fix_path(const char *path, int add_slash);
 
 /**
  * Returns the path with the home directory at the start.
@@ -62,7 +55,7 @@ extern char *merge_home_relative_filename(const char *filename, const char *rela
  * @param n The size of the array that will be returned.
  * @return A string array that contains the split_except form of the str.
  */
-extern char **split_except(char* str, char delimiter, char prev_delim_except, size_t* n);
+extern char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n);
 
 /**
  * Checks if a path is a directory.
@@ -72,5 +65,11 @@ extern char **split_except(char* str, char delimiter, char prev_delim_except, si
 extern int is_dir(const char *path);
 
 extern void read_contents_of(const char *path, queue *c_queue);
+
+extern __mode_t get_permissions_of(const char *path);
+
+extern char *rand_string(size_t size);
+
+extern char *analyze_spaces_to_path(char *path);
 
 #endif

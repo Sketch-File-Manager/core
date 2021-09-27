@@ -5,14 +5,14 @@
 
 typedef struct file_info {
     // Basic info of file.
-    char            *f_name;
-    mode_t           f_permissions;
-    uid_t            f_user_id;
-    gid_t            f_group_id;
+    char *f_name;
+    mode_t f_permissions;
+    uid_t f_user_id;
+    gid_t f_group_id;
     // Times.
-    struct timespec  f_last_access;
-    struct timespec  f_last_modify;
-    struct timespec  f_status_change;
+    struct timespec f_last_access;
+    struct timespec f_last_modify;
+    struct timespec f_status_change;
 
     // File serial number
     __ino_t f_serial_number;
@@ -43,7 +43,8 @@ extern int read_file(const char *file_path, char **config_content);
  */
 extern int write_file(const char *file_path, char *changes, size_t changes_len);
 
-extern void check_requirements(const char *config_file, const char *sketch_folder_name, const char *sessions_folder_name);
+extern void
+check_requirements(const char *config_file, const char *sketch_folder_name);
 
 /**
  * Lists the all the files and sub folder of a  directory.
@@ -52,6 +53,6 @@ extern void check_requirements(const char *config_file, const char *sketch_folde
  * @param size The size of the array.
  * @return SUCCESS in case of success, otherwise the appropriate error number.
  */
-extern int list_files(const char *path, char ***result_files, size_t *size);
+extern int list_files_names(const char *path, char ***result_files, size_t *size);
 
 #endif
