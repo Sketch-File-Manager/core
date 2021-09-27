@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 int endsWith(const char *str, const char *suffix) {
     if (!str || !suffix)
@@ -33,22 +34,32 @@ char* str_copy(const char* src) {
     return dst;
 }
 
-char* str_add(const char* str1, const char* str2, ...) {
-    char* ret = calloc(strlen(str1) + strlen(str2) + 1, sizeof(char));
-    strcpy(ret, str1);
-
+char* str_add(const char* str1, ...) {
     va_list args;
-    va_start(args, str2);
-    char* str = va_arg(args, char*);
-    ret = realloc(ret, strlen(ret) + strlen(str) + 1);
-    strcat(ret, str);
+    va_start(args, str1);
+
+    char *result = calloc(strlen(str1) + 1, sizeof(char));
+    strcpy(result, str1);
+
+    char *p = "";
+
+    while (1) {
+        p = va_arg(args, char *);
+
+        if (p == NULL) break;
+
+        result = realloc(result, (strlen(result) + strlen(p) + 1) * sizeof(char));
+        strcat(result, p);
+    }
     va_end(args);
 
-    return ret;
+    return result;
 }
 
 char* get_home_path() {
-    return str_add("/home/", getlogin(), "/");
+    char *result = str_add("/home/", getlogin(), "/", NULL);
+
+    return result;
 }
 
 char* fix_path(const char* path, int add_slash) {

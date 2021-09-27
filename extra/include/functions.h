@@ -26,7 +26,7 @@ extern int endsWith(const char *str, const char *suffix);
  * @param str2 The str2 string.
  * @return The concat of the the two strings.
  */
-extern char* str_add(const char* str1, const char* str2, ...);
+extern char* str_add(const char* str1, ...);
 
 /**
  * Return a copy of a string.
