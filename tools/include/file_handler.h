@@ -43,9 +43,6 @@ extern int read_file(const char *file_path, char **config_content);
  */
 extern int write_file(const char *file_path, char *changes, size_t changes_len);
 
-extern void
-check_requirements(const char *config_file, const char *sketch_folder_name);
-
 /**
  * Lists the all the files and sub folder of a  directory.
  * @param path The folder path,

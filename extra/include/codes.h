@@ -11,9 +11,13 @@
 #define TRUE 1
 #define FALSE -1
 
-#define SESSION_FOLDER_LOCATION    "~/.local/share/sketch/sessions/"
-#define CONFIG_LOCATION     "~/.local/share/sketch/"
-#define SKETCH_LOCATION     "~/.local/share/"
+// Locations
+#define SKETCH_CORE_LOCATION     "~/.local/share/sketch/core/"
+#define CONFIG_FILE_LOCATION     "~/.local/share/sketch/core/config.conf"
+#define SESSION_FOLDER_LOCATION    "~/.local/share/sketch/core/sessions/"
+
+// Config
+#define CURRENT_SESSION_ID  "current_session:"
 
 
 #endif

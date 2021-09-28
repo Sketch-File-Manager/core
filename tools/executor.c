@@ -62,7 +62,7 @@ int execute(char *command) {
         char *flag = array[2];
         char *content = array[3];
 
-        result = command_edit(src, content, flag);
+        result = command_edit(src, flag, content);
         free(src);
     } else if (strcmp(array[0], "permissions") == 0) {
         char *src = fix_path(array[1], TRUE);

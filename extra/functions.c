@@ -128,25 +128,25 @@ int is_dir(const char *path) {
     return SUCCESS;
 }
 
-void read_contents_of(const char *path, queue *c_queue) {
-    DIR *dir = opendir(path);
+void read_contents_of(const char *directory, queue *c_queue) {
+    DIR *dir = opendir(directory);
     struct dirent *dir_contents = NULL;
     char *tmp_path;
 
     // Read the files and folder inside the dir.
     while ((dir_contents = readdir(dir)) != NULL) {
-        // Save the path.
-        tmp_path = str_add(path, dir_contents->d_name, NULL);
+        // Save the directory.
+        tmp_path = str_add(directory, dir_contents->d_name, NULL);
         // Add it to the queue.
         add(c_queue, tmp_path);
     }
     closedir(dir);
 }
 
-__mode_t get_permissions_of(const char *path) {
+__mode_t get_permissions_of(const char *src) {
     struct stat path_stat;
 
-    if (stat(path, &path_stat) == -1)
+    if (stat(src, &path_stat) == -1)
         return -1;
 
     return path_stat.st_mode;
@@ -168,19 +168,19 @@ char *rand_string(size_t size) {
     return str;
 }
 
-char *analyze_spaces_to_path(char *path) {
+char *analyze_string_spaces(char *str) {
     int space_count = 0;
     // count spaces
-    for (int i = 0; path[i]; i++, path[i] == ' ' ? space_count++ : 0);
+    for (int i = 0; str[i]; i++, str[i] == ' ' ? space_count++ : 0);
 
-    char *analyzed_path = (char *) calloc(strlen(path) + space_count + 1, sizeof(char));
-    for (int i = 0, k = 0; path[i]; i++, k++) {
-        if (path[i] == ' ') {
-            analyzed_path[k] = '\\';
+    char *analyzed = (char *) calloc(strlen(str) + space_count + 1, sizeof(char));
+    for (int i = 0, k = 0; str[i]; i++, k++) {
+        if (str[i] == ' ') {
+            analyzed[k] = '\\';
             k++;
         }
-        analyzed_path[k] = path[i];
+        analyzed[k] = str[i];
     }
 
-    return analyzed_path;
+    return analyzed;
 }

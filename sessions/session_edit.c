@@ -40,8 +40,8 @@ void session_command_mkdir(char *dst, char *folder, char *permissions) {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    char *a_dst = analyze_spaces_to_path(dst);
-    char *a_folder = analyze_spaces_to_path(folder);
+    char *a_dst = analyze_string_spaces(dst);
+    char *a_folder = analyze_string_spaces(folder);
     char *cmd = str_add("mkdir ", a_dst, " ", a_folder, " ", permissions, NULL);
 
     int result = append_to_end(current, cmd);
@@ -57,8 +57,8 @@ void session_command_mkfile(char *dst, char *file, char *permissions) {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    char *a_dst = analyze_spaces_to_path(dst);
-    char *a_file = analyze_spaces_to_path(file);
+    char *a_dst = analyze_string_spaces(dst);
+    char *a_file = analyze_string_spaces(file);
     char *cmd = str_add("mkfile ", a_dst, " ", a_file, " ", permissions, NULL);
 
     int result = append_to_end(current, cmd);
@@ -74,8 +74,8 @@ void session_command_copy(char *src, char *dst) {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    char *a_src = analyze_spaces_to_path(src);
-    char *a_dst = analyze_spaces_to_path(dst);
+    char *a_src = analyze_string_spaces(src);
+    char *a_dst = analyze_string_spaces(dst);
     char *cmd = str_add("copy ", a_src, " ", a_dst, NULL);
 
     int result = append_to_end(current, cmd);
@@ -91,8 +91,8 @@ void session_command_move(char *src, char *dst) {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    char *a_src = analyze_spaces_to_path(src);
-    char *a_dst = analyze_spaces_to_path(dst);
+    char *a_src = analyze_string_spaces(src);
+    char *a_dst = analyze_string_spaces(dst);
     char *cmd = str_add("move ", a_src, " ", a_dst, NULL);
 
     int result = append_to_end(current, cmd);
@@ -108,7 +108,7 @@ void session_command_rename(char *src, char *name) {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    char *a_src = analyze_spaces_to_path(src);
+    char *a_src = analyze_string_spaces(src);
     char *cmd = str_add("rename ", a_src, " ", name, NULL);
 
     int result = append_to_end(current, cmd);
@@ -123,8 +123,8 @@ void session_command_edit(char *src, char *flag, char *content) {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    char *a_src = analyze_spaces_to_path(src);
-    char *a_content = analyze_spaces_to_path(content);
+    char *a_src = analyze_string_spaces(src);
+    char *a_content = analyze_string_spaces(content);
     char *cmd = str_add("edit ", a_src, " ", flag, " ", a_content, NULL);
 
     int result = append_to_end(current, cmd);
@@ -143,7 +143,7 @@ void session_command_permission(char *src, char *permissions, char *recursive) {
     if (strcmp(recursive, "0") != 0 && strcmp(recursive, "1") != 0)
         return logger(ERROR, "Recursive must be 0 or 1", NULL);
 
-    char *a_src = analyze_spaces_to_path(src);
+    char *a_src = analyze_string_spaces(src);
     char *cmd = str_add("permissions ", a_src, " ", permissions, " ", recursive, NULL);
 
     int result = append_to_end(current, cmd);

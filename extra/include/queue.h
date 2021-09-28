@@ -12,9 +12,17 @@ typedef struct queue {
     int size;
 } queue;
 
-
+/**
+ * Returns an empty queue.
+ * @return
+ */
 extern queue *create_empty_queue();
 
+/**
+ * Takes a peek a the first time of the queue.
+ * @param c_queue The queue.
+ * @return The item's data.
+ */
 extern void *peek(queue *c_queue);
 
 /**

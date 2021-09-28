@@ -8,7 +8,6 @@
 #include <include/codes.h>
 #include <include/queue.h>
 #include <errno.h>
-#include <stdio.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
@@ -66,41 +65,6 @@ int write_file(const char *file_path, char *changes, size_t changes_len) {
     // close the file.
     close(config_fd);
     return SUCCESS;
-}
-
-static inline void create_dir(const char *name, const char *path) {
-    char *with_home = fix_path(path, TRUE);
-    char *absolute_path = str_add(with_home, name, NULL);
-    free(with_home);
-
-    // TODO check for errors.
-    mkdir(absolute_path, 0700);
-    free(absolute_path);
-}
-
-void check_requirements(const char *config_file, const char *sketch_folder_name) {
-    // Sketch folder
-    create_dir(sketch_folder_name, SKETCH_LOCATION);
-
-    // Config file
-    char *home = get_home_path();
-    char *absolute_path = str_add(home, CONFIG_LOCATION, config_file, NULL);
-    free(home);
-
-    // try to open the file, and in case that it does not exist create it.
-    int config_fd = open(absolute_path, O_CREAT, 0700);
-    char *first_write = "current_session:";
-
-    if (write_file(absolute_path, first_write, strlen(first_write))) {
-        free(absolute_path);
-        return;
-    }
-
-    close(config_fd);
-    free(absolute_path);
-
-    // Session folder
-    mkdir(SESSION_FOLDER_LOCATION, 0700);
 }
 
 int list_files_names(const char *path, char ***result_files, size_t *size) {

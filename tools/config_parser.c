@@ -4,15 +4,31 @@
 #include <file_handler.h>
 #include <include/codes.h>
 #include <include/functions.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
 
-#define CONFIG_FILE         "config.conf"
-#define CURRENT_SESSION_ID  "current_session:"
+
+int create_config_file() {
+    char *absolute_path = fix_path(CONFIG_FILE_LOCATION, FALSE);
+
+    // try to open the file, and in case that it does not exist create it.
+    int config_fd = open(absolute_path, O_CREAT, 0700);
+    int result = write_file(absolute_path, CURRENT_SESSION_ID, strlen(CURRENT_SESSION_ID));
+    if (result != SUCCESS) {
+        free(absolute_path);
+        return result;
+    }
+
+    close(config_fd);
+    free(absolute_path);
+
+    return SUCCESS;
+}
 
 int get_current(char **current) {
     char *config = NULL;
-    char *with_home = fix_path(CONFIG_LOCATION, TRUE);
-    char *path = str_add(with_home, CONFIG_FILE, NULL);
-    free(with_home);
+    char *path = fix_path(CONFIG_FILE_LOCATION, FALSE);
 
     int result = read_file(path, &config);
     if (result != SUCCESS) return result;
@@ -50,9 +66,7 @@ int set_current(const char *current) {
     strcat(new_current_session, current);
     strcat(new_current_session, "\n");
 
-    char *with_home = fix_path(CONFIG_LOCATION, TRUE);
-    char *absolute_path = str_add(with_home, CONFIG_FILE, NULL);
-    free(with_home);
+    char *absolute_path = fix_path(CONFIG_FILE_LOCATION, FALSE);
 
     // Make the changes in the config file.
     int result = write_file(absolute_path, new_current_session, new_current_session_s + 2);

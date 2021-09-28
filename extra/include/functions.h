@@ -64,12 +64,32 @@ extern char **split_except(char *str, char delimiter, char prev_delim_except, si
  */
 extern int is_dir(const char *path);
 
-extern void read_contents_of(const char *path, queue *c_queue);
+/**
+ * Reads all the contents of a directory and appends them to a given queue.
+ * @param directory The directory that will be searched.
+ * @param c_queue The queue where the information will be saved.
+ */
+extern void read_contents_of(const char *directory, queue *c_queue);
 
-extern __mode_t get_permissions_of(const char *path);
+/**
+ * Returns the permissions of a file or directory.
+ * @param src The file or directory.
+ * @return The permissions.
+ */
+extern __mode_t get_permissions_of(const char *src);
 
+/**
+ * Generates a random string of a specific size.
+ * @param size The size the random string will have.
+ * @return The random generated string.
+ */
 extern char *rand_string(size_t size);
 
-extern char *analyze_spaces_to_path(char *path);
+/**
+ * Appends a backslash (\) before every space in a string
+ * @param str The string that will be analyzed.
+ * @return The analyzed string.
+ */
+extern char *analyze_string_spaces(char *str);
 
 #endif

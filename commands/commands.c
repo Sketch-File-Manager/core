@@ -125,7 +125,7 @@ int command_rename(char *src, char *new_name) {
     return SUCCESS;
 }
 
-int command_edit(char *src, char *content, char *flag) {
+int command_edit(char *src, char *flag, char *content) {
     // TODO - edit
     return SUCCESS;
 }
@@ -164,19 +164,18 @@ int command_permissions(char *src, __mode_t permissions, unsigned int recursive)
 int command_ls(char *directory) {
     file_info **list;
     size_t list_s = 0;
-    char *fix = fix_path(directory, TRUE);
-    int result = get_info_of(fix, &list, &list_s);
+    char *f_directory = fix_path(directory, TRUE);
+    int result = get_info_of(f_directory, &list, &list_s);
 
     if (result != SUCCESS)
         return result;
 
-    char *tmp_fix = fix_path(directory, TRUE);
     printf("[\n");
     for (int i = 0; i < list_s; i++) {
         printf("  {\n");
         // General
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
-        printf("    \"location\": \"%s\"\n", tmp_fix);
+        printf("    \"location\": \"%s\"\n", f_directory);
         printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions&0777);
         printf("    \"size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
@@ -185,8 +184,7 @@ int command_ls(char *directory) {
         // Timespec
         printf("    \"last_access\": \"%ld.%.9ld\"\n", list[i]->f_last_access.tv_sec, list[i]->f_last_access.tv_nsec);
         printf("    \"last_modify\": \"%ld.%.9ld\"\n", list[i]->f_last_modify.tv_sec, list[i]->f_last_modify.tv_nsec);
-        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec,
-               list[i]->f_status_change.tv_nsec);
+        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec, list[i]->f_status_change.tv_nsec);
         // Other
         printf("    \"serial_number\": \"%lu\"\n", list[i]->f_serial_number);
         printf("    \"f_link_count\": \"%lu\"\n", list[i]->f_link_count);
@@ -202,8 +200,7 @@ int command_ls(char *directory) {
 
     free(list[list_s]);
     free(list);
-    free(fix);
-    free(tmp_fix);
+    free(f_directory);
 
     return SUCCESS;
 }
