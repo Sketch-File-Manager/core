@@ -91,13 +91,12 @@ void check_requirements(const char *config_file, const char *sketch_folder_name)
     int config_fd = open(absolute_path, O_CREAT, 0700);
     char *first_write = "current_session:";
 
-    close(config_fd);
-
     if (write_file(absolute_path, first_write, strlen(first_write))) {
         free(absolute_path);
         return;
     }
 
+    close(config_fd);
     free(absolute_path);
 
     // Session folder
