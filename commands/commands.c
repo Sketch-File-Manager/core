@@ -109,19 +109,54 @@ int command_copy(char *src, char *dst_folder) {
 }
 
 int command_move(char *src, char *dst_folder) {
-    command_copy(src, dst_folder);
+    char *src_fix = fix_path(src, FALSE);
+    char *dst_fix = fix_path(dst_folder, TRUE);
 
-    if (is_dir(src) == TRUE) {
-        if (rmdir(src) == -1) return -1;
-    } else {
-        delete_file(src);
-    }
+    size_t src_split_s = 0;
+    char **src_split = split_except(src_fix, '/', '\0', &src_split_s);
 
-    return SUCCESS;
+    char *dst_full = str_add(dst_folder, src_split[src_split_s - 1]);
+    int result =  rename(src_fix, dst_full);
+
+    for (int fr = 0; fr < src_split_s; fr++) free(src_split[fr]);
+    free(src_split);
+    free(dst_full);
+    free(dst_fix);
+    free(src_fix);
+
+    return result;
 }
 
 int command_rename(char *src, char *new_name) {
-    // TODO - rename
+    size_t src_split_s = 0;
+    char **src_split = split_except(src, '/', '\0', &src_split_s);
+    char *path = calloc(strlen(src_split[1]) + 2, sizeof(char));
+    strcpy(path, "/");
+    strcat(path, src_split[1]);
+
+    // Form the path without the file/folder name, example: /home/username/name -> /home/username/
+    for (int split = 2; split < src_split_s - 1; split++) {
+        path = realloc(path, strlen(path) + strlen(src_split[split]) + 2);
+        strcat(path, "/");
+        strcat(path, src_split[split]);
+        free(src_split[split]);
+    }
+    free(src_split[src_split_s - 1]);
+    free(src_split);
+
+    // Now we have the path where the file should be sent ( in this case we send it in the exactly same path to rename it.)
+    // Form the new path ( with the new name ).
+    char *renamed = str_add(path, "/", new_name, NULL);
+    free(path);
+
+    // Rename the file.
+    if (rename(src, renamed) == -1) {
+        free(renamed);
+        return errno;
+    }
+
+    free(renamed);
+
     return SUCCESS;
 }
 

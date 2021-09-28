@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include "include/logger.h"
 
 void logger(int priority, char *message, ...) {

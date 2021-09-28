@@ -3,6 +3,7 @@
 
 
 #include <include/queue.h>
+#include <stdlib.h>
 
 /**
  * Checks if a string starts with another string.

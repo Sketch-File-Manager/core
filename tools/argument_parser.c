@@ -179,7 +179,10 @@ static inline int parse_double(char **argv) {
 }
 
 int parse(int argc, char **argv) {
-    if (argv[1] == NULL) return -1;
+    if (argv[1] == NULL) {
+        print_help();
+        return WRONG_ARGUMENT_COMMAND;
+    }
 
     int index, offset;
     if (strcmp(argv[1], "session") == 0 || strcmp(argv[1], "do") == 0) {
@@ -216,7 +219,7 @@ int parse(int argc, char **argv) {
     else if (commands[index].c_argc == 4) result = ((exec_four_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
     // if is a simple command show some logs.
     if (strcmp(argv[1], "do") == 0 && result != SUCCESS)
-        logger(ERROR, "Failed to execute simple command with error code: ", result, NULL);
+        logger(ERROR, "Failed to execute simple command with error code: ", "test ", result, NULL);
 
     return result;
 }

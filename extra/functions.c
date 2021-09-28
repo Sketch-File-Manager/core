@@ -6,7 +6,6 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <time.h>
 
 int endsWith(const char *str, const char *suffix) {

@@ -12,6 +12,7 @@
 #define FALSE -1
 
 // Locations
+#define SKETCH_FOLDER_LOCATION   "~/.local/share/sketch/"
 #define SKETCH_CORE_LOCATION     "~/.local/share/sketch/core/"
 #define CONFIG_FILE_LOCATION     "~/.local/share/sketch/core/config.conf"
 #define SESSION_FOLDER_LOCATION    "~/.local/share/sketch/core/sessions/"
