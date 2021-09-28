@@ -59,13 +59,7 @@ int set_current(const char *current) {
     // Calculate the size of the new current session.
     size_t new_current_session_s = strlen(current) + strlen(CURRENT_SESSION_ID);
     // Allocate enough memory for the new current session.
-    char *new_current_session = calloc(new_current_session_s + 3, sizeof(char));
-    // Set the new current session.
-    strcpy(new_current_session, CURRENT_SESSION_ID);
-    strcat(new_current_session, " ");
-    strcat(new_current_session, current);
-    strcat(new_current_session, "\n");
-
+    char *new_current_session = str_add(CURRENT_SESSION_ID, " ", current, "\n", NULL);
     char *absolute_path = fix_path(CONFIG_FILE_LOCATION, FALSE);
 
     // Make the changes in the config file.
