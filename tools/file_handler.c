@@ -8,6 +8,7 @@
 #include <include/codes.h>
 #include <include/queue.h>
 #include <errno.h>
+#include <stdio.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
@@ -91,7 +92,11 @@ void check_requirements(const char *config_file, const char *sketch_folder_name)
     char *first_write = "current_session:";
 
     close(config_fd);
-    if (write_file(absolute_path, first_write, strlen(first_write))) return;
+
+    if (write_file(absolute_path, first_write, strlen(first_write))) {
+        free(absolute_path);
+        return;
+    }
 
     free(absolute_path);
 
@@ -135,7 +140,6 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
     file_info **tmp_files = calloc(1, sizeof(file_info *));
     tmp_files[0] = calloc(1, sizeof(file_info));
-
     read_contents_of(path, c_queue);
 
     char **curr_element_name; // file or directory name.
@@ -145,7 +149,18 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     int current_path = 0;
     while (c_queue->size != 0) {
         int result = stat((const char *) peek(c_queue), &curr_element_stat);
-        if (result == -1) return errno;
+        if (result == -1) {
+            // Free the current allocated space and return error.
+            free(c_queue);
+            while (c_queue->size != 0) {
+                removed_item = pop(c_queue);
+                free(removed_item);
+            }
+            for (int fr = 0; fr < current_path; fr++) free(tmp_files[fr]);
+            free(tmp_files[current_path]);
+            free(tmp_files);
+            return errno;
+        }
 
         curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
@@ -176,6 +191,5 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     *files = tmp_files;
 
     free(c_queue);
-
     return SUCCESS;
 }

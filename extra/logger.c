@@ -3,23 +3,18 @@
 #include "include/logger.h"
 
 void logger(int priority, char *message, ...) {
-    // TODO - Add terminal colors
     switch (priority) {
         case INFO:
-            printf("Info - ");
-            // White
+            printf("\033[0;37mInfo - ");
             break;
         case WARNING:
-            printf("Warning - ");
-            // Dark yellow
+            printf("\033[0;33mWarning - ");
             break;
         case ERROR:
-            printf("Error - ");
-            // Dark red
+            printf("\033[0;31mError - ");
             break;
         case DEBUG:
-            printf("Debug - ");
-            // Light blue
+            printf("\033[0;36mDebug - ");
             break;
         default:
             printf("NoPriority - ");

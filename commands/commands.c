@@ -166,15 +166,17 @@ int command_ls(char *directory) {
     size_t list_s = 0;
     char *fix = fix_path(directory, TRUE);
     int result = get_info_of(fix, &list, &list_s);
+
     if (result != SUCCESS)
         return result;
 
+    char *tmp_fix = fix_path(directory, TRUE);
     printf("[\n");
     for (int i = 0; i < list_s; i++) {
         printf("  {\n");
         // General
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
-        printf("    \"location\": \"%s\"\n", fix_path(directory, TRUE));
+        printf("    \"location\": \"%s\"\n", tmp_fix);
         printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions&0777);
         printf("    \"size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
@@ -198,8 +200,10 @@ int command_ls(char *directory) {
         free(list[element]);
     }
 
+    free(list[list_s]);
     free(list);
     free(fix);
+    free(tmp_fix);
 
     return SUCCESS;
 }

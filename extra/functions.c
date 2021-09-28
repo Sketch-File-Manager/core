@@ -36,15 +36,15 @@ char *str_add(const char *str1, ...) {
     char *result = calloc(strlen(str1) + 1, sizeof(char));
     strcpy(result, str1);
 
-    char *p = "";
+    char *str = "";
 
     while (1) {
-        p = va_arg(args, char *);
+        str = va_arg(args, char *);
 
-        if (p == NULL) break;
+        if (str == NULL) break;
 
-        result = realloc(result, (strlen(result) + strlen(p) + 1) * sizeof(char));
-        strcat(result, p);
+        result = realloc(result, (strlen(result) + strlen(str) + 1) * sizeof(char));
+        strcat(result, str);
     }
     va_end(args);
 
@@ -140,6 +140,7 @@ void read_contents_of(const char *path, queue *c_queue) {
         // Add it to the queue.
         add(c_queue, tmp_path);
     }
+    closedir(dir);
 }
 
 __mode_t get_permissions_of(const char *path) {
