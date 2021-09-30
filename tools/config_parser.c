@@ -5,7 +5,6 @@
 #include <include/codes.h>
 #include <include/functions.h>
 #include <fcntl.h>
-#include <errno.h>
 #include <unistd.h>
 
 
@@ -53,7 +52,6 @@ int get_option(const char *option, char **result) {
 
     free(config);
     free(path);
-
 
     return SUCCESS;
 }

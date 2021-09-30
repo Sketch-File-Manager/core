@@ -69,7 +69,7 @@ int copy_with_byte_rate(const char *src, const char *dst, size_t rate) {
     char buffer[rate];
     ssize_t result = read(src_fd, &buffer, rate);
     while (result && result != -1) {
-        if (write_file(dst, buffer, result) == -1) return errno;
+        if (write(dst_fd, buffer, result) == -1) return errno;
         result = read(src_fd, &buffer, rate);
     }
 
