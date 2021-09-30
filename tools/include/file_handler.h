@@ -52,4 +52,6 @@ extern int write_file(const char *file_path, char *changes, size_t changes_len);
  */
 extern int list_files_names(const char *path, char ***result_files, size_t *size);
 
+extern int copy_with_byte_rate(const char *src, const char *dst, size_t rate);
+
 #endif

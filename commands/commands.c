@@ -12,34 +12,6 @@
 #include <include/queue.h>
 #include <stdio.h>
 
-
-static int copy_file_content_of(char *src_file, char *dst_file) {
-    // Open the source file.
-    int src_fd = open(src_file, O_RDONLY);
-    if (src_fd == -1) return errno;
-
-    char *src_contents = NULL;
-
-    // Read the content of the source file.
-    int read_result = read_file(src_file, &src_contents);
-    if (read_result == -1) return read_result;
-
-    __mode_t file_permissions = get_permissions_of(src_file);
-    // Create a new file at the destination.
-    int dst_fd = open(dst_file, O_CREAT, file_permissions);
-    if (dst_fd == -1) return errno;
-
-    size_t src_file_s = strlen(src_file);
-
-    // Write the contents of the src to destination.
-    int result = write_file(dst_file, src_file, src_file_s);
-    if (result != SUCCESS) return result;
-
-    close(src_fd);
-    close(dst_fd);
-    return SUCCESS;
-}
-
 /** ================ COMMANDS ================ */
 
 int command_mkdir(char *dst_folder, char *name, __mode_t permissions) {
@@ -88,7 +60,7 @@ int command_copy(char *src, char *dst_folder) {
             mkdir(send_to, current_path_perms);
             // Search for more files in the new directory. ( source path ).
             read_contents_of((char *) peek(c_queue), c_queue);
-        } else result = copy_file_content_of((char *) peek(c_queue), send_to);
+        } else result = copy_with_byte_rate((char *) peek(c_queue), send_to, 516); // TODO - Don't take the rate by literal.
 
 
         free(send_to);

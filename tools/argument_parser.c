@@ -132,7 +132,6 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = SIMPLE_EDIT,         .c_argc = 3, .c_exec = (exec_general *) command_edit},
         {.c_name = SIMPLE_PERMISSIONS,  .c_argc = 3, .c_exec = (exec_general *) command_permissions},
         {.c_name = SIMPLE_LS,           .c_argc = 1, .c_exec = (exec_general *) command_ls},
-
         // session.
         {.c_name = SESSION_START,       .c_argc = 0, .c_exec = (exec_general *) session_start},
         {.c_name = SESSION_END,         .c_argc = 1, .c_exec = (exec_general *) session_end},
@@ -141,7 +140,6 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = SESSION_CURRENT,     .c_argc = 0, .c_exec = (exec_general *) session_current},
         {.c_name = SESSION_SHOW,        .c_argc = 1, .c_exec = (exec_general *) session_show},
         {.c_name = SESSION_LIST,        .c_argc = 0, .c_exec = (exec_general *) session_list},
-
         // session commands.
         {.c_name = COMMAND_EXIT,        .c_argc = 0, .c_exec = (exec_general *) session_command_exit},
         {.c_name = COMMAND_UNDO,        .c_argc = 0, .c_exec = (exec_general *) session_command_undo},
@@ -152,7 +150,6 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = COMMAND_RENAME,      .c_argc = 2, .c_exec = (exec_general *) session_command_rename},
         {.c_name = COMMAND_EDIT,        .c_argc = 3, .c_exec = (exec_general *) session_command_edit},
         {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission},
-
         // options
         {.c_name = OPTION_HELP,         .c_argc = 0, .c_exec = (exec_general *) print_help},
         {.c_name = OPTION_VERSION_FULL, .c_argc = 0, .c_exec = (exec_general *) print_version}

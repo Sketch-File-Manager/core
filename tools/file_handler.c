@@ -54,6 +54,33 @@ int read_file(const char *file_path, char **config_content) {
     return SUCCESS;
 }
 
+int copy_with_byte_rate(const char *src, const char *dst, size_t rate) {
+    // Get the permissions of the source file.
+    mode_t file_permissions = get_permissions_of(src);
+
+    // Open the source file.
+    int src_fd = open(src, O_RDONLY);
+    // Open or create the destination file with append mode.
+    // TODO - remove previous file if exists?
+    int dst_fd = open(dst, O_CREAT | O_APPEND, file_permissions);
+
+    if (src_fd == -1 || dst_fd == -1) return errno;
+
+    char buffer[rate];
+    ssize_t result = read(src_fd, &buffer, rate);
+    while (result && result != -1) {
+        if (write_file(dst, buffer, result) == -1) return errno;
+        result = read(src_fd, &buffer, rate);
+    }
+
+    if (result == -1) return errno;
+
+    close(src_fd);
+    close(dst_fd);
+    return SUCCESS;
+}
+
+
 int write_file(const char *file_path, char *changes, size_t changes_len) {
     int config_fd = get_file_fd(file_path, O_RDWR | O_TRUNC, NULL);
 
