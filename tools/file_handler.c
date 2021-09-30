@@ -58,11 +58,16 @@ int copy_with_byte_rate(const char *src, const char *dst, size_t rate) {
     // Get the permissions of the source file.
     mode_t file_permissions = get_permissions_of(src);
 
+    // Open or create the destination file with append mode.
+    int dst_fd = open(dst, O_RDONLY);
+    // If the file already exists.
+    if (dst_fd != -1) {
+        close(dst_fd);
+        return SUCCESS;
+    }
     // Open the source file.
     int src_fd = open(src, O_RDONLY);
-    // Open or create the destination file with append mode.
-    // TODO - remove previous file if exists?
-    int dst_fd = open(dst, O_CREAT | O_APPEND, file_permissions);
+    dst_fd = open(dst, O_CREAT | O_APPEND, file_permissions);
 
     if (src_fd == -1 || dst_fd == -1) return errno;
 
