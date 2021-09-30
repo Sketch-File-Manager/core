@@ -9,7 +9,7 @@
 
 static char *check_current() {
     char *current;
-    int result = get_current(&current);
+    int result = get_option(CURRENT_SESSION_ID, &current);
     if (result != SUCCESS)
         logger(WARNING, "Failed to find current session with error code: ", result, NULL);
 
@@ -20,7 +20,7 @@ void session_command_exit() {
     char *current = check_current();
     if (strcmp(current, "") == 0) return;
 
-    int result = set_current("");
+    int result = set_option(CURRENT_SESSION_ID,"");
     if (result == SUCCESS)
         logger(INFO, "Exited current session.", NULL);
     else

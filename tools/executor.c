@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 #include "executor.h"
-#include "../commands/commands.h"
+#include "include/commands.h"
 
 /**
  * Translate a string of permissions to bitmask.

@@ -5,7 +5,7 @@
 #include <session_parser.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <commands.h>
+#include <include/commands.h>
 #include <file_handler.h>
 #include <unistd.h>
 #include <include/functions.h>

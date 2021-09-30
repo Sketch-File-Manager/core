@@ -7,18 +7,9 @@
  */
 extern int create_config_file();
 
-/**
- * Return the current session file.
- * @param current The variable where the string name will be stored.
- * @return SUCCESS in case of success, otherwise the appropriate error number.
- */
-extern int get_current(char **current);
+extern int get_option(const char *option, char **result);
 
-/**
- * Sets the current session file.
- * @param current The session name
- * @return SUCCESS in case of success, otherwise the appropriate error number.
- */
-extern int set_current(const char *current);
+extern int set_option(const char *option, const char *value);
 
+extern int set_byte_rate(const char *value);
 #endif

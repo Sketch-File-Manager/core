@@ -11,7 +11,7 @@
 
 static int check_current() {
     char *current;
-    int config_result = get_current(&current);
+    int config_result = get_option(CURRENT_SESSION_ID, &current);
     if (config_result != SUCCESS)
         return FALSE;
 
@@ -71,7 +71,7 @@ void session_use(char *id) {
         strcat(name, ".session");
 
     if (session_exists(name) == TRUE) {
-        int result = set_current(name);
+        int result = set_option(CURRENT_SESSION_ID, name);
         if (result == SUCCESS)
             logger(INFO, "Current session is set to: ", name, NULL);
         else
@@ -133,7 +133,7 @@ void session_run(char *id) {
 
 void session_current() {
     char *current;
-    int config_result = get_current(&current);
+    int config_result = get_option(CURRENT_SESSION_ID, &current);
     if (config_result != SUCCESS)
         return logger(ERROR, "Cannot access current session.", NULL);
 

@@ -10,6 +10,7 @@
 
 
 int create_config_file() {
+    // TODO - Add the option for the byte rate in the config file with default value 516 bytes.
     char *absolute_path = fix_path(CONFIG_FILE_LOCATION, FALSE);
 
     // try to open the file, and in case that it does not exist create it.
@@ -26,35 +27,47 @@ int create_config_file() {
     return SUCCESS;
 }
 
-int get_current(char **current) {
+int get_option(const char *option, char **result) {
     char *config = NULL;
     char *path = fix_path(CONFIG_FILE_LOCATION, FALSE);
 
-    int result = read_file(path, &config);
-    if (result != SUCCESS) return result;
+    int code = read_file(path, &config);
+    if (code != SUCCESS) return code;
 
     // Find the location of current session in the file.
-    char *location_of_interest = strstr(config, CURRENT_SESSION_ID);
+    char *location_of_interest = strstr(config, option);
     strtok(location_of_interest, " ");
     // get the current session.
     char *current_session = strtok(NULL, "\n");
 
     if (current_session == NULL) {
-        *current = calloc(1, sizeof(char));
-        strcpy(*current, "");
+        *result = calloc(1, sizeof(char));
+        strcpy(*result, "");
         return SUCCESS;
     }
 
     // Allocate enough space for the current session.
-    *current = calloc(strlen(current_session) + 1, sizeof(char));
+    *result = calloc(strlen(current_session) + 1, sizeof(char));
     // set the current session to current.
-    strcpy(*current, current_session);
+    strcpy(*result, current_session);
 
     free(config);
     free(path);
+
+
     return SUCCESS;
 }
 
+int set_option(const char *option, const char *value) {
+    // TODO - Make set option.
+    return SUCCESS;
+}
+
+int set_byte_rate(const char *value) {
+    return set_option(BYTE_RATE, value);
+}
+
+/*
 int set_current(const char *current) {
     // Calculate the size of the new current session.
     size_t new_current_session_s = strlen(current) + strlen(CURRENT_SESSION_ID);
@@ -69,3 +82,4 @@ int set_current(const char *current) {
 
     return result;
 }
+*/

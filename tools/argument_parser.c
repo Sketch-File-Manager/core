@@ -6,11 +6,12 @@
 #include <session_edit.h>
 #include <include/codes.h>
 #include <include/logger.h>
-#include "../commands/commands.h"
+#include <commands.h>
+#include <config_parser.h>
 
 #define VERSION                 "1.0.0"
 
-#define COMMAND_NUMBER          26
+#define COMMAND_NUMBER          27
 
 // simple commands
 #define SIMPLE_MKDIR            "do mkdir"
@@ -45,6 +46,7 @@
 // options
 #define OPTION_HELP             "--help"
 #define OPTION_VERSION_FULL     "--version"
+#define OPTION_RATE             "--rate"
 
 // Function pointer types.
 typedef int exec_general(void);
@@ -152,7 +154,8 @@ static struct command commands[COMMAND_NUMBER] = {
         {.c_name = COMMAND_PERMISSIONS, .c_argc = 3, .c_exec = (exec_general *) session_command_permission},
         // options
         {.c_name = OPTION_HELP,         .c_argc = 0, .c_exec = (exec_general *) print_help},
-        {.c_name = OPTION_VERSION_FULL, .c_argc = 0, .c_exec = (exec_general *) print_version}
+        {.c_name = OPTION_VERSION_FULL, .c_argc = 0, .c_exec = (exec_general *) print_version},
+        {.c_name = OPTION_RATE,         .c_argc = 1, .c_exec = (exec_general *) set_byte_rate}
 };
 
 static inline int find_command(char *name) {
