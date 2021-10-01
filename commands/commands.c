@@ -5,7 +5,7 @@
 #include <session_parser.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <include/commands.h>
+#include <commands.h>
 #include <file_handler.h>
 #include <unistd.h>
 #include <include/functions.h>
@@ -37,12 +37,12 @@ int command_mkfile(char *dst_folder, char *name, __mode_t permissions) {
     return SUCCESS;
 }
 
-int command_copy(char *src, char *dst_folder) {
+static int copy_dir_contents(const char *src, const char *dst) {
     queue *c_queue = create_empty_queue();
     read_contents_of(src, c_queue);
     char *send_to;
 
-    __mode_t current_path_perms;
+    mode_t current_path_perms;
     size_t current_path_split_s = 0;
     char **current_path_split = NULL;
 
@@ -53,7 +53,7 @@ int command_copy(char *src, char *dst_folder) {
         current_path_perms = get_permissions_of((char *) peek(c_queue));
         // Make the path to the new made directory or file.
         // File or directory name is located in the current_path_split[current_path_split_s - 1] based on split_except.
-        send_to = calloc(strlen(dst_folder) + strlen(current_path_split[current_path_split_s - 1]) + 1, sizeof(char));
+        send_to = calloc(strlen(dst) + strlen(current_path_split[current_path_split_s - 1]) + 1, sizeof(char));
         // If the element that we are looking is directory. Then make a directory with the same name, under the new location.
         if (is_dir((const char *) pop(c_queue)) == TRUE) {
             // Create the directory. ( destination path ).
@@ -61,7 +61,6 @@ int command_copy(char *src, char *dst_folder) {
             // Search for more files in the new directory. ( source path ).
             read_contents_of((char *) peek(c_queue), c_queue);
         } else result = copy_with_byte_rate((char *) peek(c_queue), send_to, 516); // TODO - Don't take the rate by literal.
-
 
         free(send_to);
         // Free the split_except.
@@ -77,6 +76,33 @@ int command_copy(char *src, char *dst_folder) {
     }
     free(c_queue);
 
+    return result;
+}
+
+static int copy_file(char *src, const char *dst_folder) {
+    char *fix = fix_path(dst_folder, TRUE);
+    size_t src_split_s = 0;
+    char **src_split = split_except(src, '/', '\0', &src_split_s);
+    // form the dst path.
+    char *dst = str_add(fix, src_split[src_split_s - 1], NULL);
+    if (copy_with_byte_rate(src, dst, 516) != SUCCESS) return errno;
+
+    free(fix);
+    for (int i = 0; i < src_split_s; i++) free(src_split[i]);
+    free(src_split);
+    free(dst);
+
+    return SUCCESS;
+}
+
+int command_copy(char *src, char *dst_folder) {
+    if (is_dir(src) == SUCCESS) {
+        // TODO - Fix copy dir contents.
+        return copy_dir_contents(src, dst_folder);
+    }
+    else {
+        return copy_file(src, dst_folder); // TODO - Don't take the rate by literal.
+    }
     return SUCCESS;
 }
 

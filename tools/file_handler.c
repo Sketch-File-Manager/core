@@ -8,6 +8,7 @@
 #include <include/codes.h>
 #include <include/queue.h>
 #include <errno.h>
+#include <stdio.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
@@ -67,15 +68,14 @@ int copy_with_byte_rate(const char *src, const char *dst, size_t rate) {
     }
     // Open the source file.
     int src_fd = open(src, O_RDONLY);
-    dst_fd = open(dst, O_CREAT | O_APPEND, file_permissions);
-
+    dst_fd = open(dst, O_CREAT | O_APPEND | O_WRONLY, file_permissions);
     if (src_fd == -1 || dst_fd == -1) return errno;
 
     char buffer[rate];
     ssize_t result = read(src_fd, &buffer, rate);
     while (result && result != -1) {
         if (write(dst_fd, buffer, result) == -1) return errno;
-        result = read(src_fd, &buffer, rate);
+        result = read(src_fd, buffer, rate);
     }
 
     if (result == -1) return errno;
@@ -146,11 +146,11 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         int result = stat((const char *) peek(c_queue), &curr_element_stat);
         if (result == -1) {
             // Free the current allocated space and return error.
-            free(c_queue);
             while (c_queue->size != 0) {
                 removed_item = pop(c_queue);
                 free(removed_item);
             }
+            free(c_queue);
             for (int fr = 0; fr < current_path; fr++) free(tmp_files[fr]);
             free(tmp_files[current_path]);
             free(tmp_files);

@@ -31,7 +31,7 @@ void logger(int priority, char *message, ...) {
         p = va_arg(args, char *);
 
         if (p == NULL) break;
-        printf("%s", p);
+//        printf("%s", p);
     }
     va_end(args);
 

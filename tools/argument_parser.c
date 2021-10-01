@@ -128,7 +128,7 @@ static struct command commands[COMMAND_NUMBER] = {
         // simple commands.
         {.c_name = SIMPLE_MKDIR,        .c_argc = 3, .c_exec = (exec_general *) command_mkdir},
         {.c_name = SIMPLE_MKFILE,       .c_argc = 3, .c_exec = (exec_general *) command_mkfile},
-        {.c_name = SIMPLE_COPY,         .c_argc = 4, .c_exec = (exec_general *) command_copy},
+        {.c_name = SIMPLE_COPY,         .c_argc = 2, .c_exec = (exec_general *) command_copy},
         {.c_name = SIMPLE_MOVE,         .c_argc = 4, .c_exec = (exec_general *) command_move},
         {.c_name = SIMPLE_RENAME,       .c_argc = 2, .c_exec = (exec_general *) command_rename},
         {.c_name = SIMPLE_EDIT,         .c_argc = 3, .c_exec = (exec_general *) command_edit},
