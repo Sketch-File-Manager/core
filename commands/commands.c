@@ -11,6 +11,7 @@
 #include <include/functions.h>
 #include <include/queue.h>
 #include <stdio.h>
+#include <mem.h>
 
 /** ================ COMMANDS ================ */
 
@@ -42,37 +43,49 @@ static int copy_dir_contents(const char *src, const char *dst) {
     read_contents_of(src, c_queue);
     char *send_to;
 
-    mode_t current_path_perms;
-    size_t current_path_split_s = 0;
-    char **current_path_split = NULL;
+    mode_t element_perms;
+    char *element_name;
+    char *removed;
+
+    char **element_split;
+    size_t element_split_s = 0;
+
+    char *tmp;
 
     int result = SUCCESS;
     while (c_queue->size != 0) {
-        current_path_split = split_except((char *) peek(c_queue), '/', '\0', &current_path_split_s);
-        // Get the permissions of the current path.
-        current_path_perms = get_permissions_of((char *) peek(c_queue));
-        // Make the path to the new made directory or file.
-        // File or directory name is located in the current_path_split[current_path_split_s - 1] based on split_except.
-        send_to = calloc(strlen(dst) + strlen(current_path_split[current_path_split_s - 1]) + 1, sizeof(char));
-        // If the element that we are looking is directory. Then make a directory with the same name, under the new location.
-        if (is_dir((const char *) pop(c_queue)) == TRUE) {
-            // Create the directory. ( destination path ).
-            mkdir(send_to, current_path_perms);
-            // Search for more files in the new directory. ( source path ).
-            read_contents_of((char *) peek(c_queue), c_queue);
-        } else result = copy_with_byte_rate((char *) peek(c_queue), send_to, 516); // TODO - Don't take the rate by literal.
+        element_split = split_except((char *) peek(c_queue), '/', '\0', &element_split_s);
+        element_name = calloc(strlen(element_split[element_split_s - 1]) + 1, sizeof(char));
+        strcpy(element_name, element_split[element_split_s - 1]);
 
+        if (strcmp(element_name, ".") == 0 || strcmp(element_name, "..") == 0) {
+            removed = pop(c_queue);
+            free(removed);
+            FREE_ARRAY(element_split, element_split_s);
+            free(element_name);
+            continue;
+        }
+
+        // TODO - Fix recursive copy, build the sub path for the new file.
+
+        send_to = str_add(dst, element_name, NULL);
+        removed = pop(c_queue);
+        if (is_dir(removed) == TRUE) {
+            tmp = str_add(removed, "/", NULL);
+            element_perms = get_permissions_of(removed);
+            mkdir(send_to, element_perms);
+            read_contents_of(tmp, c_queue);
+            free(tmp);
+        }
+        else result = copy_with_byte_rate(removed, send_to, 516);
+
+        if (result != SUCCESS) return result;
+
+
+        FREE_ARRAY(element_split, element_split_s);
+        free(removed);
         free(send_to);
-        // Free the split_except.
-        for (int fr = 0; fr < current_path_split_s; fr++) {
-            free(current_path_split[fr]);
-            current_path_split_s = 0;
-        }
-
-        if (result != SUCCESS) {
-            free(c_queue);
-            return result;
-        }
+        free(element_name);
     }
     free(c_queue);
 
@@ -96,14 +109,12 @@ static int copy_file(char *src, const char *dst_folder) {
 }
 
 int command_copy(char *src, char *dst_folder) {
-    if (is_dir(src) == SUCCESS) {
-        // TODO - Fix copy dir contents.
+    if (is_dir(src) == TRUE) {
         return copy_dir_contents(src, dst_folder);
     }
     else {
         return copy_file(src, dst_folder); // TODO - Don't take the rate by literal.
     }
-    return SUCCESS;
 }
 
 int command_move(char *src, char *dst_folder) {

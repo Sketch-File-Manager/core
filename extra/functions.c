@@ -121,10 +121,10 @@ int is_dir(const char *path) {
 
     // do an and statement with bits of st_mode and bits of S_IFDIR.
     // If is the same the result is ok, otherwise the result is zero.
-    if (path_stat.st_mode == S_IFDIR)
+    if (path_stat.st_mode & S_IFDIR)
         return TRUE;
 
-    return SUCCESS;
+    return FALSE;
 }
 
 void read_contents_of(const char *directory, queue *c_queue) {
