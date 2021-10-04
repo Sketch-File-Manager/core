@@ -13,7 +13,8 @@
 /** ================ COMMANDS ================ */
 
 int command_mkdir(char *dst_folder, char *name, mode_t permissions) {
-    char *folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+    char *folder_path;
+    ALLOCATE_MEM(folder_path, strlen(dst_folder) + strlen(name) + 1, sizeof(char));
     strcpy(folder_path, dst_folder);
     strcpy(folder_path, name);
 
@@ -25,7 +26,8 @@ int command_mkdir(char *dst_folder, char *name, mode_t permissions) {
 }
 
 int command_mkfile(char *dst_folder, char *name, mode_t permissions) {
-    char *destination = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
+    char *destination;
+    ALLOCATE_MEM(destination, strlen(dst_folder) + strlen(name) + 1, sizeof(char));
     strcpy(destination, dst_folder);
     strcat(destination, name);
 
@@ -50,7 +52,7 @@ static int copy_dir_contents(char *src, const char *dst) {
     char *root_folder;
     // Save the deeper sub folder of the src.
     element_split = split_except(src, '/', '\0', &element_split_s);
-    root_folder = calloc(strlen(element_split[element_split_s - 2]) + 1, sizeof(char));
+    ALLOCATE_MEM(root_folder, strlen(element_split[element_split_s - 2]) + 1, sizeof(char));
     strcpy(root_folder, element_split[element_split_s - 2]);
     FREE_ARRAY(element_split, element_split_s);
     element_split_s = 0;
@@ -63,7 +65,8 @@ static int copy_dir_contents(char *src, const char *dst) {
     while (c_queue->size != 0) {
         // Get the name of the current element.
         element_split = split_except((char *) peek(c_queue), '/', '\0', &element_split_s);
-        element_name = calloc(strlen(element_split[element_split_s - 1]) + 1, sizeof(char));
+
+        ALLOCATE_MEM(element_name, strlen(element_split[element_split_s - 1]) + 1, sizeof(char));
         strcpy(element_name, element_split[element_split_s - 1]);
 
         // Check if the current element is either folder . or folder ..
@@ -75,9 +78,8 @@ static int copy_dir_contents(char *src, const char *dst) {
             continue;
         }
 
-        tmp = calloc(1, sizeof(char));
-
-        tmp_path = calloc(2, sizeof(char));
+        ALLOCATE_MEM(tmp, 1, sizeof(char));
+        ALLOCATE_MEM(tmp_path, 2, sizeof(char));
         strcpy(tmp_path, "/");
 
         // Build the sub folder sequence for the current element.
@@ -91,7 +93,7 @@ static int copy_dir_contents(char *src, const char *dst) {
            end result: /home/username/test/test/copy.txt
         */
         for (int curr_el = 0; curr_el < element_split_s; curr_el++) {
-            tmp_path = realloc(tmp_path, (strlen(tmp_path) + strlen(element_split[curr_el]) + 2) * sizeof(char));
+            REALLOCATE_MEM(tmp_path, (strlen(tmp_path) + strlen(element_split[curr_el]) + 2) * sizeof(char));
             strcat(tmp_path, element_split[curr_el]);
             strcat(tmp_path, "/");
 
@@ -101,7 +103,7 @@ static int copy_dir_contents(char *src, const char *dst) {
             }
 
             if (flag == TRUE) {
-                tmp = realloc(tmp, (strlen(tmp) + strlen(element_split[curr_el]) + 1) * sizeof(char));
+                REALLOCATE_MEM(tmp, (strlen(tmp) + strlen(element_split[curr_el]) + 1) * sizeof(char));
                 strcat(tmp, element_split[curr_el]);
                 if (is_dir(tmp_path) == TRUE) {
                     tmp = realloc(tmp, (strlen(tmp) + 2) * sizeof(char));
@@ -119,7 +121,8 @@ static int copy_dir_contents(char *src, const char *dst) {
         // Check if the current element is directory.
         if (is_dir(removed) == TRUE) {
             // Fix the path ( for DIR ).
-            tmp = str_add(removed, "/", NULL);
+            if (removed[strlen(removed) - 1] != '/')
+                tmp = str_add(removed, "/", NULL);
             // Get the permission of the directory.
             element_perms = get_permissions_of(removed);
             // Make a directory with the same name under the new path.
@@ -187,13 +190,14 @@ int command_move(char *src, char *dst_folder) {
 int command_rename(char *src, char *new_name) {
     size_t src_split_s = 0;
     char **src_split = split_except(src, '/', '\0', &src_split_s);
-    char *path = calloc(strlen(src_split[1]) + 2, sizeof(char));
+    char *path;
+    ALLOCATE_MEM(path, strlen(src_split[1]) + 2, sizeof(char));
     strcpy(path, "/");
     strcat(path, src_split[1]);
 
     // Form the path without the file/folder name, example: /home/username/name -> /home/username/
     for (int split = 2; split < src_split_s - 1; split++) {
-        path = realloc(path, strlen(path) + strlen(src_split[split]) + 2);
+        REALLOCATE_MEM(path, strlen(path) + strlen(src_split[split]) + 2);
         strcat(path, "/");
         strcat(path, src_split[split]);
         free(src_split[split]);
@@ -235,7 +239,7 @@ int command_permissions(char *src, mode_t permissions, unsigned int recursive) {
                 return errno;
 
             if (is_dir((const char *) peek(c_queue)) == TRUE) {
-                tmp = calloc(strlen((const char *) peek(c_queue)) + 1, sizeof(char));
+                ALLOCATE_MEM(tmp, strlen((const char *) peek(c_queue)) + 1, sizeof(char));
                 strcpy(tmp, (const char *) peek(c_queue));
                 read_contents_of(tmp, c_queue);
             }
