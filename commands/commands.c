@@ -2,12 +2,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <session_parser.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <commands.h>
 #include <file_handler.h>
-#include <unistd.h>
 #include <include/functions.h>
 #include <include/queue.h>
 #include <stdio.h>
@@ -15,7 +12,7 @@
 
 /** ================ COMMANDS ================ */
 
-int command_mkdir(char *dst_folder, char *name, __mode_t permissions) {
+int command_mkdir(char *dst_folder, char *name, mode_t permissions) {
     char *folder_path = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
     strcpy(folder_path, dst_folder);
     strcpy(folder_path, name);
@@ -27,7 +24,7 @@ int command_mkdir(char *dst_folder, char *name, __mode_t permissions) {
     return errno;
 }
 
-int command_mkfile(char *dst_folder, char *name, __mode_t permissions) {
+int command_mkfile(char *dst_folder, char *name, mode_t permissions) {
     char *destination = calloc(strlen(dst_folder) + strlen(name) + 1, sizeof(char));
     strcpy(destination, dst_folder);
     strcat(destination, name);
@@ -38,7 +35,7 @@ int command_mkfile(char *dst_folder, char *name, __mode_t permissions) {
     return SUCCESS;
 }
 
-static int copy_dir_contents(const char *src, const char *dst) {
+static int copy_dir_contents(char *src, const char *dst) {
     queue *c_queue = create_empty_queue();
     read_contents_of(src, c_queue);
     char *send_to;
@@ -50,14 +47,26 @@ static int copy_dir_contents(const char *src, const char *dst) {
     char **element_split;
     size_t element_split_s = 0;
 
+    char *root_folder;
+    // Save the deeper sub folder of the src.
+    element_split = split_except(src, '/', '\0', &element_split_s);
+    root_folder = calloc(strlen(element_split[element_split_s - 2]) + 1, sizeof(char));
+    strcpy(root_folder, element_split[element_split_s - 2]);
+    FREE_ARRAY(element_split, element_split_s);
+    element_split_s = 0;
+
     char *tmp;
+    char *tmp_path;
+    int flag = FALSE;
 
     int result = SUCCESS;
     while (c_queue->size != 0) {
+        // Get the name of the current element.
         element_split = split_except((char *) peek(c_queue), '/', '\0', &element_split_s);
         element_name = calloc(strlen(element_split[element_split_s - 1]) + 1, sizeof(char));
         strcpy(element_name, element_split[element_split_s - 1]);
 
+        // Check if the current element is either folder . or folder ..
         if (strcmp(element_name, ".") == 0 || strcmp(element_name, "..") == 0) {
             removed = pop(c_queue);
             free(removed);
@@ -66,28 +75,72 @@ static int copy_dir_contents(const char *src, const char *dst) {
             continue;
         }
 
-        // TODO - Fix recursive copy, build the sub path for the new file.
+        tmp = calloc(1, sizeof(char));
 
-        send_to = str_add(dst, element_name, NULL);
+        tmp_path = calloc(2, sizeof(char));
+        strcpy(tmp_path, "/");
+
+        // Build the sub folder sequence for the current element.
+        /* @element = file or directory.
+           exp: if the current src is /home/username/testing and the
+           current element is the /test/copy.txt
+           and the destination is /home/username/test/
+           then the bellow 18 lines build up the test/copy.txt
+           witch is the sub path of the src. This is necessary to concatenate in the right of the
+           destination path, in order to build the correct location for the specific element.
+           end result: /home/username/test/test/copy.txt
+        */
+        for (int curr_el = 0; curr_el < element_split_s; curr_el++) {
+            tmp_path = realloc(tmp_path, (strlen(tmp_path) + strlen(element_split[curr_el]) + 2) * sizeof(char));
+            strcat(tmp_path, element_split[curr_el]);
+            strcat(tmp_path, "/");
+
+            if (strcmp(root_folder, element_split[curr_el]) == 0 && flag != TRUE) {
+                flag = TRUE;
+                continue;
+            }
+
+            if (flag == TRUE) {
+                tmp = realloc(tmp, (strlen(tmp) + strlen(element_split[curr_el]) + 1) * sizeof(char));
+                strcat(tmp, element_split[curr_el]);
+                if (is_dir(tmp_path) == TRUE) {
+                    tmp = realloc(tmp, (strlen(tmp) + 2) * sizeof(char));
+                    strcat(tmp, "/");
+                }
+            }
+        }
+        // Build the path where the current element must send.
+        send_to = str_add(dst, tmp, NULL);
+        // Remove the current element from the queue.
         removed = pop(c_queue);
+
+        free(tmp);
+        free(tmp_path);
+        // Check if the current element is directory.
         if (is_dir(removed) == TRUE) {
+            // Fix the path ( for DIR ).
             tmp = str_add(removed, "/", NULL);
+            // Get the permission of the directory.
             element_perms = get_permissions_of(removed);
+            // Make a directory with the same name under the new path.
             mkdir(send_to, element_perms);
+            // Read all the contents of the directory.
             read_contents_of(tmp, c_queue);
             free(tmp);
         }
+        // If the current element is file, then just copy it to the destination.
         else result = copy_with_byte_rate(removed, send_to, 516);
 
         if (result != SUCCESS) return result;
 
-
+        flag = FALSE;
         FREE_ARRAY(element_split, element_split_s);
         free(removed);
         free(send_to);
         free(element_name);
     }
     free(c_queue);
+    free(root_folder);
 
     return result;
 }
@@ -101,7 +154,7 @@ static int copy_file(char *src, const char *dst_folder) {
     if (copy_with_byte_rate(src, dst, 516) != SUCCESS) return errno;
 
     free(fix);
-    for (int i = 0; i < src_split_s; i++) free(src_split[i]);
+    FREE_ARRAY(src_split, src_split_s);
     free(src_split);
     free(dst);
 
@@ -109,12 +162,8 @@ static int copy_file(char *src, const char *dst_folder) {
 }
 
 int command_copy(char *src, char *dst_folder) {
-    if (is_dir(src) == TRUE) {
-        return copy_dir_contents(src, dst_folder);
-    }
-    else {
-        return copy_file(src, dst_folder); // TODO - Don't take the rate by literal.
-    }
+    if (is_dir(src) == TRUE) return copy_dir_contents(src, dst_folder);
+    else return copy_file(src, dst_folder); // TODO - Don't take the rate by literal.
 }
 
 int command_move(char *src, char *dst_folder) {
@@ -127,8 +176,7 @@ int command_move(char *src, char *dst_folder) {
     char *dst_full = str_add(dst_folder, src_split[src_split_s - 1]);
     int result =  rename(src_fix, dst_full);
 
-    for (int fr = 0; fr < src_split_s; fr++) free(src_split[fr]);
-    free(src_split);
+    FREE_ARRAY(src_split, src_split_s);
     free(dst_full);
     free(dst_fix);
     free(src_fix);
@@ -174,7 +222,7 @@ int command_edit(char *src, char *flag, char *content) {
     return SUCCESS;
 }
 
-int command_permissions(char *src, __mode_t permissions, unsigned int recursive) {
+int command_permissions(char *src, mode_t permissions, unsigned int recursive) {
     if (recursive == 1) {
         queue *c_queue = create_empty_queue();
         char *tmp;

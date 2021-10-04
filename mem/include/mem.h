@@ -10,14 +10,14 @@
 } while (0)
 
 #define ALLOCATE_MEM(ITEM, SIZE, TYPE) do {                         \
-        (ITEM) = calloc((SIZE), sizeof((TYPE));                     \
+        (ITEM) = calloc((SIZE), sizeof((TYPE)));                     \
         if ((ITEM) == NULL)                                         \
                 // TODO - Do something.                             \
                                                                     \
 } while(0)
 
 #define REALLOCATE_MEM(ITEM, NEW_SIZE, TYPE) do {                   \
-        (ITEM) = realloc((ITEM), sizeof(TYPE) * NEW_SIZE)           \
+        (ITEM) = realloc((ITEM), sizeof((TYPE)) * (NEW_SIZE))           \
         if ((ITEM) == NULL)                                         \
                 // TODO - Do something.                             \
 } while(0)
