@@ -130,6 +130,20 @@ int list_files_names(const char *path, char ***result_files, size_t *size) {
 }
 
 int get_info_of(char *path, file_info ***files, size_t *size) {
+    // TODO - Fix the crash problem in ls command.
+    /* Crash summary:
+           ls result strange results:
+                  /home/username/Desktop/..
+                  /home/username/Desktop/..py   ????
+
+            brakes at:
+                  result = stat((const char *) peek(c_queue), &curr_element_stat);
+
+            problem:
+                  result is -1, and occurs an errno return that causes the program to crash.
+                  The reason behind the result = -1 is that the ..py element does not exist so
+                  the stat function can't read the information about an element tha doesn't exist.
+     */
     struct stat curr_element_stat;
     queue *c_queue = create_empty_queue();
 
@@ -141,9 +155,11 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     size_t curr_element_name_s;
     char *removed_item;
 
+    int result;
     int current_path = 0;
     while (c_queue->size != 0) {
-        int result = stat((const char *) peek(c_queue), &curr_element_stat);
+        printf("%s\n", (const char *) peek(c_queue));
+        result = stat((const char *) peek(c_queue), &curr_element_stat);
         if (result == -1) {
             // Free the current allocated space and return error.
             while (c_queue->size != 0) {
@@ -171,8 +187,8 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         tmp_files[current_path]->f_size = curr_element_stat.st_size;
 
         removed_item = pop(c_queue);
-        if (is_dir((const char *) removed_item))
-            read_contents_of((char *) peek(c_queue), c_queue);
+        if (is_dir((const char *) removed_item) == TRUE)
+            read_contents_of((char *) removed_item, c_queue);
 
         for (int fr = 0; fr < curr_element_name_s; fr++) free(curr_element_name[fr]);
 

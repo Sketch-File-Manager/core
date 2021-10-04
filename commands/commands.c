@@ -131,7 +131,7 @@ static int copy_dir_contents(char *src, const char *dst) {
             read_contents_of(tmp, c_queue);
             free(tmp);
         }
-        // If the current element is file, then just copy it to the destination.
+            // If the current element is file, then just copy it to the destination.
         else result = copy_with_byte_rate(removed, send_to, 516);
 
         if (result != SUCCESS) return result;
@@ -177,7 +177,7 @@ int command_move(char *src, char *dst_folder) {
     char **src_split = split_except(src_fix, '/', '\0', &src_split_s);
 
     char *dst_full = str_add(dst_folder, src_split[src_split_s - 1]);
-    int result =  rename(src_fix, dst_full);
+    int result = rename(src_fix, dst_full);
 
     FREE_ARRAY(src_split, src_split_s);
     free(dst_full);
@@ -272,7 +272,7 @@ int command_ls(char *directory) {
         // General
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
         printf("    \"location\": \"%s\"\n", f_directory);
-        printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions&0777);
+        printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions & 0777);
         printf("    \"size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
         printf("    \"group_id\": \"%u\"\n", list[i]->f_group_id);
@@ -280,7 +280,8 @@ int command_ls(char *directory) {
         // Timespec
         printf("    \"last_access\": \"%ld.%.9ld\"\n", list[i]->f_last_access.tv_sec, list[i]->f_last_access.tv_nsec);
         printf("    \"last_modify\": \"%ld.%.9ld\"\n", list[i]->f_last_modify.tv_sec, list[i]->f_last_modify.tv_nsec);
-        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec, list[i]->f_status_change.tv_nsec);
+        printf("    \"last_status_change\": \"%ld.%.9ld\"\n", list[i]->f_status_change.tv_sec,
+               list[i]->f_status_change.tv_nsec);
         // Other
         printf("    \"serial_number\": \"%lu\"\n", list[i]->f_serial_number);
         printf("    \"f_link_count\": \"%lu\"\n", list[i]->f_link_count);
