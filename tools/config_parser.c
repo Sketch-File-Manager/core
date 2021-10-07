@@ -1,5 +1,5 @@
+/* config_parser.c */
 #include <string.h>
-
 #include <config_parser.h>
 #include <file_handler.h>
 #include <include/codes.h>

@@ -1,5 +1,5 @@
+/* queue.c */
 #include <include/queue.h>
-#include <malloc.h>
 #include <memory.h>
 #include <include/codes.h>
 #include <mem.h>

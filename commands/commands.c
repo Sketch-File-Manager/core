@@ -1,3 +1,4 @@
+/* commands.c */
 #include <include/codes.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -111,7 +112,7 @@ static int copy_dir_contents(char *src, const char *dst) {
                 REALLOCATE_MEM(tmp, (strlen(tmp) + strlen(element_split[curr_el]) + 1) * sizeof(char));
                 strcat(tmp, element_split[curr_el]);
                 if (is_dir(tmp_path) == TRUE) {
-                    tmp = realloc(tmp, (strlen(tmp) + 2) * sizeof(char));
+                    REALLOCATE_MEM(tmp, (strlen(tmp) + 2) * sizeof(char));
                     strcat(tmp, "/");
                 }
             }

@@ -1,3 +1,4 @@
+/* session_edit.c */
 #include <session_edit.h>
 #include <session_parser.h>
 #include <config_parser.h>

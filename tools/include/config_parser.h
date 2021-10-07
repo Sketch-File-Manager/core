@@ -1,3 +1,4 @@
+/* config_parser.h */
 #ifndef SKETCH_CORE_CONFIG_PARSER_H
 #define SKETCH_CORE_CONFIG_PARSER_H 1
 

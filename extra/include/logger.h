@@ -1,3 +1,4 @@
+/* logger.h */
 #ifndef SKETCH_CORE_LOGGER_H
 #define SKETCH_CORE_LOGGER_H
 

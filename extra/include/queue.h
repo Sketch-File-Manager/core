@@ -1,3 +1,4 @@
+/* queue.h */
 #ifndef SKETCH_CORE_QUEUE_H
 #define SKETCH_CORE_QUEUE_H
 

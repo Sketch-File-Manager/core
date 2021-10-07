@@ -1,3 +1,4 @@
+/* main.c */
 #include <argument_parser.h>
 #include <config_parser.h>
 #include <sys/stat.h>

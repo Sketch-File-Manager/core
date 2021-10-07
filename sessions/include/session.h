@@ -1,3 +1,4 @@
+/* session.h */
 #ifndef SKETCH_CORE_SESSION_H
 #define SKETCH_CORE_SESSION_H 1
 

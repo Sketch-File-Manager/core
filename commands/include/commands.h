@@ -1,3 +1,4 @@
+/* commands.h */
 #ifndef SKETCH_CORE_COMMANDS_H
 #define SKETCH_CORE_COMMANDS_H
 

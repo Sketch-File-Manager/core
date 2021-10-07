@@ -1,3 +1,4 @@
+/* codes.h */
 #ifndef SKETCH_CORE_CODES_H
 #define SKETCH_CORE_CODES_H
 
