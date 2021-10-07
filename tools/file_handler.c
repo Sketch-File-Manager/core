@@ -150,24 +150,20 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     while (c_queue->size != 0) {
         curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
-        if (strcmp(curr_element_name[curr_element_name_s - 1], "..") == 0 || strcmp(curr_element_name[curr_element_name_s - 1], ".") == 0) {
+        if (strcmp(curr_element_name[curr_element_name_s - 1], "..") == 0     ||
+            strcmp(curr_element_name[curr_element_name_s - 1], ".")  == 0     ||
+            strstr(curr_element_name[curr_element_name_s - 1], "..") != NULL  ||
+            curr_element_name[curr_element_name_s - 1][strlen(curr_element_name[curr_element_name_s - 1]) - 1] == '.') {
+
             free(pop(c_queue));
             FREE_ARRAY(curr_element_name, curr_element_name_s);
             continue;
         }
-
-        printf("%s\n", (char *) peek(c_queue));
         result = stat((const char *) peek(c_queue), &curr_element_stat);
         if (result == -1) {
-            // Free the current allocated space and return error.
-            while (c_queue->size != 0)
-                free(pop(c_queue));
-
-            free(c_queue);
-            for (int fr = 0; fr < current_path; fr++) free(tmp_files[fr]);
-            free(tmp_files[current_path]);
-            free(tmp_files);
-            return errno;
+            FREE_ARRAY(curr_element_name, curr_element_name_s);
+            free(pop(c_queue));
+            continue;
         }
 
         tmp_files[current_path]->f_name = str_add(curr_element_name[curr_element_name_s - 1], NULL);
