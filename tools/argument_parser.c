@@ -10,6 +10,7 @@
 #include <commands.h>
 #include <config_parser.h>
 #include <mem.h>
+#include <include/functions.h>
 
 #define VERSION                 "1.0.0"
 
@@ -222,7 +223,7 @@ int parse(int argc, char **argv) {
     else if (commands[index].c_argc == 4) result = ((exec_four_arg *) commands[index].c_exec)(argv[3 - offset], argv[4 - offset], argv[5 - offset], argv[6 - offset]);
     // if is a simple command show some logs.
     if (strcmp(argv[1], "do") == 0 && result != SUCCESS)
-        logger(ERROR, "Failed to execute simple command with error code: ", "test ", result, NULL);
+        logger(ERROR, "Failed to execute simple command with error code: ", "test ", to_string(result), NULL);
 
     return result;
 }

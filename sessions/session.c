@@ -39,7 +39,7 @@ void session_start() {
     if (result == SUCCESS)
         logger(INFO, "Session created successfully.\n", "New session id: ", name, NULL);
     else
-        logger(ERROR, "Failed to create session with error code: ", result, NULL);
+        logger(ERROR, "Failed to create session with error code: ", to_string(result), NULL);
 
     free(name);
 }
@@ -59,7 +59,7 @@ void session_end(char *id) {
     if (result == SUCCESS)
         logger(INFO, "Session ended.", NULL);
     else
-        logger(ERROR, "Session failed to end with error code: ", result, NULL);
+        logger(ERROR, "Session failed to end with error code: ", to_string(result), NULL);
 
     free(name);
 }
@@ -80,7 +80,7 @@ void session_use(char *id) {
         if (result == SUCCESS)
             logger(INFO, "Current session is set to: ", name, NULL);
         else
-            logger(ERROR, "Failed to use session with error code: ", result, NULL);
+            logger(ERROR, "Failed to use session with error code: ", to_string(result), NULL);
     } else logger(WARNING, "Session does not exist.", NULL);
 
     free(name);
@@ -109,7 +109,7 @@ void session_run(char *id) {
             // Add to the start as executed.
             int append_result = append_to_start(name, "executed");
             if (append_result != SUCCESS) {
-                logger(ERROR, "Failed to execute session with error code: ", append_result, NULL);
+                logger(ERROR, "Failed to execute session with error code: ", to_string(append_result), NULL);
                 flag = 1;
             }
 
@@ -122,14 +122,14 @@ void session_run(char *id) {
                     int exec_result = execute(line);
 
                     if (exec_result != SUCCESS) {
-                        logger(ERROR, "Failed to execute a part of the session with error code: ", exec_result,
+                        logger(ERROR, "Failed to execute a part of the session with error code: ", to_string(exec_result),
                                "\nException line: ", i, NULL);
                         flag = 1;
                     }
                 }
             }
         } else logger(WARNING, "Session is already executed.", NULL);
-    } else logger(ERROR, "Failed to read session with error code: ", read_result, NULL);
+    } else logger(ERROR, "Failed to read session with error code: ", to_string(read_result), NULL);
 
     free(name);
     for (int i = 0; i < n; ++i)
@@ -166,7 +166,7 @@ void session_show(char *id) {
 
     int result = read_session(name, &lines, &n);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to open session with error code: ", result, NULL);
+        logger(ERROR, "Failed to open session with error code: ", to_string(result), NULL);
     else {
         for (size_t i = 0; i < n; i++)
             printf("%s\n", lines[i]);
@@ -185,7 +185,7 @@ void session_list() {
 
     int result = list_sessions(&lines, &n);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to list sessions with error code: ", result, NULL);
+        logger(ERROR, "Failed to list sessions with error code: ", to_string(result), NULL);
 
     for (size_t i = 0; i < n; i++)
         printf("[%d] %s\n", ((int) i) + 1, lines[i]);

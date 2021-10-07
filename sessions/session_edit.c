@@ -12,7 +12,7 @@ static char *check_current() {
     char *current;
     int result = get_option(CURRENT_SESSION_ID, &current);
     if (result != SUCCESS)
-        logger(WARNING, "Failed to find current session with error code: ", result, NULL);
+        logger(WARNING, "Failed to find current session with error code: ", to_string(result), NULL);
 
     return current;
 }
@@ -25,7 +25,7 @@ void session_command_exit() {
     if (result == SUCCESS)
         logger(INFO, "Exited current session.", NULL);
     else
-        logger(ERROR, "Failed to exit current session with error code: ", result, NULL);
+        logger(ERROR, "Failed to exit current session with error code: ", to_string(result), NULL);
 }
 
 void session_command_undo() {
@@ -34,7 +34,7 @@ void session_command_undo() {
 
     int result = delete_last_line(current);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to undo command with error code: ", result, NULL);
+        logger(ERROR, "Failed to undo command with error code: ", to_string(result), NULL);
 }
 
 void session_command_mkdir(char *dst, char *folder, char *permissions) {
@@ -47,7 +47,7 @@ void session_command_mkdir(char *dst, char *folder, char *permissions) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_dst);
     free(a_folder);
@@ -64,7 +64,7 @@ void session_command_mkfile(char *dst, char *file, char *permissions) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_dst);
     free(a_file);
@@ -81,7 +81,7 @@ void session_command_copy(char *src, char *dst) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_src);
     free(a_dst);
@@ -98,7 +98,7 @@ void session_command_move(char *src, char *dst) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_src);
     free(a_dst);
@@ -114,7 +114,7 @@ void session_command_rename(char *src, char *name) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_src);
     free(cmd);
@@ -130,7 +130,7 @@ void session_command_edit(char *src, char *flag, char *content) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_src);
     free(a_content);
@@ -149,7 +149,7 @@ void session_command_permission(char *src, char *permissions, char *recursive) {
 
     int result = append_to_end(current, cmd);
     if (result != SUCCESS)
-        logger(ERROR, "Failed to add command with error code: ", result, NULL);
+        logger(ERROR, "Failed to add command with error code: ", to_string(result), NULL);
 
     free(a_src);
     free(cmd);

@@ -94,4 +94,6 @@ extern char *rand_string(size_t size);
  */
 extern char *analyze_string_spaces(char *str);
 
+extern char *to_string(int number);
+
 #endif

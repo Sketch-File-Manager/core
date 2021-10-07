@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <include/codes.h>
 #include <include/functions.h>
+#include <stdlib.h>
 
 void create_requirements() {
     char *sketch_folder_loc = fix_path(SKETCH_FOLDER_LOCATION, TRUE);
@@ -26,5 +27,6 @@ void create_requirements() {
 
 int main(int argc, char **argv) {
     create_requirements();
+
     return parse(argc, argv);
 }

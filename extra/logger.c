@@ -1,7 +1,6 @@
 /* logger.c */
 #include <stdio.h>
 #include <stdarg.h>
-#include <stdlib.h>
 #include "include/logger.h"
 
 void logger(int priority, char *message, ...) {
@@ -27,14 +26,15 @@ void logger(int priority, char *message, ...) {
 
     printf("%s", message);
 
-    char *p = "";
+    char *p;
     while (1) {
         p = va_arg(args, char *);
 
         if (p == NULL) break;
-//        printf("%s", p);
+        printf("%s", p);
     }
     va_end(args);
 
     putchar('\n');
+    printf("\033[0;37m");
 }
