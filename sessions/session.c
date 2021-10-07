@@ -8,6 +8,7 @@
 #include <include/codes.h>
 #include <include/functions.h>
 #include <include/logger.h>
+#include <mem.h>
 
 static int check_current() {
     char *current;
@@ -26,7 +27,8 @@ void session_start() {
         return logger(WARNING, "A session is already in use.", NULL);
 
     int name_len = 10;
-    char *name = (char *) calloc(name_len + 9 + 1, sizeof(char));
+    char *name;
+    ALLOCATE_MEM(name, name_len + 9 + 1, sizeof(char));
     strcat(name, rand_string(10));
 
     if (endsWith(name, ".session") == FALSE)
@@ -45,7 +47,8 @@ void session_end(char *id) {
     if (check_current() == TRUE)
         return logger(WARNING, "A session is already in use.");
 
-    char *name = (char *) calloc(strlen(id) + 9 + 1, sizeof(char));
+    char *name;
+    ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
     if (endsWith(name, ".session") == FALSE)
@@ -64,7 +67,8 @@ void session_use(char *id) {
     if (check_current() == TRUE)
         return logger(WARNING, "A session is already in use.", NULL);
 
-    char *name = (char *) calloc(strlen(id) + 9 + 1, sizeof(char));
+    char *name;
+    ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
     if (endsWith(name, ".session") == FALSE)
@@ -85,7 +89,8 @@ void session_run(char *id) {
     if (check_current() == TRUE)
         return logger(WARNING, "A session is already in use.", NULL);
 
-    char *name = (char *) calloc(strlen(id) + 9 + 1, sizeof(char));
+    char *name;
+    ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
     if (endsWith(name, ".session") == FALSE)
@@ -148,7 +153,8 @@ void session_show(char *id) {
     if (check_current() == TRUE)
         return logger(WARNING, "A session is already in use.", NULL);
 
-    char *name = (char *) calloc(strlen(id) + 9 + 1, sizeof(char));
+    char *name;
+    ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
     if (endsWith(name, ".session") == FALSE)
