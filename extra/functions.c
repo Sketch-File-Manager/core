@@ -191,8 +191,6 @@ char *analyze_string_spaces(char *str) {
     return analyzed;
 }
 
-
-
 char *to_string(int number) {
     static char result[10]; // Max 2 ** 32 - 1
     sprintf(result, "%d", number);
