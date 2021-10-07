@@ -91,6 +91,11 @@ static int copy_dir_contents(char *src, const char *dst) {
            witch is the sub path of the src. This is necessary to concatenate in the right of the
            destination path, in order to build the correct location for the specific element.
            end result: /home/username/test/test/copy.txt
+                      |                   |    |        |
+                       ------------------  ---   ------
+                            |                |       |
+                            v                v       v
+                       destination      sub path   file
         */
         for (int curr_el = 0; curr_el < element_split_s; curr_el++) {
             REALLOCATE_MEM(tmp_path, (strlen(tmp_path) + strlen(element_split[curr_el]) + 2) * sizeof(char));

@@ -9,6 +9,7 @@
 #include <include/queue.h>
 #include <errno.h>
 #include <stdio.h>
+#include <mem.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
     // allocate enough space for the full path.
@@ -130,25 +131,12 @@ int list_files_names(const char *path, char ***result_files, size_t *size) {
 }
 
 int get_info_of(char *path, file_info ***files, size_t *size) {
-    // TODO - Fix the crash problem in ls command.
-    /* Crash summary:
-           ls result strange results:
-                  /home/username/Desktop/..
-                  /home/username/Desktop/..py   ????
-
-            brakes at:
-                  result = stat((const char *) peek(c_queue), &curr_element_stat);
-
-            problem:
-                  result is -1, and occurs an errno return that causes the program to crash.
-                  The reason behind the result = -1 is that the ..py element does not exist so
-                  the stat function can't read the information about an element tha doesn't exist.
-     */
     struct stat curr_element_stat;
     queue *c_queue = create_empty_queue();
 
-    file_info **tmp_files = calloc(1, sizeof(file_info *));
-    tmp_files[0] = calloc(1, sizeof(file_info));
+    file_info **tmp_files;
+    ALLOCATE_MEM(tmp_files, 1, sizeof(file_info *));
+    ALLOCATE_MEM(tmp_files[0], 1, sizeof(file_info));
     read_contents_of(path, c_queue);
 
     char **curr_element_name; // file or directory name.
@@ -158,22 +146,27 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     int result;
     int current_path = 0;
     while (c_queue->size != 0) {
-        printf("%s\n", (const char *) peek(c_queue));
+        curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
+
+        if (strcmp(curr_element_name[curr_element_name_s - 1], "..") == 0 || strcmp(curr_element_name[curr_element_name_s - 1], ".") == 0) {
+            free(pop(c_queue));
+            FREE_ARRAY(curr_element_name, curr_element_name_s);
+            continue;
+        }
+
+        printf("%s\n", (char *) peek(c_queue));
         result = stat((const char *) peek(c_queue), &curr_element_stat);
         if (result == -1) {
             // Free the current allocated space and return error.
-            while (c_queue->size != 0) {
-                removed_item = pop(c_queue);
-                free(removed_item);
-            }
+            while (c_queue->size != 0)
+                free(pop(c_queue));
+
             free(c_queue);
             for (int fr = 0; fr < current_path; fr++) free(tmp_files[fr]);
             free(tmp_files[current_path]);
             free(tmp_files);
             return errno;
         }
-
-        curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
         tmp_files[current_path]->f_name = str_add(curr_element_name[curr_element_name_s - 1], NULL);
         tmp_files[current_path]->f_user_id = curr_element_stat.st_uid;
@@ -190,13 +183,11 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
         if (is_dir((const char *) removed_item) == TRUE)
             read_contents_of((char *) removed_item, c_queue);
 
-        for (int fr = 0; fr < curr_element_name_s; fr++) free(curr_element_name[fr]);
-
-        free(curr_element_name);
+        FREE_ARRAY(curr_element_name, curr_element_name_s);
         free(removed_item);
         ++current_path;
-        tmp_files = realloc(tmp_files, sizeof(file_info *) * (current_path + 1));
-        tmp_files[current_path] = calloc(1, sizeof(file_info));
+        REALLOCATE_MEM(tmp_files, sizeof(file_info *) * (current_path + 1));
+        ALLOCATE_MEM(tmp_files[current_path], 1, sizeof(file_info));
     }
     *size = current_path;
     *files = tmp_files;
