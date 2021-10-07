@@ -1,8 +1,4 @@
 /* executor.h */
-//
-// Created by george on 9/1/21.
-//
-
 #ifndef SKETCH_CORE_EXECUTOR_H
 #define SKETCH_CORE_EXECUTOR_H
 

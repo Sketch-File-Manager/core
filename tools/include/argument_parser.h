@@ -1,6 +1,6 @@
 /* argument_parser.h */
 #ifndef SKETCH_CORE_ARGUMENT_PARSER_H
-#define SKETCH_CORE_ARGUMENT_PARSER_H 1
+#define SKETCH_CORE_ARGUMENT_PARSER_H
 
 /**
  * An argument parser that calls the designed functions for each acceptable argument.

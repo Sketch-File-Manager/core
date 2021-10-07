@@ -63,7 +63,7 @@ static int copy_dir_contents(char *src, const char *dst) {
     int flag = FALSE;
 
     int result = SUCCESS;
-    while (c_queue->size != 0) {
+    while (c_queue->q_size != 0) {
         // Get the name of the current element.
         element_split = split_except((char *) peek(c_queue), '/', '\0', &element_split_s);
 
@@ -239,7 +239,7 @@ int command_permissions(char *src, mode_t permissions, unsigned int recursive) {
         // Read the first contents.
         read_contents_of(src, c_queue);
 
-        while (c_queue->size != 0) {
+        while (c_queue->q_size != 0) {
             int result = chmod((const char *) peek(c_queue), permissions);
             if (result == -1)
                 return errno;
@@ -279,7 +279,7 @@ int command_ls(char *directory) {
         printf("    \"name\": \"%s\"\n", list[i]->f_name);
         printf("    \"location\": \"%s\"\n", f_directory);
         printf("    \"permissions\": \"%u\"\n", list[i]->f_permissions & 0777);
-        printf("    \"size\": \"%ld\"\n", list[i]->f_size);
+        printf("    \"q_size\": \"%ld\"\n", list[i]->f_size);
         // Owners' ids
         printf("    \"group_id\": \"%u\"\n", list[i]->f_group_id);
         printf("    \"user_id\": \"%u\"\n", list[i]->f_user_id);

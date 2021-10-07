@@ -2,10 +2,10 @@
 #ifndef SKETCH_CORE_LOGGER_H
 #define SKETCH_CORE_LOGGER_H
 
-#define INFO 0
-#define WARNING 1
-#define ERROR 2
-#define DEBUG 3
+#define INFO        0
+#define WARNING     1
+#define ERROR       2
+#define DEBUG       3
 
 /**
  * Logs a message to the stdout.

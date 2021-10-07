@@ -1,6 +1,6 @@
 /* session_edit.h */
 #ifndef SKETCH_CORE_SESSION_EDIT_H
-#define SKETCH_CORE_SESSION_EDIT_H 1
+#define SKETCH_CORE_SESSION_EDIT_H
 
 /**
  * Exits the current session.

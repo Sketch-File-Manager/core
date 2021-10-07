@@ -147,7 +147,7 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
 
     int result;
     int current_path = 0;
-    while (c_queue->size != 0) {
+    while (c_queue->q_size != 0) {
         curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
 
         if (strcmp(curr_element_name[curr_element_name_s - 1], "..") == 0     ||

@@ -1,6 +1,6 @@
 /* config_parser.h */
 #ifndef SKETCH_CORE_CONFIG_PARSER_H
-#define SKETCH_CORE_CONFIG_PARSER_H 1
+#define SKETCH_CORE_CONFIG_PARSER_H
 
 /**
  * Check and create the config file if missing.

@@ -1,6 +1,6 @@
 /* session.h */
 #ifndef SKETCH_CORE_SESSION_H
-#define SKETCH_CORE_SESSION_H 1
+#define SKETCH_CORE_SESSION_H
 
 /**
  * Starts a new session with a random id.

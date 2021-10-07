@@ -1,6 +1,6 @@
 /* functions.h */
 #ifndef SKETCH_CORE_FUNCTIONS_H
-#define SKETCH_CORE_FUNCTIONS_H 1
+#define SKETCH_CORE_FUNCTIONS_H
 
 
 #include <include/queue.h>
