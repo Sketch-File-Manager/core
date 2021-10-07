@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <stdarg.h>
 #include <time.h>
+#include <mem.h>
 
 int endsWith(const char *str, const char *suffix) {
     if (!str || !suffix)
@@ -32,7 +33,8 @@ char *str_add(const char *str1, ...) {
     va_list args;
     va_start(args, str1);
 
-    char *result = calloc(strlen(str1) + 1, sizeof(char));
+    char *result;
+    ALLOCATE_MEM(result, strlen(str1) + 1, sizeof(char));
     strcpy(result, str1);
 
     char *str = "";
@@ -42,7 +44,7 @@ char *str_add(const char *str1, ...) {
 
         if (str == NULL) break;
 
-        result = realloc(result, (strlen(result) + strlen(str) + 1) * sizeof(char));
+        REALLOCATE_MEM(result, (strlen(result) + strlen(str) + 1) * sizeof(char));
         strcat(result, str);
     }
     va_end(args);
@@ -82,11 +84,13 @@ char *fix_path(const char *path, int add_slash) {
 }
 
 char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n) {
-    char **ret = (char **) calloc(1, sizeof(char *));
+    char **ret;
+    ALLOCATE_MEM(ret, 1, sizeof(char *));
     int a = 0;
     *n = 0;
 
-    char *token = calloc(strlen(str) + 1, sizeof(char));
+    char *token;
+    ALLOCATE_MEM(token, strlen(str) + 1, sizeof(char));
     int k = 0;
 
     for (int i = 0; str[i] != '\0'; i++) {
@@ -98,11 +102,11 @@ char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n
 
         ret[a] = str_add(token, NULL);
         a++;
-        ret = realloc(ret, (a + 1) * sizeof(char *));
+        REALLOCATE_MEM(ret, (a + 1) * sizeof(char *));
         // Free the previous pointer.
         free(token);
         // Allocate space for new token.
-        token = calloc(strlen(str) + 1, sizeof(char));
+        ALLOCATE_MEM(token, strlen(str) + 1, sizeof(char));
         k = 0;
     }
 
@@ -155,7 +159,8 @@ char *rand_string(size_t size) {
     srand(time(NULL));
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
-    char *str = (char *) calloc(size + 1, sizeof(char));
+    char *str;
+    ALLOCATE_MEM(str, size + 1, sizeof(char));
     if (size) {
         --size;
         for (size_t n = 0; n < size; n++) {
@@ -172,7 +177,8 @@ char *analyze_string_spaces(char *str) {
     // count spaces
     for (int i = 0; str[i]; i++, str[i] == ' ' ? space_count++ : 0);
 
-    char *analyzed = (char *) calloc(strlen(str) + space_count + 1, sizeof(char));
+    char *analyzed;
+    ALLOCATE_MEM(analyzed, strlen(str) + space_count + 1, sizeof(char));
     for (int i = 0, k = 0; str[i]; i++, k++) {
         if (str[i] == ' ') {
             analyzed[k] = '\\';

@@ -41,7 +41,7 @@ int read_file(const char *file_path, char **config_content) {
     if (fd == -1) return errno;
 
     // allocate enough space for the content of the file.
-    buffer = calloc(file_len, sizeof(char));
+    ALLOCATE_MEM(buffer, file_len, sizeof(char));
     // read the file.
     if (read(fd, buffer, file_len) == -1)
         return errno;
@@ -107,7 +107,8 @@ int list_files_names(const char *path, char ***result_files, size_t *size) {
     if (dir == NULL) return errno;
 
     size_t files_s = 1;
-    char **files = calloc(1, sizeof(char *));
+    char **files;
+    ALLOCATE_MEM(files, 1, sizeof(char *));
     char *current_file = NULL;
     int index = 0;
 
@@ -119,7 +120,7 @@ int list_files_names(const char *path, char ***result_files, size_t *size) {
         files[index] = str_add(current_file, NULL);
 
         ++files_s;
-        files = realloc(files, sizeof(char *) * files_s);
+        REALLOCATE_MEM(files, sizeof(char *) * files_s);
         index++;
     }
     --files_s;

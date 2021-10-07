@@ -8,6 +8,7 @@
 #include <include/logger.h>
 #include <commands.h>
 #include <config_parser.h>
+#include <mem.h>
 
 #define VERSION                 "1.0.0"
 
@@ -60,8 +61,8 @@ typedef int exec_three_arg(char *, char *, char *);
 typedef int exec_four_arg(char *, char *, char *, char *);
 
 struct command {
-    char *c_name;
-    int c_argc;
+    char         *c_name;
+    int           c_argc;
     exec_general *c_exec;
 };
 
@@ -168,7 +169,8 @@ static inline int parse_double(char **argv) {
     if (argv[1] == NULL || argv[2] == NULL) return -1;
 
     // form the full result_command.
-    char *name = calloc(strlen(argv[1]) + strlen(argv[2]) + 2, sizeof(char));
+    char *name;
+    ALLOCATE_MEM(name, strlen(argv[1]) + strlen(argv[2]) + 2, sizeof(char));
     strcat(name, argv[1]);
     strcat(name, " ");
     strcat(name, argv[2]);

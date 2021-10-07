@@ -2,16 +2,20 @@
 #include <malloc.h>
 #include <memory.h>
 #include <include/codes.h>
+#include <mem.h>
 
 queue *create_empty_queue() {
-    return calloc(1, sizeof(queue));
+    queue *tmp_queue;
+    ALLOCATE_MEM(tmp_queue, 1, sizeof(queue));
+    return tmp_queue;
 }
 
 int add(queue *c_queue, void *item) {
     if (c_queue == NULL || item == NULL) return -1;
 
     // Make the new c_queue to hold the new item.
-    queue_node *new_node = calloc(1, sizeof(queue_node));
+    queue_node *new_node;
+    ALLOCATE_MEM(new_node, 1, sizeof(queue_node));
     new_node->q_item = item;
     new_node->q_next_node = NULL;
 

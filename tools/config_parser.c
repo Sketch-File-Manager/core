@@ -6,6 +6,7 @@
 #include <include/functions.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <mem.h>
 
 
 int create_config_file() {
@@ -40,13 +41,13 @@ int get_option(const char *option, char **result) {
     char *current_session = strtok(NULL, "\n");
 
     if (current_session == NULL) {
-        *result = calloc(1, sizeof(char));
+        ALLOCATE_MEM(*result, 1, sizeof(char));
         strcpy(*result, "");
         return SUCCESS;
     }
 
     // Allocate enough space for the current session.
-    *result = calloc(strlen(current_session) + 1, sizeof(char));
+    ALLOCATE_MEM(*result, strlen(current_session) + 1, sizeof(char));
     // set the current session to current.
     strcpy(*result, current_session);
 

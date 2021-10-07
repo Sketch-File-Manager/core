@@ -8,6 +8,7 @@
 #include <include/codes.h>
 #include <include/functions.h>
 #include <errno.h>
+#include <mem.h>
 
 int delete_file(const char *name) {
     char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);
@@ -44,19 +45,21 @@ int create_file(const char *name) {
 static inline char *double_array_to_string(const char **d_array, size_t size) {
 
     if (size == 1) {
-        char *tmp = calloc(strlen(d_array[0]) + 1, sizeof(char));
+        char *tmp;
+        ALLOCATE_MEM(tmp, strlen(d_array[0]) + 1, sizeof(char));
         strcpy(tmp, d_array[0]);
         return tmp;
     }
 
     // allocate the space of the new string.
     size_t total_size = 1 + size;
-    char *string_form = calloc(1 + size, sizeof(char));
+    char *string_form;
+    ALLOCATE_MEM(string_form, size + 1, sizeof(char));
     // save each element on the as sequence of strings.
     for (int element = 0; element < size; element++) {
         // Increase the space dynamically.
         total_size += strlen(d_array[element]);
-        string_form = realloc(string_form, sizeof(char) * total_size);
+        REALLOCATE_MEM(string_form, sizeof(char) * total_size);
         strcat(string_form, d_array[element]);
         strcat(string_form, "\n");
     }
@@ -77,7 +80,8 @@ int delete_last_line(const char *name) {
 
     // Allocate space for one element.
     size_t session_lines_s = 1;
-    char **session_lines = calloc(1, sizeof(char *));
+    char **session_lines;
+    ALLOCATE_MEM(session_lines, 1, sizeof(char *));
 
     // Get the first line.
     char *current_line = strtok(session_file, "\n");
@@ -88,12 +92,12 @@ int delete_last_line(const char *name) {
     // Fill the array with the lines in the session file.
     for (size_t s = 0; current_line != NULL; s++) {
         // Allocate space for the current line.
-        session_lines[s] = calloc(strlen(current_line) + 1, sizeof(char));
+        ALLOCATE_MEM(session_lines[s], strlen(current_line) + 1, sizeof(char));
         strcpy(session_lines[s], current_line);
         // Increase the line number in the array, because we have more lines.
         ++session_lines_s;
         // Re allocate space to fit the new line.
-        session_lines = realloc(session_lines, sizeof(char *) * session_lines_s);
+        REALLOCATE_MEM(session_lines, sizeof(char *) * session_lines_s);
         // Jump to the next line.
         current_line = strtok(NULL, "\n");
     }
@@ -128,7 +132,8 @@ static int append_to(const char *name, const char *content, int is_start) {
     if (read_result != SUCCESS) return read_result;
 
     size_t new_file_s = strlen(content) + strlen(session_file);
-    char *new_file = calloc(new_file_s + 2, sizeof(char));
+    char *new_file;
+    ALLOCATE_MEM(new_file, new_file_s + 2, sizeof(char));
 
     if (is_start == TRUE) {
         strcpy(new_file, content);
@@ -171,8 +176,8 @@ int read_session(const char *name, char ***result, size_t *size) {
     char *current_line = strtok(session_file, "\n");
 
     if (current_line == NULL) {
-        lines = calloc(1, sizeof(char *));
-        lines[0] = calloc(1, sizeof(char));
+        ALLOCATE_MEM(lines, 1, sizeof(char *));
+        ALLOCATE_MEM(lines[0], 1, sizeof(char));
         strcpy(lines[0], "");
         *size = 0;
         *result = lines;
@@ -180,10 +185,10 @@ int read_session(const char *name, char ***result, size_t *size) {
     }
 
     size_t session_file_lines_s = 1;
-    lines = calloc(1, sizeof(char *));
-
-    lines[0] = calloc(strlen(current_line) + 1, sizeof(char));
+    ALLOCATE_MEM(lines, 1, sizeof(char *));
+    ALLOCATE_MEM(lines[0], strlen(current_line) + 1, sizeof(char));
     strcpy(lines[0], current_line);
+
     for (size_t line = 1;; line++) {
         current_line = strtok(NULL, "\n");
         if (current_line == NULL) break;
@@ -192,7 +197,7 @@ int read_session(const char *name, char ***result, size_t *size) {
         ++session_file_lines_s;
         lines = realloc(lines, sizeof(char *) * session_file_lines_s);
         // Allocate space for the new line.
-        lines[line] = calloc(strlen(current_line) + 1, sizeof(char));
+        ALLOCATE_MEM(lines[line], strlen(current_line) + 1, sizeof(char));
         strcpy(lines[line], current_line);
     }
     *size = session_file_lines_s;
@@ -226,14 +231,15 @@ int list_sessions(char ***result, size_t *size) {
 
     if (list_result == SUCCESS) {
         size_t session_files_s = 1;
-        char **session_files = calloc(1, sizeof(char *));
+        char **session_files;
+        ALLOCATE_MEM(session_files, 1, sizeof(char *));
 
         for (int file = 0; file < files_s; file++) {
             if (endsWith(files[file], ".session") == TRUE) {
-                session_files[session_files_s - 1] = calloc(strlen(files[file]) + 1, sizeof(char));
+                ALLOCATE_MEM(session_files[session_files_s - 1], strlen(files[file]) + 1, sizeof(char));
                 strcpy(session_files[session_files_s - 1], files[file]);
                 ++session_files_s;
-                session_files = realloc(session_files, sizeof(char *) * session_files_s);
+                REALLOCATE_MEM(session_files, sizeof(char *) * session_files_s);
             }
             free(files[file]);
         }
