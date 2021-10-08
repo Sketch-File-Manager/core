@@ -19,7 +19,7 @@
 #define SESSION_FOLDER_LOCATION     "~/.local/share/sketch/core/sessions/"
 
 // Config
-#define CURRENT_SESSION_ID          "current_session:"
-#define BYTE_RATE                   "byte_rate:"
+#define CURRENT_SESSION_ID          "current_session"
+#define BYTE_RATE                   "byte_rate"
 
 #endif

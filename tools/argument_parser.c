@@ -63,9 +63,9 @@ typedef int exec_three_arg(char *, char *, char *);
 typedef int exec_four_arg(char *, char *, char *, char *);
 
 struct command {
+    exec_general *c_exec;
     char         *c_name;
     int           c_argc;
-    exec_general *c_exec;
 };
 
 static int print_help() {

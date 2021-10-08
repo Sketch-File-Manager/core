@@ -10,12 +10,14 @@
 
 
 int create_config_file() {
-    // TODO - Add the option for the byte rate in the config file with default value 516 bytes.
     char *absolute_path = fix_path(CONFIG_FILE_LOCATION, FALSE);
+    char *config_file = str_add(CURRENT_SESSION_ID, ":\n",
+                                "byte_rate: 516", "\n",
+                                NULL);
 
     // try to open the file, and in case that it does not exist create it.
     int config_fd = open(absolute_path, O_CREAT, 0700);
-    int result = write_file(absolute_path, CURRENT_SESSION_ID, strlen(CURRENT_SESSION_ID));
+    int result = write_file(absolute_path, config_file, strlen(config_file));
     if (result != SUCCESS) {
         free(absolute_path);
         return result;
@@ -23,6 +25,7 @@ int create_config_file() {
 
     close(config_fd);
     free(absolute_path);
+    free(config_file);
 
     return SUCCESS;
 }
@@ -58,27 +61,72 @@ int get_option(const char *option, char **result) {
 }
 
 int set_option(const char *option, const char *value) {
-    // TODO - Make set option.
+    char *config = NULL;
+    size_t config_s = 0;
+    char *path = fix_path(CONFIG_FILE_LOCATION, FALSE);
+
+    int code = read_file(path, &config);
+    if (code != SUCCESS) return code;
+
+    char **options = NULL;
+    ALLOCATE_MEM(options, 1, sizeof(char *));
+
+    char *curr_option = strtok(config, "\n");
+    config_s += strlen(curr_option);
+    ALLOCATE_MEM(options[0], strlen(curr_option) + 1, sizeof(char));
+    strcpy(options[0], curr_option);
+
+
+    int index = 1;
+    int is_found = -1;
+    // Save the options.
+    while (1) {
+        curr_option = strtok(NULL, "\n");
+        if (curr_option == NULL) break;
+
+        // Position of the option.
+        if (strstr(curr_option, option) != NULL) is_found = index;
+
+        config_s += strlen(curr_option);
+        REALLOCATE_MEM(options, (index + 1) * sizeof(char *));
+        ALLOCATE_MEM(options[index], strlen(curr_option) + 1, sizeof(char));
+        strcpy(options[index], curr_option);
+    }
+    if (is_found == -1) return FALSE;
+
+    // Here we store the option with the new value.
+    char *option_changed_value = str_add(option, ": ", value, NULL);
+    // Replace the old
+    config_s -= strlen(options[is_found]);
+    free(options[is_found]);
+    options[is_found] = option_changed_value;
+
+    config_s += strlen(options[is_found]);
+
+    // Rebuild the config.
+    char *new_config;
+    ALLOCATE_MEM(new_config, config_s + 2, sizeof(char));
+    strcpy(new_config, options[0]);
+    strcat(new_config, "\n");
+
+    for (int build = 1; build < index + 1; build++) {
+        strcat(new_config, options[build]);
+        REALLOCATE_MEM(new_config, (strlen(new_config) + 2) * sizeof(char));
+        strcat(new_config, "\n");
+    }
+
+    code = write_file(path, new_config, config_s + 1);
+    if (code != SUCCESS) return code;
+
+    free(new_config);
+    FREE_ARRAY(options, index);
+    free(config);
+    free(path);
+    free(option_changed_value);
+
     return SUCCESS;
 }
 
 int set_byte_rate(const char *value) {
     return set_option(BYTE_RATE, value);
 }
-
-/*
-int set_current(const char *current) {
-    // Calculate the size of the new current session.
-    size_t new_current_session_s = strlen(current) + strlen(CURRENT_SESSION_ID);
-    // Allocate enough memory for the new current session.
-    char *new_current_session = str_add(CURRENT_SESSION_ID, " ", current, "\n", NULL);
-    char *absolute_path = fix_path(CONFIG_FILE_LOCATION, FALSE);
-
-    // Make the changes in the config file.
-    int result = write_file(absolute_path, new_current_session, new_current_session_s + 2);
-    free(new_current_session);
-    free(absolute_path);
-
-    return result;
-}
-*/

@@ -10,6 +10,7 @@
 #include <include/queue.h>
 #include <stdio.h>
 #include <mem.h>
+#include <config_parser.h>
 
 /** ================ COMMANDS ================ */
 
@@ -138,7 +139,12 @@ static int copy_dir_contents(char *src, const char *dst) {
             free(tmp);
         }
             // If the current element is file, then just copy it to the destination.
-        else result = copy_with_byte_rate(removed, send_to, 516);
+        else {
+            char *byte_rate_str;
+            get_option(BYTE_RATE, &byte_rate_str);
+            int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
+            result = copy_with_byte_rate(removed, send_to, byte_rate);
+        }
 
         if (result != SUCCESS) return result;
 
@@ -160,7 +166,12 @@ static int copy_file(char *src, const char *dst_folder) {
     char **src_split = split_except(src, '/', '\0', &src_split_s);
     // form the dst path.
     char *dst = str_add(fix, src_split[src_split_s - 1], NULL);
-    if (copy_with_byte_rate(src, dst, 516) != SUCCESS) return errno;
+    
+    char *byte_rate_str;
+    get_option(BYTE_RATE, &byte_rate_str);
+    int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
+
+    if (copy_with_byte_rate(src, dst, byte_rate) != SUCCESS) return errno;
 
     free(fix);
     FREE_ARRAY(src_split, src_split_s);
@@ -172,7 +183,7 @@ static int copy_file(char *src, const char *dst_folder) {
 
 int command_copy(char *src, char *dst_folder) {
     if (is_dir(src) == TRUE) return copy_dir_contents(src, dst_folder);
-    else return copy_file(src, dst_folder); // TODO - Don't take the rate by literal.
+    else return copy_file(src, dst_folder);
 }
 
 int command_move(char *src, char *dst_folder) {

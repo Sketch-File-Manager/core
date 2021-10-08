@@ -15,4 +15,4 @@
  */
 extern void logger(int priority, char *message, ...);
 
-#endif //SKETCH_CORE_LOGGER_H
+#endif

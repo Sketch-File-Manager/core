@@ -9,7 +9,6 @@
 #include <include/codes.h>
 #include <include/queue.h>
 #include <errno.h>
-#include <stdio.h>
 #include <mem.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
