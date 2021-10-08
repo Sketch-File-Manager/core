@@ -40,6 +40,15 @@ int command_mkfile(char *dst_folder, char *name, mode_t permissions) {
     return SUCCESS;
 }
 
+static inline int get_byte_rate() {
+    char *byte_rate_str;
+    if (get_option(BYTE_RATE, &byte_rate_str) != SUCCESS) return errno;
+
+    int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
+
+    return byte_rate;
+}
+
 static int copy_dir_contents(char *src, const char *dst) {
     queue *c_queue = create_empty_queue();
     read_contents_of(src, c_queue);
@@ -141,9 +150,8 @@ static int copy_dir_contents(char *src, const char *dst) {
         }
             // If the current element is file, then just copy it to the destination.
         else {
-            char *byte_rate_str;
-            get_option(BYTE_RATE, &byte_rate_str);
-            int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
+            int byte_rate = get_byte_rate();
+            if (byte_rate != SUCCESS) return errno;
             result = copy_with_byte_rate(removed, send_to, byte_rate);
         }
 
@@ -167,11 +175,9 @@ static int copy_file(char *src, const char *dst_folder) {
     char **src_split = split_except(src, '/', '\0', &src_split_s);
     // form the dst path.
     char *dst = str_add(fix, src_split[src_split_s - 1], NULL);
-    
-    char *byte_rate_str;
-    get_option(BYTE_RATE, &byte_rate_str);
-    int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
 
+    int byte_rate = get_byte_rate();
+    if (byte_rate != SUCCESS) return errno;
     if (copy_with_byte_rate(src, dst, byte_rate) != SUCCESS) return errno;
 
     free(fix);
@@ -258,10 +264,9 @@ static int unshift_to(const char *src, const char *to_insert) {
     ssize_t code = write(tmp_fd, to_insert, strlen(to_insert));
     if (code != SUCCESS) return errno;
 
-    char *byte_rate_str;
-    get_option(BYTE_RATE, &byte_rate_str);
-    int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
+    int byte_rate = get_byte_rate();
 
+    if (byte_rate != SUCCESS) return errno;
     // Build the result of unshift in the tmp file.
     char buffer[byte_rate];
     ssize_t result = read(src_fd, &buffer, byte_rate);
@@ -292,6 +297,8 @@ static int unshift_to(const char *src, const char *to_insert) {
 
     if (result != SUCCESS) return errno;
 
+    // Clean up.
+    remove("/tmp/sketch_tmp.tmp");
     return SUCCESS;
 }
 
