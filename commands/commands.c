@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <mem.h>
 #include <config_parser.h>
+#include <unistd.h>
 
 /** ================ COMMANDS ================ */
 
@@ -238,8 +239,69 @@ int command_rename(char *src, char *new_name) {
     return SUCCESS;
 }
 
+static inline int edit(const char *src, const char *content, int flag) {
+    int src_fd = open(src, flag);
+    ssize_t code = write(src_fd, content, strlen(content));
+
+    if (code != SUCCESS) return errno;
+
+    close(src_fd);
+    return SUCCESS;
+}
+
+static int unshift_to(const char *src, const char *to_insert) {
+    int tmp_fd = open("/tmp/sketch_tmp.tmp", O_CREAT | O_WRONLY | O_APPEND);
+    int src_fd = open(src, O_RDONLY);
+
+    if (tmp_fd != SUCCESS || src_fd != SUCCESS) return errno;
+
+    ssize_t code = write(tmp_fd, to_insert, strlen(to_insert));
+    if (code != SUCCESS) return errno;
+
+    char *byte_rate_str;
+    get_option(BYTE_RATE, &byte_rate_str);
+    int byte_rate = (int) strtol(byte_rate_str, &byte_rate_str, 10);
+
+    // Build the result of unshift in the tmp file.
+    char buffer[byte_rate];
+    ssize_t result = read(src_fd, &buffer, byte_rate);
+    while (result && result != -1) {
+        if (write(tmp_fd, buffer, result) != SUCCESS) return errno;
+
+        result = read(src_fd, &buffer, byte_rate);
+    }
+    close(src_fd);
+    if (result != -1) {
+        close(tmp_fd);
+        return errno;
+    }
+
+    // Open again the src file and delete all the previous content.
+    src_fd = open(src, O_WRONLY | O_APPEND);
+    if (src_fd != SUCCESS) return errno;
+
+    // Copy the complete content again back to src.
+    result = read(tmp_fd, &buffer, byte_rate);
+    while (result && result != -1) {
+        if (write(src_fd, buffer, result) != SUCCESS) return errno;
+
+        result = read(tmp_fd, &buffer, byte_rate);
+    }
+    close(src_fd);
+    close(tmp_fd);
+
+    if (result != SUCCESS) return errno;
+
+    return SUCCESS;
+}
+
+
 int command_edit(char *src, char *flag, char *content) {
-    // TODO - edit
+    if (strcmp(flag, "-a") == 0 || strcmp(flag, "--append") == 0) edit(src, content, O_APPEND | O_WRONLY);
+    else if (strcmp(flag, "-w") == 0 || strcmp(flag, "--write") == 0) edit(src, content, O_WRONLY);
+    else if (strcmp(flag, "-u") == 0 || strcmp(flag, "--unshift") == 0) unshift_to(src, content);
+    else return FALSE;
+
     return SUCCESS;
 }
 
