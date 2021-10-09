@@ -237,7 +237,7 @@ int list_sessions(char ***result, size_t *size) {
         ALLOCATE_MEM(session_files, 1, sizeof(char *));
 
         for (int file = 0; file < files_s; file++) {
-            if (endsWith(files[file], ".session") == TRUE) {
+            if (ends_with(files[file], ".session") == TRUE) {
                 ALLOCATE_MEM(session_files[session_files_s - 1], strlen(files[file]) + 1, sizeof(char));
                 strcpy(session_files[session_files_s - 1], files[file]);
                 ++session_files_s;

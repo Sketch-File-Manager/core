@@ -33,7 +33,7 @@ void session_start() {
     ALLOCATE_MEM(name, name_len + 9 + 1, sizeof(char));
     strcat(name, rand_string(10));
 
-    if (endsWith(name, ".session") == FALSE)
+    if (ends_with(name, ".session") == FALSE)
         strcat(name, ".session");
 
     int result = create_file(name);
@@ -53,7 +53,7 @@ void session_end(char *id) {
     ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
-    if (endsWith(name, ".session") == FALSE)
+    if (ends_with(name, ".session") == FALSE)
         strcat(name, ".session");
 
     int result = delete_file(name);
@@ -73,7 +73,7 @@ void session_use(char *id) {
     ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
-    if (endsWith(name, ".session") == FALSE)
+    if (ends_with(name, ".session") == FALSE)
         strcat(name, ".session");
 
     if (session_exists(name) == TRUE) {
@@ -95,7 +95,7 @@ void session_run(char *id) {
     ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
-    if (endsWith(name, ".session") == FALSE)
+    if (ends_with(name, ".session") == FALSE)
         strcat(name, ".session");
 
     char **lines;
@@ -159,7 +159,7 @@ void session_show(char *id) {
     ALLOCATE_MEM(name, strlen(id) + 9 + 1, sizeof(char));
     strcat(name, id);
 
-    if (endsWith(name, ".session") == FALSE)
+    if (ends_with(name, ".session") == FALSE)
         strcat(name, ".session");
 
     char **lines;

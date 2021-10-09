@@ -8,7 +8,7 @@
 #include <include/functions.h>
 #include <mem.h>
 
-int endsWith(const char *str, const char *suffix) {
+int ends_with(const char *str, const char *suffix) {
     if (!str || !suffix)
         return FALSE;
     size_t lenstr = strlen(str);
@@ -56,7 +56,7 @@ char *fix_path(const char *path, int add_slash) {
     }
 
     // Ends with /
-    if (add_slash == TRUE && endsWith(path, "/") == FALSE) {
+    if (add_slash == TRUE && ends_with(path, "/") == FALSE) {
         char *tmp = str_add(ret, "/", NULL);
         if (ret != NULL)
             free(ret);

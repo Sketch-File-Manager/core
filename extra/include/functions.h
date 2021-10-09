@@ -17,7 +17,7 @@
  * @param suffix The possible ending string.
  * @return TRUE or FALSE if it ends with or not.
  */
-extern int endsWith(const char *str, const char *suffix);
+extern int ends_with(const char *str, const char *suffix);
 
 /**
  * Return the concat of two strings.
