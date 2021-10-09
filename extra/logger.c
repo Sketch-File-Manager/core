@@ -1,7 +1,8 @@
 /* logger.c */
 #include <stdio.h>
 #include <stdarg.h>
-#include "include/logger.h"
+
+#include <include/logger.h>
 
 void logger(int priority, char *message, ...) {
     switch (priority) {

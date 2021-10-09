@@ -1,14 +1,15 @@
 /* session.c */
-#include <session.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
+#include <executor.h>
 #include <session_parser.h>
 #include <config_parser.h>
-#include <stdio.h>
-#include <executor.h>
 #include <include/codes.h>
 #include <include/functions.h>
 #include <include/logger.h>
+#include <session.h>
 #include <mem.h>
 
 static int check_current() {

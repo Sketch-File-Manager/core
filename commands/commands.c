@@ -276,7 +276,7 @@ static int unshift_to(const char *src, const char *to_insert) {
         result = read(src_fd, &buffer, byte_rate);
     }
     close(src_fd);
-    if (result != -1) {
+    if (result != SUCCESS) {
         close(tmp_fd);
         return errno;
     }

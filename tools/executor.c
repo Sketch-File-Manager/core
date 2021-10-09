@@ -1,11 +1,11 @@
 /* executor.c */
 #include <string.h>
-#include <include/codes.h>
-#include <include/functions.h>
 #include <stdlib.h>
 
-#include "executor.h"
+#include <executor.h>
 #include <commands.h>
+#include <include/codes.h>
+#include <include/functions.h>
 
 /**
  * Translate a string of permissions to bitmask.

@@ -2,9 +2,14 @@
 #ifndef SKETCH_CORE_QUEUE_H
 #define SKETCH_CORE_QUEUE_H
 
+typedef struct queue_node {
+    void              *q_item;
+    struct queue_node *q_next_node;
+} queue_node;
+
 typedef struct queue {
-    struct queue_node *q_first_node;
-    struct queue_node *q_last_node;
+    queue_node *q_first_node;
+    queue_node *q_last_node;
     int                q_size;
 } queue;
 
@@ -19,7 +24,10 @@ extern queue *create_empty_queue();
  * @param c_queue The queue.
  * @return The item's data.
  */
-extern void *peek(queue *c_queue);
+
+static inline void *peek(queue *c_queue) {
+    return c_queue->q_first_node->q_item;
+}
 
 /**
  * Add a new item to the queue_node.

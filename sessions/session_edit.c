@@ -1,12 +1,12 @@
 /* session_edit.c */
-#include <session_edit.h>
-#include <session_parser.h>
-#include <config_parser.h>
-#include <malloc.h>
 #include <string.h>
+
 #include <include/codes.h>
 #include <include/logger.h>
 #include <include/functions.h>
+#include <session_edit.h>
+#include <session_parser.h>
+#include <config_parser.h>
 
 static char *check_current() {
     char *current;

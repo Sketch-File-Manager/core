@@ -1,8 +1,8 @@
 /* config_parser.c */
 #include <string.h>
+
 #include <config_parser.h>
 #include <file_handler.h>
-#include <include/codes.h>
 #include <include/functions.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -125,8 +125,4 @@ int set_option(const char *option, const char *value) {
     free(option_changed_value);
 
     return SUCCESS;
-}
-
-int set_byte_rate(const char *value) {
-    return set_option(BYTE_RATE, value);
 }

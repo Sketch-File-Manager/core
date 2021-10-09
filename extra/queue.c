@@ -1,13 +1,9 @@
 /* queue.c */
-#include <include/queue.h>
 #include <memory.h>
+
+#include <include/queue.h>
 #include <include/codes.h>
 #include <mem.h>
-
-struct queue_node {
-    void              *q_item;
-    struct queue_node *q_next_node;
-};
 
 queue *create_empty_queue() {
     queue *tmp_queue;
@@ -19,8 +15,8 @@ int add(queue *c_queue, void *item) {
     if (c_queue == NULL || item == NULL) return -1;
 
     // Make the new c_queue to hold the new item.
-    struct queue_node *new_node;
-    ALLOCATE_MEM(new_node, 1, sizeof(struct queue_node));
+    queue_node *new_node;
+    ALLOCATE_MEM(new_node, 1, sizeof(queue_node));
     new_node->q_item = item;
     new_node->q_next_node = NULL;
 
@@ -48,10 +44,6 @@ int add(queue *c_queue, void *item) {
     return SUCCESS;
 }
 
-void *peek(queue *c_queue) {
-    return c_queue->q_first_node->q_item;
-}
-
 void *pop(queue *c_queue) {
     void *removed_item = c_queue->q_first_node->q_item;
 
@@ -59,7 +51,7 @@ void *pop(queue *c_queue) {
 
     --c_queue->q_size;
 
-    struct queue_node *tmp_node = c_queue->q_first_node;
+    queue_node *tmp_node = c_queue->q_first_node;
     c_queue->q_first_node = c_queue->q_first_node->q_next_node;
 
     free(tmp_node);

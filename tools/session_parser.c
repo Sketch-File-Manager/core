@@ -3,12 +3,14 @@
 #include <string.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
+
 #include <session_parser.h>
 #include <file_handler.h>
 #include <include/codes.h>
 #include <include/functions.h>
-#include <errno.h>
 #include <mem.h>
+
 
 int delete_file(const char *name) {
     char *with_home = fix_path(SESSION_FOLDER_LOCATION, TRUE);

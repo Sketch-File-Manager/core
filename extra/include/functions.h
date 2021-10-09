@@ -5,14 +5,11 @@
 
 #include <include/queue.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
 
-/**
- * Checks if a string starts with another string.
- * @param str The base string
- * @param pre The prefix.
- * @return TRUE or FALSE if it starts with or not
- */
-extern int startsWith(const char *str, const char *pre);
+#include <include/codes.h>
 
 /**
  * Checks if a string ends with another string.
@@ -34,20 +31,14 @@ extern char *str_add(const char *str1, ...);
  * Return the home directory.
  * @return The home directory.
  */
-extern char *get_home_path();
+static inline char *get_home_path() {
+    return str_add("/home/", getlogin(), "/", NULL);
+}
 
 /**
  * Replace ~ with home directory and add / at the end if missing.
  */
 extern char *fix_path(const char *path, int add_slash);
-
-/**
- * Returns the path with the home directory at the start.
- * @param filename The file's filename.
- * @param relative_path The relative path.
- * @return The fixed path.
- */
-extern char *merge_home_relative_filename(const char *filename, const char *relative_path);
 
 /**
  * Splits a string to an array of strings by a specific delimiter. It will skip the split_except by delimiter if the previous character is the same as the prev_delim_except.
@@ -64,7 +55,17 @@ extern char **split_except(char *str, char delimiter, char prev_delim_except, si
  * @param path The path to check.
  * @return TRUE if the path is directory, FALSE otherwise.
  */
-extern int is_dir(const char *path);
+
+static inline int is_dir(const char *path) {
+    struct stat path_stat;
+    if (stat(path, &path_stat) == -1) return FALSE;
+
+    if (path_stat.st_mode & S_IFDIR) return TRUE;
+
+    return FALSE;
+}
+
+
 
 /**
  * Reads all the contents of a directory and appends them to a given queue.
@@ -78,7 +79,13 @@ extern void read_contents_of(const char *directory, queue *c_queue);
  * @param src The file or directory.
  * @return The permissions.
  */
-extern __mode_t get_permissions_of(const char *src);
+
+static inline mode_t get_permissions_of(const char *src) {
+    struct stat path_stat;
+    if (stat(src, &path_stat) == -1) return -1;
+
+    return path_stat.st_mode;
+}
 
 /**
  * Generates a random string of a specific size.
@@ -94,6 +101,12 @@ extern char *rand_string(size_t size);
  */
 extern char *analyze_string_spaces(char *str);
 
-extern char *to_string(int number);
+static inline char *to_string(int number) {
+    static char result[10]; // Max 2 ** 32 - 1
+    sprintf(result, "%d", number);
+
+    return result;
+}
+
 
 #endif

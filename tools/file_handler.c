@@ -3,12 +3,13 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <file_handler.h>
 #include <dirent.h>
+#include <errno.h>
+
+#include <file_handler.h>
 #include <include/functions.h>
 #include <include/codes.h>
 #include <include/queue.h>
-#include <errno.h>
 #include <mem.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {

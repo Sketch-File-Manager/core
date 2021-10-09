@@ -1,13 +1,11 @@
 /* functions.c */
 #include <string.h>
-#include <unistd.h>
 #include <malloc.h>
-#include "include/functions.h"
-#include <include/codes.h>
-#include <sys/stat.h>
 #include <dirent.h>
 #include <stdarg.h>
 #include <time.h>
+
+#include <include/functions.h>
 #include <mem.h>
 
 int endsWith(const char *str, const char *suffix) {
@@ -24,12 +22,6 @@ int endsWith(const char *str, const char *suffix) {
     return TRUE;
 }
 
-int startsWith(const char *str, const char *pre) {
-    size_t lenpre = strlen(pre),
-            lenstr = strlen(str);
-    return lenstr < lenpre ? FALSE : memcmp(pre, str, lenpre) == 0;
-}
-
 char *str_add(const char *str1, ...) {
     va_list args;
     va_start(args, str1);
@@ -38,7 +30,7 @@ char *str_add(const char *str1, ...) {
     ALLOCATE_MEM(result, strlen(str1) + 1, sizeof(char));
     strcpy(result, str1);
 
-    char *str = "";
+    char *str;
 
     while (1) {
         str = va_arg(args, char *);
@@ -49,12 +41,6 @@ char *str_add(const char *str1, ...) {
         strcat(result, str);
     }
     va_end(args);
-
-    return result;
-}
-
-char *get_home_path() {
-    char *result = str_add("/home/", getlogin(), "/", NULL);
 
     return result;
 }
@@ -118,20 +104,6 @@ char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n
     return ret;
 }
 
-int is_dir(const char *path) {
-    struct stat path_stat;
-
-    if (stat(path, &path_stat) == -1)
-        return FALSE;
-
-    // do an and statement with bits of st_mode and bits of S_IFDIR.
-    // If is the same the result is ok, otherwise the result is zero.
-    if (path_stat.st_mode & S_IFDIR)
-        return TRUE;
-
-    return FALSE;
-}
-
 void read_contents_of(const char *directory, queue *c_queue) {
     DIR *dir = opendir(directory);
     struct dirent *dir_contents = NULL;
@@ -145,15 +117,6 @@ void read_contents_of(const char *directory, queue *c_queue) {
         add(c_queue, tmp_path);
     }
     closedir(dir);
-}
-
-__mode_t get_permissions_of(const char *src) {
-    struct stat path_stat;
-
-    if (stat(src, &path_stat) == -1)
-        return -1;
-
-    return path_stat.st_mode;
 }
 
 char *rand_string(size_t size) {
@@ -189,11 +152,4 @@ char *analyze_string_spaces(char *str) {
     }
 
     return analyzed;
-}
-
-char *to_string(int number) {
-    static char result[10]; // Max 2 ** 32 - 1
-    sprintf(result, "%d", number);
-
-    return result;
 }

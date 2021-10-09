@@ -1,10 +1,11 @@
 /* main.c */
-#include <argument_parser.h>
-#include <config_parser.h>
 #include <sys/stat.h>
+#include <stdlib.h>
+
 #include <include/codes.h>
 #include <include/functions.h>
-#include <stdlib.h>
+#include <argument_parser.h>
+#include <config_parser.h>
 
 void create_requirements() {
     char *sketch_folder_loc = fix_path(SKETCH_FOLDER_LOCATION, TRUE);
