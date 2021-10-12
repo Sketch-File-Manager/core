@@ -4,7 +4,7 @@
 
 // Error codes
 #define SUCCESS                              0
-#define WRONG_ARGUMENT_COMMAND              -1
+#define WRONG_ARGUMENT_COMMAND               0 // In case of wrong command Finish the program, with no errors but do nothing.
 #define UNKNOWN_COMMAND                     -2
 #define CANNOT_UNDO_ZERO_COMMANDS_FOUND     -3
 
