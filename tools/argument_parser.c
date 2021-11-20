@@ -2,15 +2,14 @@
 #include <string.h>
 #include <malloc.h>
 
-#include <parsers/argument_parser.h>
+#include <parser/argument_parser.h>
 #include <session.h>
 #include <session_edit.h>
-#include "../constants/include/codes.h"
-#include "../logger/include/logger.h"
+#include <codes.h>
+#include <logger.h>
 #include <commands.h>
-#include <parsers/config_parser.h>
-#include <mem.h>
-#include "../general functions/include/functions.h"
+#include <parser/config_parser.h>
+#include <functions.h>
 
 #define VERSION                 "1.0.0"
 
@@ -171,15 +170,10 @@ static inline int parse_double(char **argv) {
     if (argv[1] == NULL || argv[2] == NULL) return -1;
 
     // form the full result_command.
-    char *name;
-    ALLOCATE_MEM(name, strlen(argv[1]) + strlen(argv[2]) + 2, sizeof(char));
-    strcat(name, argv[1]);
-    strcat(name, " ");
-    strcat(name, argv[2]);
+    char name[strlen(argv[1]) + strlen(argv[2]) + 1];
+    sprintf(name, "%s %s", argv[1], argv[2]);
 
-    int result_command = find_command(name);
-    free(name);
-    return result_command;
+    return find_command(name);
 }
 
 int parse(int argc, char **argv) {
