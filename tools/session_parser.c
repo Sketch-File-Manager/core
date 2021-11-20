@@ -5,10 +5,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include <session_parser.h>
-#include <file_handler.h>
-#include <include/codes.h>
-#include <include/functions.h>
+#include <parsers/session_parser.h>
+#include <files/file_handler.h>
+#include "../constants/include/codes.h"
+#include "../general functions/include/functions.h"
 #include <mem.h>
 
 

@@ -1,9 +1,9 @@
 /* config_parser.c */
 #include <string.h>
 
-#include <config_parser.h>
-#include <file_handler.h>
-#include <include/functions.h>
+#include <parsers/config_parser.h>
+#include <files/file_handler.h>
+#include "../general functions/include/functions.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <mem.h>

@@ -1,8 +1,8 @@
 /* queue.c */
 #include <memory.h>
 
-#include <include/queue.h>
-#include <include/codes.h>
+#include "include/queue.h"
+#include "../constants/include/codes.h"
 #include <mem.h>
 
 queue *create_empty_queue() {

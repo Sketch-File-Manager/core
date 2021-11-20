@@ -1,16 +1,16 @@
 /* commands.c */
-#include <include/codes.h>
+#include "../constants/include/codes.h"
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <commands.h>
-#include <file_handler.h>
-#include <include/functions.h>
-#include <include/queue.h>
+#include <files/file_handler.h>
+#include "../general functions/include/functions.h"
+#include "../data structures/include/queue.h"
 #include <stdio.h>
 #include <mem.h>
-#include <config_parser.h>
+#include <parsers/config_parser.h>
 #include <unistd.h>
 
 /** ================ COMMANDS ================ */

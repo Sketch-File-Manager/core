@@ -3,13 +3,13 @@
 #define SKETCH_CORE_FUNCTIONS_H
 
 
-#include <include/queue.h>
+#include "../../data structures/include/queue.h"
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
 
-#include <include/codes.h>
+#include "../../constants/include/codes.h"
 
 /**
  * Checks if a string ends with another string.

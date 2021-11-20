@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include <include/functions.h>
+#include "include/functions.h"
 #include <mem.h>
 
 int ends_with(const char *str, const char *suffix) {

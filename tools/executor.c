@@ -2,10 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <executor.h>
+#include <execute/executor.h>
 #include <commands.h>
-#include <include/codes.h>
-#include <include/functions.h>
+#include "../constants/include/codes.h"
+#include "../general functions/include/functions.h"
 
 /**
  * Translate a string of permissions to bitmask.

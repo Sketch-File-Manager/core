@@ -2,15 +2,15 @@
 #include <string.h>
 #include <malloc.h>
 
-#include <argument_parser.h>
+#include <parsers/argument_parser.h>
 #include <session.h>
 #include <session_edit.h>
-#include <include/codes.h>
-#include <include/logger.h>
+#include "../constants/include/codes.h"
+#include "../logger/include/logger.h"
 #include <commands.h>
-#include <config_parser.h>
+#include <parsers/config_parser.h>
 #include <mem.h>
-#include <include/functions.h>
+#include "../general functions/include/functions.h"
 
 #define VERSION                 "1.0.0"
 

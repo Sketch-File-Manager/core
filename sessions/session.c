@@ -3,12 +3,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <executor.h>
-#include <session_parser.h>
-#include <config_parser.h>
-#include <include/codes.h>
-#include <include/functions.h>
-#include <include/logger.h>
+#include <execute/executor.h>
+#include <parsers/session_parser.h>
+#include <parsers/config_parser.h>
+#include "../constants/include/codes.h"
+#include "../general functions/include/functions.h"
+#include "../logger/include/logger.h"
 #include <session.h>
 #include <mem.h>
 

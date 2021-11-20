@@ -6,10 +6,10 @@
 #include <dirent.h>
 #include <errno.h>
 
-#include <file_handler.h>
-#include <include/functions.h>
-#include <include/codes.h>
-#include <include/queue.h>
+#include <files/file_handler.h>
+#include "../general functions/include/functions.h"
+#include "../constants/include/codes.h"
+#include "../data structures/include/queue.h"
 #include <mem.h>
 
 static int get_file_fd(const char *file_path, int flag, size_t *file_len) {

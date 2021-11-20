@@ -2,7 +2,7 @@
 #ifndef SKETCH_CORE_CONFIG_PARSER_H
 #define SKETCH_CORE_CONFIG_PARSER_H
 
-#include <include/codes.h>
+#include "../../../constants/include/codes.h"
 
 /**
  * Check and create the config file if missing.
