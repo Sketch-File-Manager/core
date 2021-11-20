@@ -10,7 +10,7 @@
 
 // Boolean types
 #define TRUE   1
-#define FALSE -1
+#define FALSE  0
 
 // Locations
 #define SKETCH_FOLDER_LOCATION      "~/.local/share/sketch/"

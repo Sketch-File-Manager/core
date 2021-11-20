@@ -3,13 +3,13 @@
 #define SKETCH_CORE_FUNCTIONS_H
 
 
-#include "../../data structures/include/queue.h"
+#include <queue.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
 
-#include "../../constants/include/codes.h"
+#include <codes.h>
 
 /**
  * Checks if a string ends with another string.
@@ -18,22 +18,6 @@
  * @return TRUE or FALSE if it ends with or not.
  */
 extern int ends_with(const char *str, const char *suffix);
-
-/**
- * Return the concat of two strings.
- * @param str1 The str1 string
- * @param str2 The str2 string.
- * @return The concat of the the two strings.
- */
-extern char *str_add(const char *str1, ...);
-
-/**
- * Return the home directory.
- * @return The home directory.
- */
-static inline char *get_home_path() {
-    return str_add("/home/", getlogin(), "/", NULL);
-}
 
 /**
  * Replace ~ with home directory and add / at the end if missing.
@@ -64,8 +48,6 @@ static inline int is_dir(const char *path) {
 
     return FALSE;
 }
-
-
 
 /**
  * Reads all the contents of a directory and appends them to a given queue.

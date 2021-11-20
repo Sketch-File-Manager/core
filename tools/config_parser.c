@@ -3,7 +3,7 @@
 
 #include <parsers/config_parser.h>
 #include <files/file_handler.h>
-#include "../general functions/include/functions.h"
+#include <functions.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <mem.h>

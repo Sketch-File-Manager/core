@@ -2,15 +2,16 @@
 #include <string.h>
 #include <malloc.h>
 #include <dirent.h>
-#include <stdarg.h>
 #include <time.h>
 
-#include "include/functions.h"
+#include <functions.h>
 #include <mem.h>
 
-int ends_with(const char *str, const char *suffix) {
+int ends_with(const char *str, const char *suffix)
+{
     if (!str || !suffix)
         return FALSE;
+
     size_t lenstr = strlen(str);
     size_t lensuffix = strlen(suffix);
     if (lensuffix > lenstr)
@@ -22,55 +23,31 @@ int ends_with(const char *str, const char *suffix) {
     return TRUE;
 }
 
-char *str_add(const char *str1, ...) {
-    va_list args;
-    va_start(args, str1);
-
-    char *result;
-    ALLOCATE_MEM(result, strlen(str1) + 1, sizeof(char));
-    strcpy(result, str1);
-
-    char *str;
-
-    while (1) {
-        str = va_arg(args, char *);
-
-        if (str == NULL) break;
-
-        REALLOCATE_MEM(result, (strlen(result) + strlen(str) + 1) * sizeof(char));
-        strcat(result, str);
-    }
-    va_end(args);
-
-    return result;
-}
-
-char *fix_path(const char *path, int add_slash) {
+char *fix_path(const char *path, int add_slash)
+{
     char *ret = NULL;
+    size_t ret_s = 0;
 
     // If starts with ~ replace with /home/username
-    if (path[0] == '~') {
-        char *home = get_home_path();
-        ret = str_add(home, path + 2, NULL);  // Delete ~/
-        free(home);
-    }
+    if (path[0] == '~') ret_s = strlen(path) + strlen(getenv("HOME")) + add_slash;
+    else ret_s = strlen(path) + add_slash;
+
+    // Allocate space for the new string.
+    ALLOCATE_MEM(ret, ret_s + 1, sizeof(char));
+    // Build the new string.
+    sprintf(ret, "%s%s", getenv("HOME"), path + 2);
 
     // Ends with /
-    if (add_slash == TRUE && ends_with(path, "/") == FALSE) {
-        char *tmp = str_add(ret, "/", NULL);
-        if (ret != NULL)
-            free(ret);
-
-        ret = tmp;
-    }
-
-    if (ret == NULL)
-        return str_add(path, NULL);
+    if (add_slash == TRUE &&
+        ends_with(path, "/") == FALSE) sprintf(ret, "%s%c", ret, '/');
 
     return ret;
 }
 
-char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n) {
+char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n)
+{
+    // TODO - Reduce the allocations in this function.
+    // TODO - Make this function better.
     char **ret;
     ALLOCATE_MEM(ret, 1, sizeof(char *));
     int a = 0;
@@ -80,39 +57,47 @@ char **split_except(char *str, char delimiter, char prev_delim_except, size_t *n
     ALLOCATE_MEM(token, strlen(str) + 1, sizeof(char));
     int k = 0;
 
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] != delimiter || (i > 0 && str[i - 1] == prev_delim_except)) {
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (str[i] != delimiter || (i > 0 && str[i - 1] == prev_delim_except))
+        {
             token[k] = str[i];
             k++;
             continue;
         }
 
-        ret[a] = str_add(token, NULL);
+        sprintf(ret[a], "%s", token);
         a++;
-        REALLOCATE_MEM(ret, (a + 1) * sizeof(char *));
+        REALLOCATE_MEM(ret, (a + 1) * sizeof(char *))
         // Free the previous pointer.
-        free(token);
+        FREE_MEM(token)
         // Allocate space for new token.
-        ALLOCATE_MEM(token, strlen(str) + 1, sizeof(char));
+        ALLOCATE_MEM(token, strlen(str) + 1, sizeof(char))
         k = 0;
     }
 
-    ret[a] = str_add(token, NULL);
+    sprintf(ret[a], "%s", token);
 
     *n = a + 1;
-    free(token);
+    FREE_MEM(token);
     return ret;
 }
 
-void read_contents_of(const char *directory, queue *c_queue) {
+void read_contents_of(const char *directory, queue *c_queue)
+{
     DIR *dir = opendir(directory);
     struct dirent *dir_contents = NULL;
-    char *tmp_path;
+    char *tmp_path = NULL;
 
     // Read the files and folder inside the dir.
-    while ((dir_contents = readdir(dir)) != NULL) {
+    while ((dir_contents = readdir(dir)) != NULL)
+    {
+        // Allocate space for the new item.
+        ALLOCATE_MEM(tmp_path, strlen(directory) + strlen(dir_contents->d_name) + 1,
+                     sizeof(char))
         // Save the directory.
-        tmp_path = str_add(directory, dir_contents->d_name, NULL);
+        sprintf(tmp_path,  "%s%s", directory,
+                dir_contents->d_name);
         // Add it to the queue.
         add(c_queue, tmp_path);
     }
