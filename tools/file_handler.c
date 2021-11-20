@@ -3,57 +3,28 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <dirent.h>
 #include <errno.h>
 
 #include <files/file_handler.h>
-#include "../general functions/include/functions.h"
-#include "../constants/include/codes.h"
-#include "../data structures/include/queue.h"
+#include <functions.h>
+#include <queue.h>
 #include <mem.h>
 
-static int get_file_fd(const char *file_path, int flag, size_t *file_len) {
-    // allocate enough space for the full path.
-    char *path = str_add(file_path, NULL);
-
-    // open the config file.
-    int fd = open(path, flag);
-    struct stat config_stat;
-
-    if (file_len != NULL) {
-        int result = lstat(path, &config_stat);
-        if (result != 0)
-            return -1;
-
-        *file_len = config_stat.st_size;
-    }
-
-    free(path);
-    return fd;
-}
-
 int read_file(const char *file_path, char **config_content) {
-    size_t file_len;
-    // get the file descriptor of the config.
-    int fd = get_file_fd(file_path, O_RDONLY, &file_len);
-    char *buffer;
+    int fd = open(file_path, O_RDONLY);
+    if (fd == -1) return FAILED;
 
-    // if something goes wrong.
-    if (fd == -1) return errno;
+    size_t file_size = get_file_size(file_path);
 
-    // allocate enough space for the content of the file.
-    ALLOCATE_MEM(buffer, file_len, sizeof(char));
-    // read the file.
-    if (read(fd, buffer, file_len) == -1)
-        return errno;
+    char buffer[file_size];
+    // Initialize buffer.
+    memset(buffer, 0, file_size);
 
-    // Give the results.
-    *config_content = calloc(file_len + 1, sizeof(char));
-    strncpy(*config_content, buffer, file_len);
+    // Get the contents of the file.
+    if (read(fd, &buffer, file_size) == -1) return FAILED;
 
-    free(buffer);
-    close(fd);
-
+    // Copy the file to the destination.
+    memcpy(*config_content, buffer, file_size);
     return SUCCESS;
 }
 
@@ -89,7 +60,7 @@ int copy_with_byte_rate(const char *src, const char *dst, size_t rate) {
 
 
 int write_file(const char *file_path, char *changes, size_t changes_len) {
-    int config_fd = get_file_fd(file_path, O_RDWR | O_TRUNC, NULL);
+    int config_fd = open(file_path, O_WRONLY | O_TRUNC);
 
     // check if something goes wrong.
     if (config_fd == -1) return errno;
@@ -101,39 +72,29 @@ int write_file(const char *file_path, char *changes, size_t changes_len) {
     return SUCCESS;
 }
 
-int list_files_names(const char *path, char ***result_files, size_t *size) {
+int list_files_names(const char *path, char ***result_files, size_t files)
+{
     DIR *dir = opendir(path);
     struct dirent *dir_info;
+    struct stat    file_stat;
 
-    if (dir == NULL) return errno;
+    if (dir == NULL || lstat(path, &file_stat) == -1) return FAILED;
 
-    size_t files_s = 1;
-    char **files;
-    ALLOCATE_MEM(files, 1, sizeof(char *));
-    char *current_file = NULL;
-    int index = 0;
-
-    while ((dir_info = readdir(dir)) != NULL) {
-        if (strcmp(dir_info->d_name, ".") == 0 || strcmp(dir_info->d_name, "..") == 0) continue;
-
-        current_file = dir_info->d_name;
-
-        files[index] = str_add(current_file, NULL);
-
-        ++files_s;
-        REALLOCATE_MEM(files, sizeof(char *) * files_s);
-        index++;
+    int current_file = 0;
+    while ((dir_info = readdir(dir)) != NULL &&
+           current_file < files)
+    {
+        if (is_file(dir_info, &file_stat))
+            memcpy(*result_files[current_file],
+                   dir_info->d_name, strlen(dir_info->d_name));
     }
-    --files_s;
-    closedir(dir);
-    *size = files_s;
-    *result_files = files;
 
+    closedir(dir);
     return SUCCESS;
 }
 
 int get_info_of(char *path, file_info ***files, size_t *size) {
-    struct stat curr_element_stat;
+    /*struct stat curr_element_stat;
     queue *c_queue = create_empty_queue();
 
     file_info **tmp_files;
@@ -190,6 +151,6 @@ int get_info_of(char *path, file_info ***files, size_t *size) {
     *size = current_path;
     *files = tmp_files;
 
-    free(c_queue);
+    free(c_queue);*/
     return SUCCESS;
 }

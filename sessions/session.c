@@ -4,11 +4,11 @@
 #include <stdio.h>
 
 #include <execute/executor.h>
-#include <parsers/session_parser.h>
+#include <parser/session_parser.h>
 #include <parsers/config_parser.h>
-#include "../constants/include/codes.h"
-#include "../general functions/include/functions.h"
-#include "../logger/include/logger.h"
+#include <codes.h>
+#include <functions.h>
+#include <logger.h>
 #include <session.h>
 #include <mem.h>
 
