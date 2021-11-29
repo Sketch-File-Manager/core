@@ -26,7 +26,7 @@ int ends_with(const char *str, const char *suffix)
 char *fix_path(const char *path, int add_slash)
 {
     char *ret = NULL;
-    size_t ret_s = 0;
+    size_t ret_s;
 
     // If starts with ~ replace with /home/username
     if (path[0] == '~') ret_s = strlen(path) + strlen(getenv("HOME")) + add_slash;

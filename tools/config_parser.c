@@ -1,7 +1,7 @@
 /* config_parser.c */
 #include <string.h>
 
-#include <parsers/config_parser.h>
+#include <parser/config_parser.h>
 #include <files/file_handler.h>
 #include <functions.h>
 #include <fcntl.h>

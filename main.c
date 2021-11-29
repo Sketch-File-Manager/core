@@ -1,13 +1,19 @@
 /* main.c */
+#ifdef linux
 #include <sys/stat.h>
 #include <stdlib.h>
-
 #include <codes.h>
 #include <functions.h>
 #include <parser/argument_parser.h>
 #include <parser/config_parser.h>
+#endif
 
-void create_requirements() {
+#ifndef linux
+#include <stdio.h>
+#endif
+
+void create_requirements()
+{
     char *sketch_folder_loc = fix_path(SKETCH_FOLDER_LOCATION, TRUE);
     char *sketch_core_loc = fix_path(SKETCH_CORE_LOCATION, TRUE);
     char *session_loc = fix_path(SESSION_FOLDER_LOCATION, TRUE);
@@ -26,8 +32,14 @@ void create_requirements() {
     free(session_loc);
 }
 
-int main(int argc, char **argv) {
-    create_requirements();
+int main(int argc, char **argv)
+{
 
+#ifdef linux
+    create_requirements();
     return parse(argc, argv);
+#else
+    printf("The operating system is not compatible.\n");
+    return 0;
+#endif
 }

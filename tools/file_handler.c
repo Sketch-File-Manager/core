@@ -18,7 +18,7 @@ int read_file(const char *file_path, char **config_content) {
 
     char buffer[file_size];
     // Initialize buffer.
-    memset(buffer, 0, file_size);
+    memset(buffer, 0x0, file_size);
 
     // Get the contents of the file.
     if (read(fd, &buffer, file_size) == -1) return FAILED;
@@ -72,20 +72,22 @@ int write_file(const char *file_path, char *changes, size_t changes_len) {
     return SUCCESS;
 }
 
-int list_files_names(const char *path, char ***result_files, size_t files)
+// TODO - Make a function that automates the lines 79 - 92 for the two below functions.
+
+int list_files_names(const char *path, char **result_files, size_t files)
 {
     DIR *dir = opendir(path);
     struct dirent *dir_info;
     struct stat    file_stat;
 
-    if (dir == NULL || lstat(path, &file_stat) == -1) return FAILED;
+    if (dir == NULL) return FAILED;
 
     int current_file = 0;
     while ((dir_info = readdir(dir)) != NULL &&
            current_file < files)
     {
-        if (is_file(dir_info, &file_stat))
-            memcpy(*result_files[current_file],
+        if (is_file(dir_info, dir_info->d_name, path))
+            memcpy(result_files[current_file++],
                    dir_info->d_name, strlen(dir_info->d_name));
     }
 
@@ -93,64 +95,8 @@ int list_files_names(const char *path, char ***result_files, size_t files)
     return SUCCESS;
 }
 
-int get_info_of(char *path, file_info ***files, size_t *size) {
-    /*struct stat curr_element_stat;
-    queue *c_queue = create_empty_queue();
-
-    file_info **tmp_files;
-    ALLOCATE_MEM(tmp_files, 1, sizeof(file_info *));
-    ALLOCATE_MEM(tmp_files[0], 1, sizeof(file_info));
-    read_contents_of(path, c_queue);
-
-    char **curr_element_name; // file or directory name.
-    size_t curr_element_name_s;
-    char *removed_item;
-
-    int result;
-    int current_path = 0;
-    while (c_queue->q_size != 0) {
-        curr_element_name = split_except((char *) peek(c_queue), '/', '\0', &curr_element_name_s);
-
-        if (strcmp(curr_element_name[curr_element_name_s - 1], "..") == 0     ||
-            strcmp(curr_element_name[curr_element_name_s - 1], ".")  == 0     ||
-            strstr(curr_element_name[curr_element_name_s - 1], "..") != NULL  ||
-            curr_element_name[curr_element_name_s - 1][strlen(curr_element_name[curr_element_name_s - 1]) - 1] == '.') {
-
-            free(pop(c_queue));
-            FREE_ARRAY(curr_element_name, curr_element_name_s);
-            continue;
-        }
-        result = stat((const char *) peek(c_queue), &curr_element_stat);
-        if (result == -1) {
-            FREE_ARRAY(curr_element_name, curr_element_name_s);
-            free(pop(c_queue));
-            continue;
-        }
-
-        tmp_files[current_path]->f_name = str_add(curr_element_name[curr_element_name_s - 1], NULL);
-        tmp_files[current_path]->f_user_id = curr_element_stat.st_uid;
-        tmp_files[current_path]->f_group_id = curr_element_stat.st_gid;
-        tmp_files[current_path]->f_permissions = curr_element_stat.st_mode;
-        tmp_files[current_path]->f_last_access = curr_element_stat.st_atim;
-        tmp_files[current_path]->f_last_modify = curr_element_stat.st_mtim;
-        tmp_files[current_path]->f_last_access = curr_element_stat.st_ctim;
-        tmp_files[current_path]->f_serial_number = curr_element_stat.st_ino;
-        tmp_files[current_path]->f_link_count = curr_element_stat.st_nlink;
-        tmp_files[current_path]->f_size = curr_element_stat.st_size;
-
-        removed_item = pop(c_queue);
-        if (is_dir((const char *) removed_item) == TRUE)
-            read_contents_of((char *) removed_item, c_queue);
-
-        FREE_ARRAY(curr_element_name, curr_element_name_s);
-        free(removed_item);
-        ++current_path;
-        REALLOCATE_MEM(tmp_files, sizeof(file_info *) * (current_path + 1));
-        ALLOCATE_MEM(tmp_files[current_path], 1, sizeof(file_info));
-    }
-    *size = current_path;
-    *files = tmp_files;
-
-    free(c_queue);*/
+int get_files_info(const char *path, file_info *results, size_t files)
+{
+    // TODO - Make this function simple.
     return SUCCESS;
 }
