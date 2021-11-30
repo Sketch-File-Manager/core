@@ -78,7 +78,6 @@ int list_files_names(const char *path, char **result_files, size_t files)
 {
     DIR *dir = opendir(path);
     struct dirent *dir_info;
-    struct stat    file_stat;
 
     if (dir == NULL) return FAILED;
 

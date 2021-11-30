@@ -12,7 +12,8 @@
 #include <stdio.h>
 #endif
 
-void create_requirements()
+// TODO - Comment for testings.
+/*void create_requirements()
 {
     char *sketch_folder_loc = fix_path(SKETCH_FOLDER_LOCATION, TRUE);
     char *sketch_core_loc = fix_path(SKETCH_CORE_LOCATION, TRUE);
@@ -30,14 +31,15 @@ void create_requirements()
     free(sketch_folder_loc);
     free(sketch_core_loc);
     free(session_loc);
-}
+}*/
 
 int main(int argc, char **argv)
 {
 
 #ifdef linux
-    create_requirements();
-    return parse(argc, argv);
+    // create_requirements(); TODO - Comment to test.
+    // return parse(argc, argv); TODO - Comment to test.
+    return 0;
 #else
     printf("The operating system is not compatible.\n");
     return 0;
