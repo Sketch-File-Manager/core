@@ -1,4 +1,4 @@
-I#ifndef CORE_ARGS_PARSER_H
+#ifndef CORE_ARGS_PARSER_H
 #define CORE_ARGS_PARSER_H
 
 #include <memory.h>
@@ -6,12 +6,12 @@ I#ifndef CORE_ARGS_PARSER_H
 
 struct args_parser_args { 
     char *byte_rate_measure;
-    char *session_file; /* --session=session.txt */
+    char *session_file; /* --session=sketch-core.session */
 
     /**
      * mkdir, mkfile, copy, move, rename, perms, perms-recursive, delete, list
      * session-mkdir, session-mkfile, session-copy, session-move, session-rename, session-perms, session-perms-recursive, delete
-     * session-list, session-execute
+     * session-list, session-undo, session-execute
      */
     char *command;
     char **command_argv;

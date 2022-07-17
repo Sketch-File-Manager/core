@@ -99,3 +99,6 @@ After this the program will be installed and ready to run.
 
 ### Byte rate
 `--byte-rate=516KB`
+
+## Keep session after executes
+`--seession-keep=true|false`

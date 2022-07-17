@@ -1,3 +1,5 @@
+#include <bits/types/FILE.h>
+#include <stdio.h>
 #include "args_parser.h"
 #include "commands.h"
 #include "session_utils.h"
@@ -31,26 +33,34 @@ static void decide(struct args_parser_args args) {
         command_delete(args.command_argv[0]);
     else if(!strcmp(args.command, "list"))
         command_list(args.command_argv[0]);
-    else if(!strcmp(args.command, "session-mkdir"))
-        session_mkdir(args.session_file, args.command_argv[0], args.command_argv[1], str_to_mode_t(args.command_argv[2]));
-    else if(!strcmp(args.command, "session-mkfile"))
-        session_mkfile(args.session_file, args.command_argv[0], args.command_argv[1], str_to_mode_t(args.command_argv[2]));
-    else if(!strcmp(args.command, "session-copy"))
-        session_copy(args.session_file, args.command_argv[0], args.command_argv[1]);
-    else if(!strcmp(args.command, "session-move"))
-        session_move(args.session_file, args.command_argv[0], args.command_argv[1]);
-    else if(!strcmp(args.command, "session-rename"))
-        session_rename(args.session_file, args.command_argv[0], args.command_argv[1]);
-    else if(!strcmp(args.command, "session-perms"))
-        session_permissions(args.session_file, str_to_mode_t(args.command_argv[0]), args.command_argv[1]);
-    else if(!strcmp(args.command, "session-perms-recursive"))
-        session_permissions_recursive(args.session_file, str_to_mode_t(args.command_argv[0]), args.command_argv[1], str_to_int(args.command_argv[2]));
-    else if(!strcmp(args.command, "session-delete"))
-        session_delete(args.session_file, args.command_argv[0]);
-    else if(!strcmp(args.command, "session-list"))
-        session_list(args.session_file, args.command_argv[0]);
-    else if(!strcmp(args.command, "session-undo"))
-        session_undo(args.session_file);
+    else {
+        FILE *session_file = fopen(args.session_file, "w+");
+
+        if(!strcmp(args.command, "session-mkdir"))
+            session_mkdir(session_file, args.command_argv[0], args.command_argv[1], args.command_argv[2]);
+        else if(!strcmp(args.command, "session-mkfile"))
+            session_mkfile(session_file, args.command_argv[0], args.command_argv[1], args.command_argv[2]);
+        else if(!strcmp(args.command, "session-copy"))
+            session_copy(session_file, args.command_argv[0], args.command_argv[1]);
+        else if(!strcmp(args.command, "session-move"))
+            session_move(session_file, args.command_argv[0], args.command_argv[1]);
+        else if(!strcmp(args.command, "session-rename"))
+            session_rename(session_file, args.command_argv[0], args.command_argv[1]);
+        else if(!strcmp(args.command, "session-perms"))
+            session_permissions(session_file, args.command_argv[0], args.command_argv[1]);
+        else if(!strcmp(args.command, "session-perms-recursive"))
+            session_permissions_recursive(session_file, args.command_argv[0], args.command_argv[1], str_to_int(args.command_argv[2]));
+        else if(!strcmp(args.command, "session-delete"))
+            session_delete(session_file, args.command_argv[0]);
+        else if(!strcmp(args.command, "session-list"))
+            session_list(args.session_file, args.command_argv[0]);
+        else if(!strcmp(args.command, "session-undo"))
+            session_undo(session_file, args.session_file);
+        else if(!strcmp(args.command, "session-execute"))
+            session_execute(args.session_file, args.keep);
+
+        fclose(session_file);
+    }
 }
 
 int main(int argc, char **argv) {
