@@ -89,6 +89,9 @@ After this the program will be installed and ready to run.
 ### delete
 `core session-delete src`
 
+### undo
+`core session-undo`
+
 ## Options
 
 ### Session file

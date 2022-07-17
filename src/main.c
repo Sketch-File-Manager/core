@@ -49,6 +49,8 @@ static void decide(struct args_parser_args args) {
         session_delete(args.session_file, args.command_argv[0]);
     else if(!strcmp(args.command, "session-list"))
         session_list(args.session_file, args.command_argv[0]);
+    else if(!strcmp(args.command, "session-undo"))
+        session_undo(args.session_file);
 }
 
 int main(int argc, char **argv) {
