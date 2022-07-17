@@ -4,12 +4,14 @@
 #include "commands.h"
 #include "session_utils.h"
 
-static inline __mode_t str_to_mode_t(char *str) {
-    return (__mode_t) str;
+static inline __mode_t str_to_mode_t(const char *str) {
+    __mode_t converted = strtol(str, NULL, 8);
+
+    return converted;
 }
 
-static inline unsigned int str_to_int(char *str) {
-    return strtoul(str, NULL, 10);
+static inline unsigned int str_to_int(const char *str) {
+    return strtol(str, NULL, 10);
 }
 
 static void decide(struct args_parser_args args) {
