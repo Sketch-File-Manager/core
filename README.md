@@ -28,10 +28,14 @@ After this the program will be installed and ready to run.
 ## Commands
 
 ### mkdir
+`core mkdir name`: Current path \
+`core mkdir name permissions`: Current path
 `core mkdir dst name`\
 `core mkdir dst name permissions`
 
 ### mkfile
+`core mkfile name: Current path` \
+`core mkfile name permissions`: Current path \
 `core mkfile dst name`\
 `core mkfile dst name permissions`
 
@@ -49,7 +53,7 @@ After this the program will be installed and ready to run.
 `core permissions src new_perms --depth=depth`
 
 ### list
-`core list`\
+`core list`: Current path \
 `core list src`
 
 ### delete
