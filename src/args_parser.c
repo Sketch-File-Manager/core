@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include <stdio.h>
 
 #include "args_parser.h"
 
@@ -105,6 +104,20 @@ static int parse_session_commands(struct args_parser_args *args, int argc, const
                           s_session, 0))
     {
         case S_MKDIR:
+            if ( argc < 3) return -1; // check if mkdir has the right amount arguments.
+
+            args->command      = (char *) c_name;
+            args->command_argv = (char **) malloc(sizeof(char *) * 3);
+            if (args->command_argv == NULL) return -1; // failed to allocate memory.
+
+            args->command_argv[0] = getenv("PWD"); // current directory.
+            args->command_argv[1] = (*argv)[2];
+
+            // if permissions is missing then.
+            if (argc == 3)
+                args->command_argv[2] = "700"; // TODO - change it
+            else
+                args->command_argv[2] = (*argv)[3];
 
             break;
         case S_MKFILE:
@@ -187,16 +200,16 @@ static int parse_options(struct args_parser_args *args, int argc, char *c_name,
     {
         case SESSION_SET:
             tmp = strstr((**argv), "=");
-            //args->keep = 0x01 & strtol(tmp + 1, &(tmp + 1), 10); // The the value after '='
+            args->keep = 0x01 & atoi(tmp + 1); // The the value after '='
             break;
         case SESSION_KEEP:
             tmp = strstr((**argv), "=");
-            //args->keep = 0x01 & strtol(tmp + 1, &(tmp + 1), 10); // The the value after '='
+            args->keep = 0x01 & atoi(tmp + 1); // The the value after '='
             break;
         case BYTE_RATE:
             tmp = strstr((**argv), "=");
-            args->byte_rate_measure = *((*argv)++); // get the value.
-            //args->byte_rate = (unsigned int) strtol(tmp + 1, &(tmp + 1), 10); // get integer value.
+            args->byte_rate_measure = tmp + 1; // get the value.
+            args->byte_rate = (unsigned int) atoi(tmp + 1); // get integer value.
             break;
         case INVALID:
             return -1;
