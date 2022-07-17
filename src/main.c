@@ -69,6 +69,6 @@ int main(int argc, char **argv) {
     struct args_parser_args args;
     init_args(&args);
     args_parser_parse(&args, argc, argv);
-    decide(args);
+    //decide(args); TODO - breaks.
     return 0;
 }

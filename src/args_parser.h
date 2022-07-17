@@ -4,7 +4,8 @@
 #include <memory.h>
 #include <bits/types.h>
 
-struct args_parser_args { 
+struct args_parser_args 
+{ 
     char *byte_rate_measure;
     char *session_file; /* --session=sketch-core.session */
 
@@ -21,8 +22,14 @@ struct args_parser_args {
     unsigned int will_run: 1;
 };
 
-static inline void init_args(struct args_parser_args *args) {
+static inline void init_args(struct args_parser_args *args) 
+{
     memset(args, 0x0, sizeof(struct args_parser_args));
+}
+
+static inline void args_parser_free_argv(struct args_parser_args *args)
+{
+    free(args->command_argv);
 }
 
 /**

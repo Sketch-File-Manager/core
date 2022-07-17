@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include <malloc.h>
+#include <stdio.h>
 
 #include "args_parser.h"
 
@@ -49,7 +51,7 @@ static struct command simple_commands[] =
     {"list",   LIST  }, {"delete"     ,  DELETE     }
 };
 
-// session comamnds.
+// session comamnd
 static struct command session_commands[] = 
 {
     {"session-mkdir" , S_MKDIR }, {"session-mkfile"     ,  S_MKFILE     },
@@ -76,9 +78,10 @@ static inline int lookup_command(const char *c_name, struct command commands[],
     for (int i = 0; i < size; i++)
     {
         tmp = &commands[i];
+
         if (contains)
         {
-            if (strstr(tmp->c_name, c_name) == 0)
+            if (strstr(tmp->c_name, c_name))
             {
                 return tmp->c_val;
             }
@@ -105,20 +108,25 @@ static int parse_session_commands(struct args_parser_args *args, int argc, const
     {
         case S_MKDIR:
             if ( argc < 3) return -1; // check if mkdir has the right amount arguments.
-
             args->command      = (char *) c_name;
             args->command_argv = (char **) malloc(sizeof(char *) * 3);
             if (args->command_argv == NULL) return -1; // failed to allocate memory.
 
+            args->will_run        = 0x1;
             args->command_argv[0] = getenv("PWD"); // current directory.
             args->command_argv[1] = (*argv)[2];
 
             // if permissions is missing then.
             if (argc == 3)
+            {
                 args->command_argv[2] = "700"; // TODO - change it
+                ++(*argv); // skip mkdir's arguments.
+            }
             else
+            {
                 args->command_argv[2] = (*argv)[3];
-
+                (*argv) += 2; // skip mkdir's arguments.
+            }
             break;
         case S_MKFILE:
 
@@ -145,8 +153,10 @@ static int parse_session_commands(struct args_parser_args *args, int argc, const
         case S_UNDO:
            
             break;
+
+        case INVALID:
+            return -1;
         defualt:
-            
             return -1;
     }
     return 0;
@@ -163,10 +173,9 @@ static int parse_simple_commands(struct args_parser_args *args, int argc, char *
 
             break;
         case MKFILE:
-            
+
             break;
         case COPY:
-           
             break;
         case MOVE:
             
@@ -184,8 +193,9 @@ static int parse_simple_commands(struct args_parser_args *args, int argc, char *
            
             break;
 
+        case INVALID:
+            return -1;
         defualt:
-            
             return -1;
     }
     return 0;
@@ -229,6 +239,7 @@ void args_parser_parse(struct args_parser_args *args, int argc, char *argv[])
     if (argc < 2) return;
 
     char **tmp = ++argv;
+
     while (*tmp)
     {
         if (parse_simple_commands(args, argc, *tmp, &tmp) == 0 ||
@@ -236,12 +247,12 @@ void args_parser_parse(struct args_parser_args *args, int argc, char *argv[])
         {
             if (args->will_run == 1) break; // do not run second simple/session command.
 
-            ++tmp;
+            tmp = (tmp == NULL)? tmp + 1 : NULL;
             continue;
         }
         else if (parse_options(args, argc, *tmp, &tmp) == 0)
         {
-            ++tmp;
+            tmp = (tmp == NULL)? tmp + 1 : NULL;
             continue; // run as much option commands as the user need.
         }
         
