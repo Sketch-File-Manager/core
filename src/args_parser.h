@@ -5,7 +5,6 @@ I#ifndef CORE_ARGS_PARSER_H
 #include <bits/types.h>
 
 struct args_parser_args { 
-    unsigned int byte_rate; /* --byte-rate=516KB */
     char *byte_rate_measure;
     char *session_file; /* --session=session.txt */
 
@@ -17,7 +16,8 @@ struct args_parser_args {
     char *command;
     char **command_argv;
     unsigned int command_argc;
-    unsigned int delete_session_after_execute: 1;
+    unsigned int byte_rate; /* --byte-rate=516KB */
+    unsigned int keep: 1; /* --seesion-keep */
     unsigned int will_run: 1;
 };
 
