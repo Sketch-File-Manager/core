@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
-#include <malloc.h>
 #include <stdio.h>
 
 #include "args_parser.h"
@@ -34,6 +33,8 @@
 #define BYTE_RATE     18
 #define SESSION_KEEP  19
 
+// default values
+#define SESSION_FILE  ""
 
 // command representaion.
 struct command 
@@ -85,8 +86,7 @@ static inline int lookup_command(const char *c_name, struct command commands[],
             {
                 return tmp->c_val;
             }
-        }
-        else 
+        } else 
         {
             if (strcmp(tmp->c_name, c_name) == 0)
             {
@@ -121,8 +121,7 @@ static int parse_session_commands(struct args_parser_args *args, int argc, const
             {
                 args->command_argv[2] = "700"; // TODO - change it
                 ++(*argv); // skip mkdir's arguments.
-            }
-            else
+            } else
             {
                 args->command_argv[2] = (*argv)[3];
                 (*argv) += 2; // skip mkdir's arguments.
@@ -234,7 +233,7 @@ static int parse_options(struct args_parser_args *args, int argc, char *c_name,
 void args_parser_parse(struct args_parser_args *args, int argc, char *argv[])
 {
     args->will_run = 0x0;
-    args->keep = 0x0;
+    args->keep     = 0x0;
 
     if (argc < 2) return;
 
@@ -242,15 +241,15 @@ void args_parser_parse(struct args_parser_args *args, int argc, char *argv[])
 
     while (*tmp)
     {
-        if (parse_simple_commands(args, argc, *tmp, &tmp) == 0 ||
+        if (parse_simple_commands(args, argc, *tmp, &tmp) == 0 
+            ||
             parse_session_commands(args, argc, *tmp, &tmp) == 0)
         {
             if (args->will_run == 1) break; // do not run second simple/session command.
 
             tmp = (tmp == NULL)? tmp + 1 : NULL;
             continue;
-        }
-        else if (parse_options(args, argc, *tmp, &tmp) == 0)
+        } else if (parse_options(args, argc, *tmp, &tmp) == 0)
         {
             tmp = (tmp == NULL)? tmp + 1 : NULL;
             continue; // run as much option commands as the user need.
@@ -258,4 +257,16 @@ void args_parser_parse(struct args_parser_args *args, int argc, char *argv[])
         
         return;
     }
+
+    // set options to default values.
+    if (args->session_file == NULL)
+    {
+        args->session_file = (char *) malloc(sizeof(char) * strlen(SESSION_FILE) + 1);
+        strcpy(args->session_file, SESSION_FILE);
+    } 
+    if (args->byte_rate == 0)
+    {
+        args->byte_rate         =  516;
+        args->byte_rate_measure = "516";
+    } 
 }
