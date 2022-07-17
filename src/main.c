@@ -3,7 +3,9 @@
 #include "session_utils.h"
 
 void decide(struct args_parser_args args) {
+    if(args.will_run == 0) return;
 
+    if(!strcmp(args.command, ""))
 }
 
 int main(int argc, char **argv) {

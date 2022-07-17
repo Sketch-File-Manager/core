@@ -6,7 +6,7 @@
 struct args_parser_args {
     unsigned int will_run: 1;
 
-    int byte_rate; /* --byte-rate=516KB */
+    unsigned int byte_rate; /* --byte-rate=516KB */
     char *byte_rate_measure;
     char *session_file; /* --session=session.txt */
 

@@ -28,7 +28,7 @@ extern int command_mkfile(const char *dst, const char *name, __mode_t perms);
  * @param src_path The source file or directory that will be copied.
  * @return 0 on success.
  */
-extern int command_copy(const char *dst, const char *src_path);
+extern int command_copy(const char *dst, const char *src, unsigned int byte_rate);
 
 /**
  * Moves the source file or directory at the destination directory
@@ -37,7 +37,7 @@ extern int command_copy(const char *dst, const char *src_path);
  * @param src_path The source file or directory that will be moved.
  * @return 0 on success.
  */
-extern int command_move(const char *dst, const char *src_path);
+extern int command_move(const char *dst, const char *src_path, unsigned int byte_rate);
 
 /**
  * Renames a file or directory and preserves the permissions.
