@@ -2,6 +2,7 @@
 #define CORE_ARGS_PARSER_H
 
 #include <memory.h>
+#include <bits/types.h>
 
 struct args_parser_args {
     unsigned int will_run: 1;
@@ -11,9 +12,9 @@ struct args_parser_args {
     char *session_file; /* --session=session.txt */
 
     /**
-     * mkdir, mkfile, copy, move, rename, perms, perms_recursive, delete, list
-     * session_mkdir, session_mkfile, session_copy, session_move, session_rename, session_perms, session_perms_recursive, delete
-     * session_list
+     * mkdir, mkfile, copy, move, rename, perms, perms-recursive, delete, list
+     * session-mkdir, session-mkfile, session-copy, session-move, session-rename, session-perms, session-perms-recursive, delete
+     * session-list
      */
     char *command;
     char **command_argv;
@@ -28,6 +29,6 @@ static inline void init_args(struct args_parser_args *args){
  * Will parse the arguments that was passed when calling the program.
  * @param args The arguments struct.
  */
-extern void args_parser_parse(struct args_parser_args *args, int argc, char **argv);
+extern void args_parser_parse(struct args_parser_args *args, int argc, char **argv)
 
 #endif //CORE_ARGS_PARSER_H

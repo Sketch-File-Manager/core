@@ -63,7 +63,7 @@ extern int command_permissions(__mode_t new_perms, const char *src);
  * By adding 1 it will change recursively the folder and files below.
  * @return 0 on success.
  */
-extern int command_permissions_recursive(__mode_t new_perms, const char *src, int depth);
+extern int command_permissions_recursive(__mode_t new_perms, const char *src, unsigned int depth);
 
 /**
  * List the files of a directory. This will not work for session changes.
