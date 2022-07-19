@@ -43,34 +43,29 @@ struct command
     int c_val;
 };
 
-// simple command.
-static struct command simple_commands[] = 
-{
-    {"mkdir",  MKDIR }, {"mkfile"     ,  MKFILE     },
-    {"copy" ,  COPY  }, {"move"       ,  MOVE       },
-    {"rename", RENAME}, {"permissions",  PERMISSIONS},
-    {"list",   LIST  }, {"delete"     ,  DELETE     }
-};
 
-// session comamnd
-static struct command session_commands[] = 
+// comamnd set
+static struct command commands[] = 
 {
-    {"session-mkdir" , S_MKDIR }, {"session-mkfile"     ,  S_MKFILE     },
-    {"session-copy"  , S_COPY  }, {"session-move"       ,  S_MOVE       },
-    {"session-rename", S_RENAME}, {"session-permissions",  S_PERMISSIONS},
-    {"session-list"  , S_LIST  }, {"session-delete"     ,  S_DELETE     },
-    {"session-undo"  , S_UNDO  }
+    {"session-mkdir" ,S_MKDIR    }, {"session-mkfile"     ,S_MKFILE     },
+    {"session-copy"  ,S_COPY     }, {"session-move"       ,S_MOVE       },
+    {"session-rename",S_RENAME   }, {"session-permissions",S_PERMISSIONS},
+    {"session-list"  ,S_LIST     }, {"session-delete"     ,S_DELETE     },
+    {"session-undo"  ,S_UNDO     }, {"mkdir"              ,MKDIR        }, 
+    {"mkfile"        ,MKFILE     }, {"copy"               ,COPY         }, 
+    {"move"          ,MOVE       }, {"rename"             ,RENAME       }, 
+    {"permissions"   ,PERMISSIONS}, {"list"               ,LIST         }, 
+    {"delete"        ,DELETE     }
 };
 
 static struct command option_commands[] =
 {
     {"--session=" , SESSION_SET}, {"--session-keep=", SESSION_KEEP},
-    {"--byte-rate=", BYTE_RATE  }
+    {"--byte-rate=", BYTE_RATE }
 };
 
-static size_t s_simple  = sizeof(simple_commands)/sizeof(struct command); // simple commands amount
-static size_t s_session = sizeof(session_commands)/sizeof(struct command); // session commands amount
-static size_t s_options = sizeof(option_commands)/sizeof(struct command); // option commands amount
+static size_t s_commands = sizeof(commands)/sizeof(struct command); // session commands amount
+static size_t s_options  = sizeof(option_commands)/sizeof(struct command); // option commands amount
 
 static inline int lookup_command(const char *c_name, struct command commands[], 
                                  size_t size, int contains)
@@ -98,105 +93,70 @@ static inline int lookup_command(const char *c_name, struct command commands[],
     return INVALID;
 }
 
-
-static int parse_session_commands(struct args_parser_args *args, int argc, const char *c_name,
-                                  char *(*argv[]))
+static int parse_commands(struct args_parser_args *args, int argc, const char *c_name,
+                          char *(*argv[]))
 {
-
-    switch(lookup_command(c_name, session_commands,
-                          s_session, 0))
-    {
-        case S_MKDIR:
-            if ( argc < 3) return -1; // check if mkdir has the right amount arguments.
-            args->command      = (char *) c_name;
-            args->command_argv = (char **) malloc(sizeof(char *) * 3);
-            if (args->command_argv == NULL) return -1; // failed to allocate memory.
-
-            args->will_run        = 0x1;
-            args->command_argv[0] = getenv("PWD"); // current directory.
-            args->command_argv[1] = (*argv)[2];
-
-            // if permissions is missing then.
-            if (argc == 3)
-            {
-                args->command_argv[2] = "700"; // TODO - change it
-                ++(*argv); // skip mkdir's arguments.
-            } else
-            {
-                args->command_argv[2] = (*argv)[3];
-                (*argv) += 2; // skip mkdir's arguments.
-            }
-            break;
-        case S_MKFILE:
-
-            
-            break;
-        case S_COPY:
-           
-            break;
-        case S_MOVE:
-            
-            break;
-        case S_RENAME:
-            
-            break;
-        case S_PERMISSIONS:
-           
-            break;
-        case S_LIST:
-            
-            break;
-        case S_DELETE:
-           
-            break;
-        case S_UNDO:
-           
-            break;
-
-        case INVALID:
-            return -1;
-        defualt:
-            return -1;
-    }
-    return 0;
-}
-
-static int parse_simple_commands(struct args_parser_args *args, int argc, char *c_name,
-                                 char *(*argv[]))
-{
+    int c_code = lookup_command(c_name, commands,
+                                s_commands, 0);
     
-    switch(lookup_command(c_name, simple_commands,
-                          s_simple, 0))
+    if (c_code == MKDIR || 
+        c_code == S_MKDIR)
     {
-        case MKDIR:
+        if ( argc < 4) return -1; // check if mkdir has the right amount arguments.
+        args->command      = (char *) c_name;
+        args->command_argv = (char **) malloc(sizeof(char *) * 3);
+        if (args->command_argv == NULL) return -1; // failed to allocate memory.
 
-            break;
-        case MKFILE:
+        args->will_run        = 0x1;
+        args->command_argv[0] = (strcmp((*argv)[2], ".") == 0)? getenv("PWD") : (*argv)[2]; // if user give . get current directory, otherwise the given path.
+        args->command_argv[1] = (*argv)[3];
 
-            break;
-        case COPY:
-            break;
-        case MOVE:
-            
-            break;
-        case RENAME:
-            
-            break;
-        case PERMISSIONS:
-           
-            break;
-        case LIST:
-            
-            break;
-        case DELETE:
-           
-            break;
+        // if permissions is missing then.
+        if (argc == 4)
+        {
+            args->command_argv[2] = "700"; // TODO - change it
+            ++(*argv); // skip mkdir's arguments.
+        } else
+        {
+            args->command_argv[2] = (*argv)[3];
+            (*argv) += 2; // skip mkdir's arguments.
+        }
+    } else if (c_code == MKFILE || 
+               S_MKFILE)
+    {
 
-        case INVALID:
-            return -1;
-        defualt:
-            return -1;
+    } else if (c_code == COPY ||
+               c_code == S_COPY)
+    {
+
+    } else if (c_code == MOVE ||
+               c_code == S_MOVE)
+    {
+
+    } else if (c_code == RENAME ||
+               c_code == S_RENAME)
+    {
+
+    } else if (c_code == PERMISSIONS ||
+               c_code == S_PERMISSIONS)
+    {
+
+    } else if (c_code == LIST ||
+               c_code == S_LIST)
+    {
+
+    } else if (c_code == DELETE ||
+               c_code == S_DELETE)
+    {
+
+    } else if (c_code == S_UNDO)
+    {
+
+    } else
+    {
+        return -1;
     }
+
     return 0;
 }
 
@@ -218,7 +178,7 @@ static int parse_options(struct args_parser_args *args, int argc, char *c_name,
         case BYTE_RATE:
             tmp = strstr((**argv), "=");
             args->byte_rate_measure = tmp + 1; // get the value.
-            args->byte_rate = (unsigned int) atoi(tmp + 1); // get integer value.
+            args->byte_rate         = (unsigned int) atoi(tmp + 1); // get integer value.
             break;
         case INVALID:
             return -1;
@@ -241,9 +201,7 @@ void args_parser_parse(struct args_parser_args *args, int argc, char *argv[])
 
     while (*tmp)
     {
-        if (parse_simple_commands(args, argc, *tmp, &tmp) == 0 
-            ||
-            parse_session_commands(args, argc, *tmp, &tmp) == 0)
+        if (parse_commands(args, argc, *tmp, &tmp) == 0)
         {
             if (args->will_run == 1) break; // do not run second simple/session command.
 
