@@ -143,6 +143,9 @@ static int parse_commands(struct args_parser_args *args, int argc, const char *c
         args->command_argv[0] = (strcmp((*argv)[2], ".") == 0)? getenv("PWD") : (*argv)[2]; // if user give . get current directory, otherwise the given path.
         args->command_argv[1] = (*argv)[3];
 
+        // skip arguments.
+        (*argv) += 2;
+
     } else if (c_code == PERMISSIONS ||
                c_code == S_PERMISSIONS)
     {
@@ -159,13 +162,19 @@ static int parse_commands(struct args_parser_args *args, int argc, const char *c
         if (argc == 4)
         {
             // TODO - set default depth.
+            // skip arguments.
+            (*argv) += 2;
         } else 
         {
             args->command_argv[2] = strstr((*argv)[4], "--depth=");
             if (args->command_argv[2])
             {
                 args->command_argv[2] = strstr(args->command_argv[2], "=") + 1; // get the value.
+            } else 
+            {
+                return -1;
             }
+            (*argv) += 3;
         }
 
     } else if (c_code == LIST   ||
@@ -186,6 +195,7 @@ static int parse_commands(struct args_parser_args *args, int argc, const char *c
         } else
         {
             args->command_argv[0] = (*argv)[2];
+            ++(*argv);
         }
     } else if (c_code == S_UNDO) 
     {
