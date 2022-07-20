@@ -34,7 +34,7 @@
 #define SESSION_KEEP  19
 
 // default values
-#define SESSION_FILE  ""
+#define SESSION_FILE  "" // TODO - set the default path of session file.
 
 // command representaion.
 struct command 
@@ -93,17 +93,21 @@ static inline int lookup_command(const char *c_name, struct command commands[],
     return INVALID;
 }
 
+
 static int parse_commands(struct args_parser_args *args, int argc, const char *c_name,
                           char *(*argv[]))
 {
     int c_code = lookup_command(c_name, commands,
                                 s_commands, 0);
     
-    if (c_code == MKDIR || 
-        c_code == S_MKDIR)
+    args->command = (char *) c_name;
+
+    if (c_code == MKDIR   || 
+        c_code == S_MKDIR ||
+        c_code == MKFILE  ||
+        c_code == S_MKFILE)
     {
-        if ( argc < 4) return -1; // check if mkdir has the right amount arguments.
-        args->command      = (char *) c_name;
+        if (argc < 4) return -1; // check if mkdir/mkfile has the right number of arguments.
         args->command_argv = (char **) malloc(sizeof(char *) * 3);
         if (args->command_argv == NULL) return -1; // failed to allocate memory.
 
@@ -111,47 +115,82 @@ static int parse_commands(struct args_parser_args *args, int argc, const char *c
         args->command_argv[0] = (strcmp((*argv)[2], ".") == 0)? getenv("PWD") : (*argv)[2]; // if user give . get current directory, otherwise the given path.
         args->command_argv[1] = (*argv)[3];
 
+        // TODO - check if path is valid?
+
         // if permissions is missing then.
         if (argc == 4)
         {
             args->command_argv[2] = "700"; // TODO - change it
-            ++(*argv); // skip mkdir's arguments.
+            (*argv) += 2; // skip mkdir's arguments.
         } else
         {
             args->command_argv[2] = (*argv)[3];
-            (*argv) += 2; // skip mkdir's arguments.
+            (*argv) += 3; // skip mkdir's arguments.
         }
-    } else if (c_code == MKFILE || 
-               S_MKFILE)
-    {
-
-    } else if (c_code == COPY ||
-               c_code == S_COPY)
-    {
-
-    } else if (c_code == MOVE ||
-               c_code == S_MOVE)
-    {
-
-    } else if (c_code == RENAME ||
+    } else if (c_code == COPY     ||
+               c_code == S_COPY   ||
+               c_code == MOVE     ||
+               c_code == S_MOVE   ||
+               c_code == RENAME   ||
                c_code == S_RENAME)
     {
+        if (argc < 4) return -1; // check if copy has the right number of arguments.
+        args->command_argv = (char **) malloc(sizeof(char *) * 2);
+        if (args->command_argv == NULL) return -1; // failed to allocate memory.
+
+        // TODO - check if path is valid?
+        args->will_run        = 0x1;
+        args->command_argv[0] = (strcmp((*argv)[2], ".") == 0)? getenv("PWD") : (*argv)[2]; // if user give . get current directory, otherwise the given path.
+        args->command_argv[1] = (*argv)[3];
 
     } else if (c_code == PERMISSIONS ||
                c_code == S_PERMISSIONS)
     {
+        if (argc < 4) return -1; // check if copy has the right number of arguments.
+        args->command_argv = (char **) malloc(sizeof(char *) * 2);
+        if (args->command_argv == NULL) return -1; // failed to allocate memory.
 
-    } else if (c_code == LIST ||
-               c_code == S_LIST)
-    {
+        // TODO - check if path is valid?
+        args->will_run        = 0x1;
+        args->command_argv[0] = (strcmp((*argv)[2], ".") == 0)? getenv("PWD") : (*argv)[2]; // if user give . get current directory, otherwise the given path.
+        args->command_argv[1] = (*argv)[3];
 
-    } else if (c_code == DELETE ||
+        // if depth is missing.
+        if (argc == 4)
+        {
+            // TODO - set default depth.
+        } else 
+        {
+            args->command_argv[2] = strstr((*argv)[4], "--depth=");
+            if (args->command_argv[2])
+            {
+                args->command_argv[2] = strstr(args->command_argv[2], "=") + 1; // get the value.
+            }
+        }
+
+    } else if (c_code == LIST   ||
+               c_code == S_LIST ||
+               c_code == DELETE ||
                c_code == S_DELETE)
     {
+        if (argc < 3) return -1; // check if copy has the right number of arguments.
+        args->command_argv = (char **) malloc(sizeof(char *) * 1);
+        if (args->command_argv == NULL) return -1; // failed to allocate memory.
 
-    } else if (c_code == S_UNDO)
+        // TODO - check if path is valid?
+        args->will_run = 0x1;
+
+        if (argc == 3) // get current path.
+        {
+            args->command_argv[0] = getenv("PWD"); // if user give . get current directory, otherwise the given path.
+        } else
+        {
+            args->command_argv[0] = (*argv)[2];
+        }
+    } else if (c_code == S_UNDO) 
     {
-
+        args->will_run = 0x1;
+        return 0; // we already has set the name of the command to execute.
     } else
     {
         return -1;
