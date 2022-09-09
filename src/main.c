@@ -1,13 +1,15 @@
 #include <bits/types/FILE.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
+#include <string.h>
+
 #include "args_parser.h"
 #include "commands.h"
 #include "session_utils.h"
 
-static inline __mode_t str_to_mode_t(const char *str) {
-    __mode_t converted = strtol(str, NULL, 8);
-
-    return converted;
+static inline mode_t str_to_mode_t(const char *str) {
+    return (mode_t) strtol(str, NULL, 8);
 }
 
 static inline unsigned int str_to_int(const char *str) {
